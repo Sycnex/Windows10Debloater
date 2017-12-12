@@ -117,6 +117,12 @@ There are now 2 versions of my Windows10Debloater - There is an interactive vers
 
 The interactive version is what it implies - a Windows10Debloater script with interactive prompts.
 
+# Interactive and Noninteractive switches
+
+When you run the Windows10Debloater Script you will notice that you are given two choices: 1) Interactive which does as it implies - it is interactive to the extent that you will be asked a few questions, such as if you'd like to Debloat or Revert, stop Edge from taking over as default and asking if you'd like to reboot your machine.
+
+2) Noninteractive will ask you only if you'd like to Debloat or Revert, and it explains that you won't be asked any further questions and that it'll show information on the screen. The default in the script for the Noninteractive switch is to not reboot the machine or stop Edge from taking over as default.
+
 # How To Run
 
 Download the Windows10Debloater.ps1 file. Next, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE.
