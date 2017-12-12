@@ -1,6 +1,16 @@
 #This function finds any AppX/AppXProvisioned package and uninstalls it, except for Freshpaint, Windows Calculator, Windows Store, and Windows Photos.
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
+If (Test-Path "C:\Windows10Debloater") {
+    Write-Output "C:\Windows10Debloater exists. Skipping."
+}
+Else {
+    Write-Output "The folder 'C:\Windows10Debloater' doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Sleep 1
+    New-Item -Path "C:\Windows10Debloater" -ItemType Directory
+}
+
+Start-Transcript -OutputDirectory "C:\Windows10Debloater"
 Function Start-Debloat {
     
     [CmdletBinding()]
@@ -144,7 +154,7 @@ Function Protect-Privacy {
     Write-Output "Disabling suggestions on the Start Menu"
     If ('HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager') {
         $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
-        Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 Verbose
+        Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
     }
         
     #Disables scheduled tasks that are considered unnecessary 
@@ -332,10 +342,10 @@ Function Enable-EdgePDF {
         Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723 -Verbose
     }
 }
-    
+
 #This switch will ask you if you'd like to run the script as interactive or silently. Depending on your selection, yes will be interactive, no will be silent.
 Write-Output "How would you like to run this script?"
-$ReadHost = Read-Host " ( Interactive / Silent ) "
+$ReadHost = Read-Host " ( Interactive / Noninteractive ) "
 Switch ($ReadHost) {
     Interactive {
         #Switch statement containing Debloat/Revert options
@@ -360,81 +370,120 @@ Switch ($ReadHost) {
                 Write-Output "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
                 Protect-Privacy
                 Write-Output "Cortana disabled from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
-                Sleep 1; $PublishSettings = $true
+                Sleep 1; $PublishSettings = $Debloat
     
                 Write-Output "Do you want to stop edge from taking over as the default PDF viewer?"
                 $ReadHost = Read-Host " (Yes / No ) "
                 Switch ($ReadHost) {
                     Yes {
                         Stop-EdgePDF
-                        Write-Output "Edge will no longer take over as the default PDF viewer."; $PublishSettings = $true
+                        Write-Output "Edge will no longer take over as the default PDF viewer."; $PublishSettings = $Yes
                     }
-                    No {$PublishSettings = $false}
+                    No {
+                        $PublishSettings = $No
+                    }
                 }
                 #Switch statement asking if you'd like to reboot your machine
                 Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
-                $Readhost = Read-Host " ( Yes / No ) "
+                $ReadHost = Read-Host " ( Yes / No ) " 
                 Switch ($Readhost) {
                     Yes {
                         Write-Output "Unloading the HKCR drive..."
                         Remove-PSDrive HKCR 
                         Sleep 1
-                        Write-Output "Initiating reboot."; $PublishSettings = $true
+                        Stop-Transcript
+                        Write-Output "Initiating reboot."
                         Sleep 2
-                        Restart-Computer
+                        Restart-Computer; $PublishSettings = $Yes
                     }
                     No {
                         Write-Output "Unloading the HKCR drive..."
                         Remove-PSDrive HKCR 
                         Sleep 1
+                        Stop-Transcript
                         Write-Output "Script has finished. Exiting."
                         Sleep 2
-                        Exit; $PublishSettings = $false
-                    }
-                }
-            }
-            Revert {
-                Write-Output "Reverting changes..."; $PublishSettings = $false
-                Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
-                New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-                Revert-Changes
-            
-                Write-Output "Do you want to revert changes that disabled Edge as the default PDF viewer?"
-                $ReadHost = Read-Host " (Yes / No ) "
-                Switch ($ReadHost) {
-                    Yes {
-                        Enable-EdgePDF
-                        Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; $PublishSettings = $true
-                    }
-                    No {$PublishSettings = $false}
-                }
-                #Switch statement asking if you'd like to reboot your machine
-                Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
-                $Readhost = Read-Host " ( Yes / No ) "
-                Switch ($Readhost) {
-                    Yes {
-                        Write-Output "Unloading the HKCR drive..."
-                        Remove-PSDrive HKCR 
-                        Sleep 1
-                        Write-Output "Initiating reboot."; $PublishSettings = $true
-                        Sleep 2
-                        Restart-Computer
-                    }
-                    No {
-                        Write-Output "Unloading the HKCR drive..."
-                        Remove-PSDrive HKCR 
-                        Sleep 1
-                        Write-Output "Script has finished. Exiting."
-                        Sleep 2
-                        Exit; $PublishSettings = $false
+                        Exit; $PublishSettings = $No
                     }
                 }
             }
         }
+        Revert {
+            Write-Output "Reverting changes..."
+            Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
+            New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+            Revert-Changes; $PublishSettings = $Revert
+            Write-Output "Do you want to revert changes that disabled Edge as the default PDF viewer?"
+            $ReadHost = Read-Host " (Yes / No ) "
+            Switch ($ReadHost) {
+                Yes {
+                    Enable-EdgePDF
+                    Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; $PublishSettings = $Yes
+                }
+                No {$PublishSettings = $No}
+            }
+            #Switch statement asking if you'd like to reboot your machine
+            Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
+            $Readhost = Read-Host " ( Yes / No ) "
+            Switch ($Readhost) {
+                Yes {
+                    Write-Output "Unloading the HKCR drive..."
+                    Remove-PSDrive HKCR 
+                    Sleep 1
+                    Write-Output "Initiating reboot."
+                    Stop-Transcript
+                    Sleep 2
+                    Restart-Computer; $PublishSettings = $Yes
+                }
+                No {
+                    Write-Output "Unloading the HKCR drive..."
+                    Remove-PSDrive HKCR 
+                    Sleep 1
+                    Write-Output "Script has finished. Exiting."
+                    Stop-Transcript
+                    Sleep 2
+                    Exit; $PublishSettings = $No
+                }
+            }
+        }
     }
-    Silent {
-        Start-Debloat
-        Remove-Keys
-        Protect-Privacy; $PublishSettings = $false
+    Noninteractive {
+        Write-Output "You will not be prompted for any other questions after this. With either option your machine will not automatically reboot and you will need to manually reboot. Would you like to Debloat or Revert changes?"
+        $Readhost = Read-Host " ( Debloat / Revert ) " 
+        Switch ($ReadHost) {
+            Debloat {
+                Write-Output "Uninstalling bloatware. Please wait."
+                Start-Debloat
+                Write-Output "Removing leftover bloatware registry keys."
+                Sleep 1
+                Remove-Keys
+                Write-Output "Stopping Edge from being used as the default PDF Viewer."
+                Sleep 1
+                Protect-Privacy
+                Write-Output "Script has finished. Exiting now."
+                Sleep 2
+                Stop-Transcript
+                Exit; $PublishSettings = $Debloat
+            }
+            Revert {
+                Write-Output "Reverting changes..."
+                Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
+                New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+                Write-Output "Reinstalling bloatware. Please wait."
+                Revert-Changes
+                Write-Output "Bloatware has been reinstalled."
+                Write-Output "Setting Edge back to being the default PDF Viewer."
+                Sleep 1
+                Enable-EdgePDF 
+                Write-Output "Edge has been set back to being the default PDF Viewer"
+                Write-Output "Unloading the HKCR drive..."
+                Remove-PSDrive HKCR
+                Sleep 1
+                Write-Output "Script has finished. Exiting now."
+                Stop-Transcript
+                Sleep 2
+                Exit; $PublishSettings = $Revert
+            }
+        }
     }
 }
