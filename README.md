@@ -56,7 +56,7 @@ Camera,
 Maps,
 Phone,
 SoundRecorder,
-Store,
+
 XboxApp,
 Zune Music,
 Zune Video,
