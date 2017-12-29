@@ -19,7 +19,7 @@ Function Start-Debloat {
     
     #Removes AppxPackages
     Get-AppxPackage -AllUsers | 
-        Where-Object {$_.name -notlike "*Microsoft.FreshPaint*"} | 
+        Where-Object {$_.name -notlike "*Microsoft.Paint3D*"} | 
         Where-Object {$_.name -notlike "*Microsoft.WindowsCalculator*"} |
         Where-Object {$_.name -notlike "*Microsoft.WindowsStore*"} | 
         Where-Object {$_.name -notlike "*Microsoft.Windows.Photos*"} |
@@ -27,7 +27,7 @@ Function Start-Debloat {
             
     #Removes AppxProvisionedPackages
     Get-AppxProvisionedPackage -online |
-        Where-Object {$_.packagename -notlike "*Microsoft.FreshPaint*"} |
+        Where-Object {$_.packagename -notlike "*Microsoft.Paint3D*"} |
         Where-Object {$_.packagename -notlike "*Microsoft.WindowsCalculator*"} |
         Where-Object {$_.name -notlike "*Microsoft.WindowsStore*"} |
         Where-Object {$_.name -notlike "*Microsoft.Windows.Photos*"} |
