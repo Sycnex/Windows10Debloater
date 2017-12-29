@@ -407,7 +407,6 @@ Switch ($ReadHost) {
                     }
                 }
             }
-        }
         Revert {
             Write-Output "Reverting changes..."
             Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
@@ -443,6 +442,7 @@ Switch ($ReadHost) {
                     Stop-Transcript
                     Sleep 2
                     Exit; $PublishSettings = $No
+                    }
                 }
             }
         }
@@ -483,7 +483,7 @@ Switch ($ReadHost) {
                 Stop-Transcript
                 Sleep 2
                 Exit; $PublishSettings = $Revert
+                }
             }
         }
     }
-}
