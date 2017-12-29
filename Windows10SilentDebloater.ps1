@@ -4,12 +4,24 @@
 #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
 param([switch]$Debloat)
 
+param([switch]$SysPrep)
+
+param([switch]$StopEdgePDF)
+
+#This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
+Function Begin-SysPrep {
+
+    param([switch]$SysPrep)
+
+    get-appxpackage | remove-appxpackage
+
+}
+
 #Creates a PSDrive to be able to access the 'HKCR' tree
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
 Function Start-Debloat {
     
-    param
-    ([switch]$Debloat)
+    param([switch]$Debloat)
 
     #Removes AppxPackages
     Get-AppxPackage -AllUsers | 
@@ -27,6 +39,7 @@ Function Start-Debloat {
         Where-Object {$_.packagename -notlike "*Microsoft.Windows.Photos*"} |
         Remove-AppxProvisionedPackage -online -ErrorAction SilentlyContinue
 }
+
 Function Remove-Keys {
         
     Param([switch]$Debloat)    
@@ -209,6 +222,8 @@ Function Stop-EdgePDF {
         Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ -Verbose
     }
 }
+Write-Output "Initiating Sysprep"
+Begin-SysPrep
 Write-Output "Removing bloatware apps."
 Start-Debloat
 Write-Output "Removing leftover bloatware registry keys."
