@@ -127,7 +127,23 @@ When you run the Windows10Debloater Script you will notice that you are given tw
 
 Download the Windows10Debloater.ps1 file. Next, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE.
 
-Alternatively, download the Windows10DebloaterSilent.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit), change to the directory where you placed the Windows10DebloaterSilent.ps1 file, and add the switch parameter -Debloat: E.g., C:\Windows10DebloaterSilent.ps1 -Debloat
+Alternatively, download the Windows10SilentDebloater.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit), change to the directory where you placed the Windows10SilentDebloater.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\WWindows10SilentDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
+
+# Switch Parameters
+
+There are 3 switch parameters in the Windows10SilentDebloater.ps1 script.
+
+The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
+
+The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
+
+Start-Debloat removes all bloatware apps (that are listed above) without removing Store, Photos, Paint3d, and Calculator.
+
+Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
+
+Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
+
+Finally, there is an optional switch parameter which is Stop-EdgePDF. This just stops Edge from taking over as the default PDF viewer. I made this optional since some do not find this necessary for them or their organization.
 
 # Credit
 
