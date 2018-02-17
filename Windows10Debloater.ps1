@@ -19,18 +19,18 @@ Function Start-Debloat {
     
     #Removes AppxPackages
     Get-AppxPackage -AllUsers | 
-        Where-Object {$_.name -notlike "*Microsoft.Paint3D*"} | 
-        Where-Object {$_.name -notlike "*Microsoft.WindowsCalculator*"} |
-        Where-Object {$_.name -notlike "*Microsoft.WindowsStore*"} | 
-        Where-Object {$_.name -notlike "*Microsoft.Windows.Photos*"} |
+        Where-Object {$_.name -notcontains "Microsoft.Paint3D"} | 
+        Where-Object {$_.name -notcontains "Microsoft.WindowsCalculator"} |
+        Where-Object {$_.name -notcontains "Microsoft.WindowsStore"} | 
+        Where-Object {$_.name -notcontains "Microsoft.Windows.Photos"} |
         Remove-AppxPackage -ErrorAction SilentlyContinue
             
     #Removes AppxProvisionedPackages
     Get-AppxProvisionedPackage -online |
-        Where-Object {$_.packagename -notlike "*Microsoft.Paint3D*"} |
-        Where-Object {$_.packagename -notlike "*Microsoft.WindowsCalculator*"} |
-        Where-Object {$_.packagename -notlike "*Microsoft.WindowsStore*"} |
-        Where-Object {$_.packagename -notlike "*Microsoft.Windows.Photos*"} |
+        Where-Object {$_.packagename -notcontains "Microsoft.Paint3D"} |
+        Where-Object {$_.packagename -notcontains "Microsoft.WindowsCalculator"} |
+        Where-Object {$_.packagename -notcontains "Microsoft.WindowsStore"} |
+        Where-Object {$_.packagename -notcontains "Microsoft.Windows.Photos"} |
         Remove-AppxProvisionedPackage -online -ErrorAction SilentlyContinue
 }
 Function Remove-Keys {
