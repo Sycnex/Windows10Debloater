@@ -24,20 +24,10 @@ Function Start-Debloat {
     param([switch]$Debloat)
 
     #Removes AppxPackages
-    Get-AppxPackage -AllUsers | 
-        Where-Object {$_.name -notcontains "Microsoft.Paint3D"} | 
-        Where-Object {$_.name -notcontains "Microsoft.WindowsCalculator"} |
-        Where-Object {$_.name -notcontains "Microsoft.WindowsStore"} | 
-        Where-Object {$_.name -notcontains "Microsoft.Windows.Photos"} |
-        Remove-AppxPackage -ErrorAction SilentlyContinue
-            
-    #Removes AppxProvisionedPackages
-    Get-AppxProvisionedPackage -online |
-        Where-Object {$_.packagename -notcontains "Microsoft.Paint3D"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.WindowsCalculator"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.WindowsStore"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.Windows.Photos"} |
-        Remove-AppxProvisionedPackage -online -ErrorAction SilentlyContinue
+    #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
+    [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos'
+    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
+    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
 }
 
 Function Remove-Keys {
@@ -229,6 +219,7 @@ Function FixWhitelistedApps {
     
     If(!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
     
+    #Credit to abulgatz for the 4 lines of code
     Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
     Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
     Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
