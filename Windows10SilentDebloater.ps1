@@ -222,12 +222,26 @@ Function Stop-EdgePDF {
         Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ -Verbose
     }
 }
+
+Function FixWhitelistedApps {
+    
+    Param([switch]$Debloat)
+    
+    If(!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
+    
+    Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} } }
+}
+
 Write-Output "Initiating Sysprep"
 Begin-SysPrep
 Write-Output "Removing bloatware apps."
 Start-Debloat
 Write-Output "Removing leftover bloatware registry keys."
 Remove-Keys
+Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
 Write-Output "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
 Protect-Privacy
 Write-Output "Stopping Edge from taking over as the default PDF Viewer."
