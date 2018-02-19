@@ -18,20 +18,9 @@ Function Start-Debloat {
     Param()
     
     #Removes AppxPackages
-    Get-AppxPackage -AllUsers | 
-        Where-Object {$_.name -notcontains "Microsoft.Paint3D"} | 
-        Where-Object {$_.name -notcontains "Microsoft.WindowsCalculator"} |
-        Where-Object {$_.name -notcontains "Microsoft.WindowsStore"} | 
-        Where-Object {$_.name -notcontains "Microsoft.Windows.Photos"} |
-        Remove-AppxPackage -ErrorAction SilentlyContinue
-            
-    #Removes AppxProvisionedPackages
-    Get-AppxProvisionedPackage -online |
-        Where-Object {$_.packagename -notcontains "Microsoft.Paint3D"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.WindowsCalculator"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.WindowsStore"} |
-        Where-Object {$_.packagename -notcontains "Microsoft.Windows.Photos"} |
-        Remove-AppxProvisionedPackage -online -ErrorAction SilentlyContinue
+    [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos'
+    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
+    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
 }
 Function Remove-Keys {
         
@@ -343,6 +332,19 @@ Function Enable-EdgePDF {
     }
 }
 
+Function FixWhitelistedApps {
+    
+    [CmdletBinding()]
+            
+    Param()
+    
+    If(!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
+    
+    Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} } }
+
 #This switch will ask you if you'd like to run the script as interactive or silently. Depending on your selection, yes will be interactive, no will be silent.
 Write-Output "How would you like to run this script?"
 $ReadHost = Read-Host " ( Interactive / Noninteractive ) "
@@ -366,6 +368,10 @@ Switch ($ReadHost) {
                 Write-Output "Removing specific registry keys."
                 Remove-Keys
                 Write-Output "Leftover bloatware registry keys removed."
+                Sleep 1
+                Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+                Sleep 1
+                FixWhitelistedApps
                 Sleep 1
                 Write-Output "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
                 Protect-Privacy
@@ -457,6 +463,11 @@ Switch ($ReadHost) {
                 Write-Output "Removing leftover bloatware registry keys."
                 Sleep 1
                 Remove-Keys
+                Sleep 1
+                Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+                Sleep 1
+                FixWhitelistedApps
+                Sleep 1
                 Write-Output "Stopping Edge from being used as the default PDF Viewer."
                 Sleep 1
                 Protect-Privacy
