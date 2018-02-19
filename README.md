@@ -147,7 +147,7 @@ Finally, there is an optional switch parameter which is Stop-EdgePDF. This just 
 
 # Credit
 
-Thank you to a60wattfish for some of the suggestions that I have placed into my scripts. 
+Thank you to a60wattfish and Reddit user /u/GavinEke for some of the suggestions/fixes that I have placed into my scripts. 
 
 # Donate 
 
