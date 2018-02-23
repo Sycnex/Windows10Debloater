@@ -131,7 +131,7 @@ Alternatively, download the Windows10SilentDebloater.ps1 file, place it in any d
 
 # Switch Parameters
 
-There are 3 switch parameters in the Windows10SilentDebloater.ps1 script.
+There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
 
 The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
 
