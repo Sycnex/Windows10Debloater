@@ -429,7 +429,9 @@ switch ($ReadHost) {
             Enable-EdgePDF
             Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; $PublishSettings = $Yes
           }
-          No { $PublishSettings = $No }
+          No {
+            $PublishSettings = $No
+          }
         }
         #Switch statement asking if you'd like to reboot your machine
         Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
