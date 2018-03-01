@@ -2,7 +2,7 @@
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
 #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
-param([switch]$Debloat)
+param ([switch]$Debloat)
 
 param ([switch]$SysPrep)
 
@@ -11,7 +11,7 @@ param ([switch]$StopEdgePDF)
 #This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 function Begin-SysPrep {
 
-  param([switch]$SysPrep)
+  param ([switch]$SysPrep)
 
   Get-AppxPackage | Remove-AppxPackage -ErrorAction SilentlyContinue
 
@@ -21,7 +21,7 @@ function Begin-SysPrep {
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
 function Start-Debloat {
 
-  param([switch]$Debloat)
+  param ([switch]$Debloat)
 
   #Removes AppxPackages
   #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
@@ -32,7 +32,7 @@ function Start-Debloat {
 
 function Remove-Keys {
 
-  param([switch]$Debloat)
+  param ([switch]$Debloat)
 
   #These are the registry keys that it will delete.
 
@@ -78,7 +78,7 @@ function Remove-Keys {
 
 function Protect-Privacy {
 
-  param([switch]$Debloat)
+  param ([switch]$Debloat)
 
   #Creates a PSDrive to be able to access the 'HKCR' tree
   New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -160,7 +160,7 @@ function Protect-Privacy {
   Set-ItemProperty -Path Registry::HKU\Default_User\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager -Name OemPreInstalledAppsEnabled -Value 0
   reg unload HKU\Default_User
 
-  #Disables scheduled tasks that are considered unnecessary 
+  #Disables scheduled tasks that are considered unnecessary
   Write-Output "Disabling scheduled tasks"
   Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
   Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask
@@ -172,7 +172,7 @@ function Protect-Privacy {
 
 function Stop-EdgePDF {
 
-  param([switch]$StopEdgePDF)
+  param ([switch]$StopEdgePDF)
 
   #Stops edge from taking over as the default .PDF viewer
   Write-Output "Stopping Edge from taking over as the default .PDF viewer"
@@ -215,7 +215,7 @@ function Stop-EdgePDF {
 
 function FixWhitelistedApps {
 
-  param([switch]$Debloat)
+  param ([switch]$Debloat)
 
   if (!(Get-AppxPackage -AllUsers | Select-Object Microsoft.Paint3D,Microsoft.WindowsCalculator,Microsoft.WindowsStore,Microsoft.Windows.Photos)) {
 
