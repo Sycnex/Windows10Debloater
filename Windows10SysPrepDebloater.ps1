@@ -25,7 +25,7 @@ function Start-Debloat {
 
   #Removes AppxPackages
   #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
-  [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos'
+  [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
   Get-AppxPackage -AllUsers | Where-Object { $_.Name -notmatch $WhitelistedApps } | Remove-AppxPackage -ErrorAction SilentlyContinue
   Get-AppxProvisionedPackage -Online | Where-Object { $_.PackageName -notmatch $WhitelistedApps } | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
 }
@@ -162,12 +162,12 @@ function Protect-Privacy {
 
   #Disables scheduled tasks that are considered unnecessary
   Write-Output "Disabling scheduled tasks"
-  Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
-  Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask
-  Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask
-  Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask
-  Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask
-  Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask
+  Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
 }
 
 function Stop-EdgePDF {

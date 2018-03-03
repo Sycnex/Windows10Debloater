@@ -19,7 +19,7 @@ function Start-Debloat {
 
   #Removes AppxPackages
   #Credit to /u/GavinEke for a modified version of my whitelist code
-  [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos'
+  [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
   Get-AppxPackage -AllUsers | Where-Object { $_.Name -notmatch $WhitelistedApps } | Remove-AppxPackage -ErrorAction SilentlyContinue
   Get-AppxProvisionedPackage -Online | Where-Object { $_.PackageName -notmatch $WhitelistedApps } | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
 }
@@ -285,12 +285,12 @@ function Revert-Changes {
 
   #Re-enables scheduled tasks that were disabled when running the Debloat switch
   Write-Output "Enabling scheduled tasks that were disabled"
-  Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask
-  Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask
-  Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask
-  Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask
-  Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask
-  Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask
+  Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask -ErrorAction SilentlyContinue
+  Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask -ErrorAction SilentlyContinue
 }
 
 function Enable-EdgePDF {
