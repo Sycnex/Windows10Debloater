@@ -162,12 +162,12 @@ Function Protect-Privacy {
     
     #Disables scheduled tasks that are considered unnecessary 
     Write-Output "Disabling scheduled tasks"
-    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
-    Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask
-    Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask
-    Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask
-    Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask
-    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask
+    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
 }
     
 Function Stop-EdgePDF {
