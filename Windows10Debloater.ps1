@@ -285,12 +285,12 @@ Function Revert-Changes {
         
     #Re-enables scheduled tasks that were disabled when running the Debloat switch
     Write-Output "Enabling scheduled tasks that were disabled"
-    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask
-    Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask
-    Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask
-    Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask
-    Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask
-    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask
+    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask -ErrorAction SilentlyContinue
 }
     
 Function Enable-EdgePDF {
