@@ -119,9 +119,9 @@ The interactive version is what it implies - a Windows10Debloater script with in
 
 # How To Run
 
-Download the Windows10Debloater.ps1 file. Next, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE/VSCode/etc.
+Download the Windows10Debloater.ps1 file. Next, open PowerShell ISE/VSCode as an Administrator, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE/VSCode/etc and run it.
 
-Alternatively, download the Windows10SysPrep.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit), change to the directory where you placed the Windows10SysPrep.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\WWindows10SilentDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
+Alternatively, download the Windows10SysPrepDebloater.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit)/VSCode as an administrator, change to the directory where you placed the Windows10SysPrepDebloater.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\Windows10SysPrepDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
 
 # Switch Parameters
 
