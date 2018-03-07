@@ -113,21 +113,15 @@ This comes in hand when setting up new Windows 10 machines without needing to ma
 
 # Silent and Interactive
 
-There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameter: -Debloat. The silent version can be useful for deploying MDT Images or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameter: -Debloat. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
-The interactive version is what it implies - a Windows10Debloater script with interactive prompts.
-
-# Interactive and Noninteractive switches
-
-When you run the Windows10Debloater Script you will notice that you are given two choices: 1) Interactive which does as it implies - it is interactive to the extent that you will be asked a few questions, such as if you'd like to Debloat or Revert, stop Edge from taking over as default and asking if you'd like to reboot your machine.
-
-2) Noninteractive will ask you only if you'd like to Debloat or Revert, and it explains that you won't be asked any further questions and that it'll show information on the screen. The default in the script for the Noninteractive switch is to not reboot the machine or stop Edge from taking over as default.
+The interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters.
 
 # How To Run
 
-Download the Windows10Debloater.ps1 file. Next, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE.
+Download the Windows10Debloater.ps1 file. Next, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE/VSCode/etc.
 
-Alternatively, download the Windows10SilentDebloater.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit), change to the directory where you placed the Windows10SilentDebloater.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\WWindows10SilentDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
+Alternatively, download the Windows10SysPrep.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit), change to the directory where you placed the Windows10SysPrep.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\WWindows10SilentDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
 
 # Switch Parameters
 
