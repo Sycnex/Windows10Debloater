@@ -2,11 +2,10 @@
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
 #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
-param([switch]$Debloat)
 
-param([switch]$SysPrep)
-
-param([switch]$StopEdgePDF)
+param (
+  [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF
+)
 
 #This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 Function Begin-SysPrep {
