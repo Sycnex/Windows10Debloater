@@ -1,7 +1,9 @@
 # Windows10Debloater
 Script/Utility to debloat Windows 10
 
-# This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. These registry keys are:
+# This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
+
+These registry keys are:
 
 EclipseManager,
 ActiproSoftwareLLC,
@@ -56,7 +58,6 @@ Camera,
 Maps,
 Phone,
 SoundRecorder,
-
 XboxApp,
 Zune Music,
 Zune Video,
@@ -113,7 +114,7 @@ This comes in hand when setting up new Windows 10 machines without needing to ma
 
 # Silent and Interactive
 
-There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameter: -Debloat. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameters: -Sysprep, -Debloat, and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
 The interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters.
 
