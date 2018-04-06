@@ -232,6 +232,7 @@ Start-Debloat
 Write-Output "Removing leftover bloatware registry keys."
 Remove-Keys
 Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+FixWhitelistedApps
 Write-Output "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
 Protect-Privacy
 Write-Output "Stopping Edge from taking over as the default PDF Viewer."
