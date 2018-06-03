@@ -1,6 +1,13 @@
 #This function finds any AppX/AppXProvisioned package and uninstalls it, except for Freshpaint, Windows Calculator, Windows Store, and Windows Photos.
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
+#Checks for the script running as admin and if it's not then restarts the script in admin
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
+  Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+  Exit
+}
+
 If (Test-Path "C:\Windows10Debloater") {
     Write-Output "C:\Windows10Debloater exists. Skipping."
 }
@@ -11,6 +18,10 @@ Else {
 }
 
 Start-Transcript -OutputDirectory "C:\Windows10Debloater"
+
+#no errors throughout
+$ErrorActionPreference = 'silentlycontinue'
+
 Function Start-Debloat {
     
     [CmdletBinding()]
@@ -20,8 +31,8 @@ Function Start-Debloat {
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
     [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI'
-    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
-    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
+    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
 }
 Function Remove-Keys {
         
@@ -67,7 +78,7 @@ Function Remove-Keys {
     #This writes the output of each key it is removing and also removes the keys listed above.
     ForEach ($Key in $Keys) {
         Write-Output "Removing $Key from registry"
-        Remove-Item $Key -Recurse -ErrorAction SilentlyContinue
+        Remove-Item $Key -Recurse
     }
 }
             
@@ -97,18 +108,18 @@ Function Protect-Privacy {
     $Period2 = 'HKCU:\Software\Microsoft\Siuf\Rules'
     $Period3 = 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
     If (!(Test-Path $Period3)) { 
-        mkdir $Period1 -ErrorAction SilentlyContinue
-        mkdir $Period2 -ErrorAction SilentlyContinue
-        mkdir $Period3 -ErrorAction SilentlyContinue
-        New-ItemProperty $Period3 -Name PeriodInNanoSeconds -Value 0 -Verbose -ErrorAction SilentlyContinue
+        mkdir $Period1
+        mkdir $Period2
+        mkdir $Period3
+        New-ItemProperty $Period3 -Name PeriodInNanoSeconds -Value 0 -Verbose
     }
                    
     Write-Output "Adding Registry key to prevent bloatware apps from returning"
     #Prevents bloatware applications from returning
     $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
     If (!(Test-Path $registryPath)) {
-        Mkdir $registryPath -ErrorAction SilentlyContinue
-        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+        Mkdir $registryPath 
+        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose 
     }          
         
     Write-Output "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
@@ -121,7 +132,7 @@ Function Protect-Privacy {
     Write-Output "Disabling live tiles"
     $Live = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'    
     If (!(Test-Path $Live)) {
-        mkdir $Live -ErrorAction SilentlyContinue     
+        mkdir $Live      
         New-ItemProperty $Live -Name NoTileApplicationNotification -Value 1 -Verbose
     }
         
@@ -136,7 +147,7 @@ Function Protect-Privacy {
     Write-Output "Disabling People icon on Taskbar"
     $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
     If (!(Test-Path $People)) {
-        mkdir $People -ErrorAction SilentlyContinue
+        mkdir $People 
         New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
     }
     
@@ -163,32 +174,32 @@ Function Stop-EdgePDF {
     #Stops edge from taking over as the default .PDF viewer
     If (!(Get-ItemProperty 'HKCR:\.pdf' -Name NoOpenWith)) {
         $NoOpen = 'HKCR:\.pdf'
-        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose 
     }
         
     If (!(Get-ItemProperty 'HKCR:\.pdf' -Name NoStaticDefaultVerb)) {
         $NoStatic = 'HKCR:\.pdf'
-        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose 
     }
         
     If (!(Get-ItemProperty 'HKCR:\.pdf\OpenWithProgids' -Name NoOpenWith)) {
         $NoOpen = 'HKCR:\.pdf\OpenWithProgids'
-        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose 
     }
         
     If (!(Get-ItemProperty 'HKCR:\.pdf\OpenWithProgids' -Name NoStaticDefaultVerb)) {
         $NoStatic = 'HKCR:\.pdf\OpenWithProgids'
-        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose 
     }
         
     If (!(Get-ItemProperty 'HKCR:\.pdf\OpenWithList' -Name NoOpenWith)) {
         $NoOpen = 'HKCR:\.pdf\OpenWithList'
-        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoOpen -Name NoOpenWith -Verbose 
     }
         
     If (!(Get-ItemProperty 'HKCR:\.pdf\OpenWithList' -Name NoStaticDefaultVerb)) {
         $NoStatic = 'HKCR:\.pdf\OpenWithList'
-        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $NoStatic -Name NoStaticDefaultVerb -Verbose 
     }
         
     #Appends an underscore '_' to the Registry key for Edge
@@ -197,6 +208,7 @@ Function Stop-EdgePDF {
         Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ -Verbose
     }
 }
+
 Function Revert-Changes {   
             
     [CmdletBinding()]
@@ -206,7 +218,7 @@ Function Revert-Changes {
     #This function will revert the changes you made when running the Start-Debloat function.
         
     #This line reinstalls all of the bloatware that was removed
-    Get-AppxPackage -AllUsers | ForEach {Add-AppxPackage -Verbose -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} -ErrorAction SilentlyContinue
+    Get-AppxPackage -AllUsers | ForEach {Add-AppxPackage -Verbose -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
         
     Write-Output "Re-enabling key to show advertisement information"
     #Tells Windows to enable your advertising information.
@@ -227,7 +239,7 @@ Function Revert-Changes {
     If (!('HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds')) { 
         mkdir 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
         $Period = 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
-        New-Item $Period -ErrorAction SilentlyContinue
+        New-Item $Period 
         Set-ItemProperty -Name PeriodInNanoSeconds -Value 1 -Verbose
     }
                    
@@ -235,8 +247,8 @@ Function Revert-Changes {
     #Enables bloatware applications
     If ('HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent') {
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
-        Mkdir $registryPath -ErrorAction SilentlyContinue
-        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 0 -Verbose -ErrorAction SilentlyContinue
+        Mkdir $registryPath 
+        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 0 -Verbose 
     }
         
     #Changes Mixed Reality Portal Key 'FirstRunSucceeded' to 1
@@ -249,17 +261,17 @@ Function Revert-Changes {
     #Re-enables live tiles
     Write-Output "Enabling live tiles"
     If ('HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications') {
-        mkdir 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications' -ErrorAction SilentlyContinue       
+        mkdir 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'        
         $Live = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'
-        New-ItemProperty $Live -Name NoTileApplicationNotification -Value 0 -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $Live -Name NoTileApplicationNotification -Value 0 -Verbose 
     }
                
     Write-Output "Changing the 'Cloud Content' registry key value to 1 to allow bloatware apps to reinstall"
     #Prevents bloatware applications from returning
     If ("HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\") {
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
-        Mkdir $registryPath -ErrorAction SilentlyContinue
-        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+        Mkdir $registryPath 
+        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose 
     }
         
     #Re-enables data collection
@@ -273,7 +285,7 @@ Function Revert-Changes {
     Write-Output "Enabling People icon on Taskbar"
     If ('HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People') {
         $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
-        New-ItemProperty $People -Name PeopleBand -Value 1 -Verbose -ErrorAction SilentlyContinue
+        New-ItemProperty $People -Name PeopleBand -Value 1 -Verbose 
     }
     
     #Re-enables suggestions on start menu
@@ -285,12 +297,12 @@ Function Revert-Changes {
         
     #Re-enables scheduled tasks that were disabled when running the Debloat switch
     Write-Output "Enabling scheduled tasks that were disabled"
-    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask -ErrorAction SilentlyContinue
-    Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask -ErrorAction SilentlyContinue
-    Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask -ErrorAction SilentlyContinue
-    Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask -ErrorAction SilentlyContinue
-    Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask -ErrorAction SilentlyContinue
-    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask -ErrorAction SilentlyContinue
+    Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Enable-ScheduledTask 
+    Get-ScheduledTask -TaskName XblGameSaveTask | Enable-ScheduledTask 
+    Get-ScheduledTask -TaskName Consolidator | Enable-ScheduledTask 
+    Get-ScheduledTask -TaskName UsbCeip | Enable-ScheduledTask 
+    Get-ScheduledTask -TaskName DmClient | Enable-ScheduledTask 
+    Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Enable-ScheduledTask 
 }
     
 Function Enable-EdgePDF {
@@ -350,13 +362,21 @@ Function FixWhitelistedApps {
 }
 
 
-#Switch statement containing Debloat/Revert options
-Write-Output "The following options will allow you to either Debloat Windows 10, or to revert changes made after Debloating Windows 10.
-        Choose 'Debloat' to Debloat Windows 10 or choose 'Revert' to revert changes made by this script." 
-$Readhost = Read-Host " ( Debloat / Revert ) " 
-Switch ($ReadHost) {
+#GUI prompt Debloat/Revert options and GUI variables
+$Button = [Windows.MessageBoxButton]::YesNo
+$ErrorIco = [Windows.MessageBoxImage]::Error
+$Warn = [Windows.MessageBoxImage]::Warning
+$Ask = 'The following will allow you to either Debloat Windows 10, or to revert changes made after Debloating Windows 10.
+        Choose "Yes" to Debloat Windows 10
+        Choose "No" to revert changes made by this script.'
+$EdgePdf = 'Do you want to stop edge from taking over as the default PDF viewer?'
+$EdgePdf2 = 'Do you want to revert changes that disabled Edge as the default PDF viewer?'
+$Reboot = 'For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?'
+
+$Prompt1 = [Windows.MessageBox]::Show($Ask,'Debloat or Revert',$Button,$ErrorIco) 
+Switch ($Prompt1) {
     #This will debloat Windows 10
-    Debloat {
+    Yes {
         #Creates a "drive" to access the HKCR (HKEY_CLASSES_ROOT)
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -377,10 +397,9 @@ Switch ($ReadHost) {
         Protect-Privacy
         Write-Output "Cortana disabled from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
         Start-Sleep 1; $PublishSettings = $Debloat
-    
-        Write-Output "Do you want to stop edge from taking over as the default PDF viewer?"
-        $ReadHost = Read-Host " (Yes / No ) "
-        Switch ($ReadHost) {
+
+        $Prompt2 = [Windows.MessageBox]::Show($EdgePdf,'Edge PDF',$Button,$Warn)
+        Switch ($Prompt2) {
             Yes {
                 Stop-EdgePDF
                 Write-Output "Edge will no longer take over as the default PDF viewer."; $PublishSettings = $Yes
@@ -389,10 +408,9 @@ Switch ($ReadHost) {
                 $PublishSettings = $No
             }
         }
-        #Switch statement asking if you'd like to reboot your machine
-        Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
-        $ReadHost = Read-Host " ( Yes / No ) " 
-        Switch ($Readhost) {
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt3 = [Windows.MessageBox]::Show($Reboot,'Reboot',$Button,$Warn) 
+        Switch ($Prompt3) {
             Yes {
                 Write-Output "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
@@ -413,24 +431,23 @@ Switch ($ReadHost) {
             }
         }
     }
-    Revert {
+    No {
         Write-Output "Reverting changes..."
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         Revert-Changes; $PublishSettings = $Revert
-        Write-Output "Do you want to revert changes that disabled Edge as the default PDF viewer?"
-        $ReadHost = Read-Host " (Yes / No ) "
-        Switch ($ReadHost) {
+        #Prompt asking to revert edge changes as well
+        $Prompt4 = [Windows.MessageBox]::Show($EdgePdf2,'Revert Edge',$Button,$ErrorIco)
+        Switch ($Prompt4) {
             Yes {
                 Enable-EdgePDF
                 Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; $PublishSettings = $Yes
             }
             No {$PublishSettings = $No}
         }
-        #Switch statement asking if you'd like to reboot your machine
-        Write-Output "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
-        $Readhost = Read-Host " ( Yes / No ) "
-        Switch ($Readhost) {
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt5 = [Windows.MessageBox]::Show($Reboot,'Reboot',$Button,$Warn)
+        Switch ($Prompt5) {
             Yes {
                 Write-Output "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
