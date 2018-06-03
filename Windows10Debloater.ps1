@@ -363,12 +363,16 @@ Function FixWhitelistedApps {
 
 
 #GUI prompt Debloat/Revert options and GUI variables
-$Button = [Windows.MessageBoxButton]::YesNo
+$Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
 $Warn = [Windows.MessageBoxImage]::Warning
-$Ask = 'The following will allow you to either Debloat Windows 10, or to revert changes made after Debloating Windows 10.
-        Choose "Yes" to Debloat Windows 10
-        Choose "No" to revert changes made by this script.'
+$Ask = 'The following will allow you to either Debloat Windows 10 or to revert changes made after Debloating Windows 10.
+
+        Select "Yes" to Debloat Windows 10
+
+        Select "No" to Revert changes made by this script
+        
+        Select "Cancel" to stop the script.'
 $EdgePdf = 'Do you want to stop edge from taking over as the default PDF viewer?'
 $EdgePdf2 = 'Do you want to revert changes that disabled Edge as the default PDF viewer?'
 $Reboot = 'For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?'
@@ -467,5 +471,8 @@ Switch ($Prompt1) {
                 Exit; $PublishSettings = $No
             }
         }
+    }
+    Cancel {
+    Exit-PSSession
     }
 }
