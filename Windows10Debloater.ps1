@@ -34,6 +34,7 @@ Function Start-Debloat {
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
 }
+
 Function Remove-Keys {
         
     [CmdletBinding()]
@@ -117,9 +118,19 @@ Function Protect-Privacy {
     Write-Output "Adding Registry key to prevent bloatware apps from returning"
     #Prevents bloatware applications from returning
     $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
+    $registryOEM = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
     If (!(Test-Path $registryPath)) {
         Mkdir $registryPath 
         New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose 
+    }
+    If (!(Test-Path $registryOEM)) {
+        Mkdir $registryOEM
+        Set-ItemProperty $registryOEM -Name ContentDeliveryAllowed -Value 0 -Verbose
+        Set-ItemProperty $registryOEM -Name OemPreInstalledAppsEnabled -Value 0 -Verbose
+        Set-ItemProperty $registryOEM -Name PreInstalledAppsEnabled -Value 0 -Verbose
+        Set-ItemProperty $registryOEM -Name PreInstalledAppsEverEnabled -Value 0 -Verbose
+        Set-ItemProperty $registryOEM -Name SilentInstalledAppsEnabled -Value 0 -Verbose
+        Set-ItemProperty $registryOEM -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
     }          
         
     Write-Output "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
