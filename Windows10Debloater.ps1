@@ -460,15 +460,15 @@ Function UninstallOneDrive {
     $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
     $ExplorerReg2 = "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
 	Stop-Process OneDrive
-	Start-Sleep 3
+	Start-Sleep 2
 	If (!(Test-Path $onedrive)) {
 		$onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
 	}
 	Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
-	Start-Sleep 3
+	Start-Sleep 2
     Write-Output "Stopping explorer"
     Start-Sleep 1
-	Stop-Process explorer.exe
+	.\taskkill.exe /F /IM explorer.exe
 	Start-Sleep 3
     Write-Output "Removing leftover files"
 	Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
@@ -487,7 +487,7 @@ Function UninstallOneDrive {
     }
     Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0 -Verbose
     Write-Output "Restarting Explorer that was shut down before."
-    Start-Process explorer.exe
+    Start explorer.exe -NoNewWindow
 }
 
 #GUI prompt Debloat/Revert options and GUI variables
