@@ -94,24 +94,24 @@ Function Protect-Privacy {
     Write-Output "Disabling Windows Feedback Experience program"
     $Advertising = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
     If (Test-Path $Advertising) {
-        Set-ItemProperty $Advertising Enabled -Value 0 -Verbose
+        Set-ItemProperty $Advertising Enabled -Value 0 
     }
             
     #Stops Cortana from being used as part of your Windows Search Function
     Write-Output "Stopping Cortana from being used as part of your Windows Search Function"
     $Search = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
     If (Test-Path $Search) {
-        Set-ItemProperty $Search AllowCortana -Value 0 -Verbose
+        Set-ItemProperty $Search AllowCortana -Value 0 
     }
 
     #Disables Web Search in Start Menu
     Write-Output "Disabling Bing Search in Start Menu"
     $WebSearch = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
-    Set-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" BingSearchEnabled -Value 0 -Verbose
+    Set-ItemProperty "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" BingSearchEnabled -Value 0 
 	If (!(Test-Path $WebSearch)) {
         New-Item $WebSearch
 	}
-	Set-ItemProperty $WebSearch DisableWebSearch -Value 1 -Verbose
+	Set-ItemProperty $WebSearch DisableWebSearch -Value 1 
             
     #Stops the Windows Feedback Experience from sending anonymous data
     Write-Output "Stopping the Windows Feedback Experience program"
@@ -119,7 +119,7 @@ Function Protect-Privacy {
     If (!(Test-Path $Period)) { 
         New-Item $Period
     }
-    Set-ItemProperty $Period PeriodInNanoSeconds -Value 0 -Verbose
+    Set-ItemProperty $Period PeriodInNanoSeconds -Value 0 
 
     #Prevents bloatware applications from returning and removes Start Menu suggestions               
     Write-Output "Adding Registry key to prevent bloatware apps from returning"
@@ -128,23 +128,23 @@ Function Protect-Privacy {
     If (!(Test-Path $registryPath)) { 
         New-Item $registryPath
     }
-    Set-ItemProperty $registryPath DisableWindowsConsumerFeatures -Value 1 -Verbose
+    Set-ItemProperty $registryPath DisableWindowsConsumerFeatures -Value 1 
 
     If (!(Test-Path $registryOEM)) {
         New-Item $registryOEM
     }
-        Set-ItemProperty $registryOEM  ContentDeliveryAllowed -Value 0 -Verbose
-        Set-ItemProperty $registryOEM  OemPreInstalledAppsEnabled -Value 0 -Verbose
-        Set-ItemProperty $registryOEM  PreInstalledAppsEnabled -Value 0 -Verbose
-        Set-ItemProperty $registryOEM  PreInstalledAppsEverEnabled -Value 0 -Verbose
-        Set-ItemProperty $registryOEM  SilentInstalledAppsEnabled -Value 0 -Verbose
-        Set-ItemProperty $registryOEM  SystemPaneSuggestionsEnabled -Value 0 -Verbose          
+        Set-ItemProperty $registryOEM  ContentDeliveryAllowed -Value 0 
+        Set-ItemProperty $registryOEM  OemPreInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM  PreInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM  PreInstalledAppsEverEnabled -Value 0 
+        Set-ItemProperty $registryOEM  SilentInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM  SystemPaneSuggestionsEnabled -Value 0          
     
     #Preping mixed Reality Portal for removal    
     Write-Output "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
     $Holo = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Holographic"    
     If (Test-Path $Holo) {
-        Set-ItemProperty $Holo  FirstRunSucceeded -Value 0 -Verbose
+        Set-ItemProperty $Holo  FirstRunSucceeded -Value 0 
     }
 
     #Disables Wi-fi Sense
@@ -155,12 +155,12 @@ Function Protect-Privacy {
     If (!(Test-Path $WifiSense1)) {
 	    New-Item $WifiSense1
     }
-    Set-ItemProperty $WifiSense1  Value -Value 0 -Verbose
+    Set-ItemProperty $WifiSense1  Value -Value 0 
 	If (!(Test-Path $WifiSense2)) {
 	    New-Item $WifiSense2
     }
-    Set-ItemProperty $WifiSense2  Value -Value 0 -Verbose
-	Set-ItemProperty $WifiSense3  AutoConnectAllowedOEM -Value 0 -Verbose
+    Set-ItemProperty $WifiSense2  Value -Value 0 
+	Set-ItemProperty $WifiSense3  AutoConnectAllowedOEM -Value 0 
         
     #Disables live tiles
     Write-Output "Disabling live tiles"
@@ -168,7 +168,7 @@ Function Protect-Privacy {
     If (!(Test-Path $Live)) {      
         New-Item $Live
     }
-    Set-ItemProperty $Live  NoTileApplicationNotification -Value 1 -Verbose
+    Set-ItemProperty $Live  NoTileApplicationNotification -Value 1 
         
     #Turns off Data Collection via the AllowTelemtry key by changing it to 0
     Write-Output "Turning off Data Collection"
@@ -176,13 +176,13 @@ Function Protect-Privacy {
     $DataCollection2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
     $DataCollection3 = "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection"    
     If (Test-Path $DataCollection1) {
-        Set-ItemProperty $DataCollection1  AllowTelemetry -Value 0 -Verbose
+        Set-ItemProperty $DataCollection1  AllowTelemetry -Value 0 
     }
     If (Test-Path $DataCollection2) {
-        Set-ItemProperty $DataCollection2  AllowTelemetry -Value 0 -Verbose
+        Set-ItemProperty $DataCollection2  AllowTelemetry -Value 0 
     }
     If (Test-Path $DataCollection3) {
-        Set-ItemProperty $DataCollection3  AllowTelemetry -Value 0 -Verbose
+        Set-ItemProperty $DataCollection3  AllowTelemetry -Value 0 
     }
     
     #Disabling Location Tracking
@@ -192,11 +192,11 @@ Function Protect-Privacy {
     If (!(Test-Path $SensorState)) {
         New-Item $SensorState
     }
-    Set-ItemProperty $SensorState SensorPermissionState -Value 0 -Verbose
+    Set-ItemProperty $SensorState SensorPermissionState -Value 0 
     If (!(Test-Path $LocationConfig)) {
         New-Item $LocationConfig
     }
-    Set-ItemProperty $LocationConfig Status -Value 0 -Verbose
+    Set-ItemProperty $LocationConfig Status -Value 0 
         
     #Disables People icon on Taskbar
     Write-Output "Disabling People icon on Taskbar"
@@ -204,7 +204,7 @@ Function Protect-Privacy {
     If (!(Test-Path $People)) {
         New-Item $People
     }
-    Set-ItemProperty $People  PeopleBand -Value 0 -Verbose
+    Set-ItemProperty $People  PeopleBand -Value 0 
         
     #Disables scheduled tasks that are considered unnecessary 
     Write-Output "Disabling scheduled tasks"
@@ -224,16 +224,16 @@ Function DisableCortana {
 	If (!(Test-Path $Cortana1)) {
 		New-Item $Cortana1
 	}
-	Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 0 -Verbose
+	Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 0 
 	If (!(Test-Path $Cortana2)) {
 		New-Item $Cortana2
 	}
-	Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 1 -Verbose
-	Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 1 -Verbose
+	Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 1 
+	Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 1 
 	If (!(Test-Path $Cortana3)) {
 		New-Item $Cortana3
 	}
-	Set-ItemProperty $Cortana3 HarvestContacts -Value 0 -Verbose
+	Set-ItemProperty $Cortana3 HarvestContacts -Value 0
 }
 
 Function EnableCortana {
@@ -244,16 +244,16 @@ Function EnableCortana {
 	If (!(Test-Path $Cortana1)) {
 		New-Item $Cortana1
 	}
-	Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 1 -Verbose
+	Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 1 
 	If (!(Test-Path $Cortana2)) {
 		New-Item $Cortana2
 	}
-	Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 0 -Verbose
-	Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 0 -Verbose
+	Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 0 
+	Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 0 
 	If (!(Test-Path $Cortana3)) {
 		New-Item $Cortana3
 	}
-	Set-ItemProperty $Cortana3 HarvestContacts -Value 1 -Verbose
+	Set-ItemProperty $Cortana3 HarvestContacts -Value 1 
 }
         
 Function Stop-EdgePDF {
@@ -264,28 +264,28 @@ Function Stop-EdgePDF {
     $NoProgids = "HKCR:\.pdf\OpenWithProgids"
     $NoWithList = "HKCR:\.pdf\OpenWithList" 
     If (!(Get-ItemProperty $NoPDF  NoOpenWith)) {
-        New-ItemProperty $NoPDF NoOpenWith -Verbose 
+        New-ItemProperty $NoPDF NoOpenWith 
     }        
     If (!(Get-ItemProperty $NoPDF  NoStaticDefaultVerb)) {
-        New-ItemProperty $NoPDF  NoStaticDefaultVerb -Verbose 
+        New-ItemProperty $NoPDF  NoStaticDefaultVerb 
     }        
     If (!(Get-ItemProperty $NoProgids  NoOpenWith)) {
-        New-ItemProperty $NoProgids  NoOpenWith -Verbose 
+        New-ItemProperty $NoProgids  NoOpenWith 
     }        
     If (!(Get-ItemProperty $NoProgids  NoStaticDefaultVerb)) {
-        New-ItemProperty $NoProgids  NoStaticDefaultVerb -Verbose 
+        New-ItemProperty $NoProgids  NoStaticDefaultVerb 
     }        
     If (!(Get-ItemProperty $NoWithList  NoOpenWith)) {
-        New-ItemProperty $NoWithList  NoOpenWith -Verbose 
+        New-ItemProperty $NoWithList  NoOpenWith
     }        
     If (!(Get-ItemProperty $NoWithList  NoStaticDefaultVerb)) {
-        New-ItemProperty $NoWithList  NoStaticDefaultVerb -Verbose 
+        New-ItemProperty $NoWithList  NoStaticDefaultVerb 
     }
             
     #Appends an underscore '_' to the Registry key for Edge
     $Edge = "HKCR:\AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_"
     If (Test-Path $Edge) {
-        Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ -Verbose
+        Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ 
     }
 }
 
@@ -304,14 +304,14 @@ Function Revert-Changes {
     Write-Output "Re-enabling key to show advertisement information"
     $Advertising = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
     If (Test-Path $Advertising) {
-        Set-ItemProperty $Advertising  Enabled -Value 1 -Verbose
+        Set-ItemProperty $Advertising  Enabled -Value 1
     }
             
     #Enables Cortana to be used as part of your Windows Search Function
     Write-Output "Re-enabling Cortana to be used in your Windows Search"
     $Search = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
     If (Test-Path $Search) {
-        Set-ItemProperty $Search  AllowCortana -Value 1 -Verbose
+        Set-ItemProperty $Search  AllowCortana -Value 1 
     }
             
     #Re-enables the Windows Feedback Experience for sending anonymous data
@@ -320,7 +320,7 @@ Function Revert-Changes {
     If (!(Test-Path $Period)) { 
         New-Item $Period
     }
-    Set-ItemProperty $Period PeriodInNanoSeconds -Value 1 -Verbose
+    Set-ItemProperty $Period PeriodInNanoSeconds -Value 1 
     
     #Enables bloatware applications               
     Write-Output "Adding Registry key to allow bloatware apps to return"
@@ -328,13 +328,13 @@ Function Revert-Changes {
     If (!(Test-Path $registryPath)) {
         New-Item $registryPath 
     }
-    Set-ItemProperty $registryPath  DisableWindowsConsumerFeatures -Value 0 -Verbose
+    Set-ItemProperty $registryPath  DisableWindowsConsumerFeatures -Value 0 
         
     #Changes Mixed Reality Portal Key 'FirstRunSucceeded' to 1
     Write-Output "Setting Mixed Reality Portal value to 1"
     $Holo = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Holographic"
     If (Test-Path $Holo) {
-        Set-ItemProperty $Holo  FirstRunSucceeded -Value 1 -Verbose
+        Set-ItemProperty $Holo  FirstRunSucceeded -Value 1 
     }
         
     #Re-enables live tiles
@@ -343,7 +343,7 @@ Function Revert-Changes {
     If (!(Test-Path $Live)) {
         New-Item $Live 
     }
-    Set-ItemProperty $Live  NoTileApplicationNotification -Value 0 -Verbose
+    Set-ItemProperty $Live  NoTileApplicationNotification -Value 0 
        
     #Re-enables data collection
     Write-Output "Re-enabling data collection"
@@ -351,7 +351,7 @@ Function Revert-Changes {
     If (!(Test-Path $DataCollection)) {
         New-Item $DataCollection
     }
-    Set-ItemProperty $DataCollection  AllowTelemetry -Value 1 -Verbose
+    Set-ItemProperty $DataCollection  AllowTelemetry -Value 1
         
     #Re-enables People Icon on Taskbar
     Write-Output "Enabling People icon on Taskbar"
@@ -359,7 +359,7 @@ Function Revert-Changes {
     If (!(Test-Path $People)) {
         New-Item $People 
     }
-    Set-ItemProperty $People  PeopleBand -Value 1 -Verbose
+    Set-ItemProperty $People  PeopleBand -Value 1 
     
     #Re-enables suggestions on start menu
     Write-Output "Enabling suggestions on the Start Menu"
@@ -367,7 +367,7 @@ Function Revert-Changes {
     If (!(Test-Path $Suggestions)) {
         New-Item $Suggestions
     }
-    Set-ItemProperty $Suggestions  SystemPaneSuggestionsEnabled -Value 1 -Verbose
+    Set-ItemProperty $Suggestions  SystemPaneSuggestionsEnabled -Value 1 
         
     #Re-enables scheduled tasks that were disabled when running the Debloat switch
     Write-Output "Enabling scheduled tasks that were disabled"
@@ -386,28 +386,28 @@ Function Enable-EdgePDF {
     $NoWithList = "HKCR:\.pdf\OpenWithList"
     #Sets edge back to default
     If (Get-ItemProperty $NoPDF  NoOpenWith) {
-        Remove-ItemProperty $NoPDF  NoOpenWith -Verbose
+        Remove-ItemProperty $NoPDF  NoOpenWith
     } 
     If (Get-ItemProperty $NoPDF  NoStaticDefaultVerb) {
-        Remove-ItemProperty $NoPDF  NoStaticDefaultVerb -Verbose
+        Remove-ItemProperty $NoPDF  NoStaticDefaultVerb 
     }       
     If (Get-ItemProperty $NoProgids  NoOpenWith) {
-        Remove-ItemProperty $NoProgids  NoOpenWith -Verbose
+        Remove-ItemProperty $NoProgids  NoOpenWith 
     }        
     If (Get-ItemProperty $NoProgids  NoStaticDefaultVerb) {
-        Remove-ItemProperty $NoProgids  NoStaticDefaultVerb -Verbose
+        Remove-ItemProperty $NoProgids  NoStaticDefaultVerb 
     }        
     If (Get-ItemProperty $NoWithList  NoOpenWith) {
-        Remove-ItemProperty $NoWithList  NoOpenWith -Verbose
+        Remove-ItemProperty $NoWithList  NoOpenWith
     }    
     If (Get-ItemProperty $NoWithList  NoStaticDefaultVerb) {
-        Remove-ItemProperty $NoWithList  NoStaticDefaultVerb -Verbose
+        Remove-ItemProperty $NoWithList  NoStaticDefaultVerb
     }
         
     #Removes an underscore '_' from the Registry key for Edge
     $Edge2 = "HKCR:\AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_"
     If (Test-Path $Edge2) {
-        Set-Item $Edge2 AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723 -Verbose
+        Set-Item $Edge2 AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723
     }
 }
 
@@ -482,11 +482,11 @@ Function UninstallOneDrive {
     If (!(Test-Path $ExplorerReg1)) {
         New-Item $ExplorerReg1
     }
-    Set-ItemProperty $ExplorerReg1 System.IsPinnedToNameSpaceTree -Value 0 -Verbose
+    Set-ItemProperty $ExplorerReg1 System.IsPinnedToNameSpaceTree -Value 0 
     If (!(Test-Path $ExplorerReg2)) {
         New-Item $ExplorerReg2
     }
-    Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0 -Verbose
+    Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
     Write-Output "Restarting Explorer that was shut down before."
     Start explorer.exe -NoNewWindow
 }
