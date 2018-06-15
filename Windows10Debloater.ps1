@@ -8,6 +8,9 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
   Exit
 }
 
+#no errors throughout
+$ErrorActionPreference = 'silentlycontinue'
+
 If (Test-Path "C:\Windows10Debloater") {
     Write-Output "C:\Windows10Debloater exists. Skipping."
 }
@@ -18,9 +21,6 @@ Else {
 }
 
 Start-Transcript -OutputDirectory "C:\Windows10Debloater"
-
-#no errors throughout
-$ErrorActionPreference = 'silentlycontinue'
 
 Function Start-Debloat {
     
