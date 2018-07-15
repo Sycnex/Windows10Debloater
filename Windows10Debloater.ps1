@@ -1,13 +1,6 @@
 #This function finds any AppX/AppXProvisioned package and uninstalls it, except for Freshpaint, Windows Calculator, Windows Store, and Windows Photos.
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
-#Checks for the script running as admin and if it's not then restarts the script in admin
-Add-Type -AssemblyName PresentationCore,PresentationFramework
-If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
-  Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-  Exit
-}
-
 #no errors throughout
 $ErrorActionPreference = 'silentlycontinue'
 
