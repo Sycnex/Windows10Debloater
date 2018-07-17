@@ -15,6 +15,8 @@ Else {
 
 Start-Transcript -OutputDirectory "C:\Windows10Debloater"
 
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+
 Function Start-Debloat {
     
     [CmdletBinding()]
