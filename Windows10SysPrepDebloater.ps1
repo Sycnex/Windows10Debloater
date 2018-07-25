@@ -7,13 +7,103 @@ param (
   [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF
 )
 
+Function Remove-AppxPackagesForSysprep {
+$AppXApps = @(
+ 
+    #Unnecessary Windows 10 AppX Apps
+    "*Microsoft.BingNews*"
+    "*Microsoft.DesktopAppInstaller*"
+    "*Microsoft.GetHelp*"
+    "*Microsoft.Getstarted*"
+    "*Microsoft.Messaging*"
+    "*Microsoft.Microsoft3DViewer*"
+    "*Microsoft.MicrosoftOfficeHub*"
+    "*Microsoft.MicrosoftSolitaireCollection*"
+    "*Microsoft.NetworkSpeedTest*"
+    "*Microsoft.Office.OneNote*"
+    "*Microsoft.Office.Sway*"
+    "*Microsoft.OneConnect*"
+    "*Microsoft.People*"
+    "*Microsoft.Print3D*"
+    "*Microsoft.RemoteDesktop*"
+    "*Microsoft.SkypeApp*"
+    "*Microsoft.StorePurchaseApp*"
+    "*Microsoft.WindowsAlarms*"
+    "*Microsoft.WindowsCamera*"
+    "*microsoft.windowscommunicationsapps*"
+    "*Microsoft.WindowsFeedbackHub*"
+    "*Microsoft.WindowsMaps*"
+    "*Microsoft.WindowsSoundRecorder*"
+    "*Microsoft.Xbox.TCUI*"
+    "*Microsoft.XboxApp*"
+    "*Microsoft.XboxGameOverlay*"
+    "*Microsoft.XboxIdentityProvider*"
+    "*Microsoft.XboxSpeechToTextOverlay*"
+    "*Microsoft.ZuneMusic*"
+    "*Microsoft.ZuneVideo*"
+ 
+    #Sponsored Windows 10 AppX Apps
+    #Add sponsored/featured apps to remove in the "*AppName*" format
+    "*EclipseManager*"
+    "*ActiproSoftwareLLC*"
+    "*AdobeSystemsIncorporated.AdobePhotoshopExpress*"
+    "*Duolingo-LearnLanguagesforFree*"
+    "*PandoraMediaInc*"
+    "*CandyCrush*"
+    "*Wunderlist*"
+    "*Flipboard*"
+    "*Twitter*"
+    "*Facebook*"
+    "*Spotify*"
+ 
+    #Optional: Typically not removed but you can if you need to for some reason
+    #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
+    #"*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
+    #"*Microsoft.BingWeather*"
+    #"*Microsoft.MSPaint*"
+    #"*Microsoft.MicrosoftStickyNotes*"
+    #"*Microsoft.Windows.Photos*"
+    #"*Microsoft.WindowsCalculator*"
+    #"*Microsoft.WindowsStore*"
+    )
+foreach ($App in $AppXApps) {
+    Get-AppxPackage -Name $App | Remove-AppxPackage -ErrorAction SilentlyContinue
+    Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $App | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+    }
+
+}
+
 #This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 Function Begin-SysPrep {
 
     param([switch]$SysPrep)
 
     get-appxpackage | remove-appxpackage -ErrorAction SilentlyContinue
-
+    Remove-AppxPackagesForSysprep -ErrorAction SilentlyContinue
+    # Disable Windows Store Automatic Updates
+    Write-Output "Adding Registry key to Disable Windows Store Automatic Updates"
+    $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+    If (!(Test-Path $registryPath)) {
+        Mkdir $registryPath -ErrorAction SilentlyContinue
+        New-ItemProperty $registryPath -Name AutoDownload -Value 2 -Verbose -ErrorAction SilentlyContinue
+    }
+    Else {
+        Set-ItemProperty $registryPath -Name AutoDownload -Value 2 -Verbose -ErrorAction SilentlyContinue
+    }
+    # Disable Microsoft Consumer Experience
+    Write-Output "Adding Registry key to prevent bloatware apps from returning"
+    #Prevents bloatware applications from returning
+    $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
+    If (!(Test-Path $registryPath)) {
+        Mkdir $registryPath -ErrorAction SilentlyContinue
+        New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+    }
+    Else{
+        Set-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+    }
+    #Stop WindowsStore Installer Service and set to Disabled
+    net stop InstallService
+    sc config InstallService start=disabled
 }
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
