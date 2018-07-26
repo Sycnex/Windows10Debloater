@@ -4,7 +4,7 @@
 #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
 
 param (
-    [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF
+    [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF, [Switch]$Privacy
 )
 $ErrorActionPreference = 'SilentlyContinue'
 Function Remove-AppxPackagesForSysprep {
@@ -67,6 +67,7 @@ Function Remove-AppxPackagesForSysprep {
         #"*Microsoft.WindowsStore*"
     )
     foreach ($App in $AppXApps) {
+        Write-Verbose -Message ('Removing Package {0}' -f $App)
         Get-AppxPackage -Name $App | Remove-AppxPackage -ErrorAction SilentlyContinue
         Get-AppxPackage -Name $App -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
         Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $App | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
@@ -79,31 +80,35 @@ Function Begin-SysPrep {
 
     param([switch]$SysPrep)
     IF ($SysPrep) {
+        Write-Verbose -Message ('Starting Sysprep Fixes')
+        Write-Verbose -Message ('Removing AppXPackages for current user')
         get-appxpackage | remove-appxpackage -ErrorAction SilentlyContinue
         Remove-AppxPackagesForSysprep -ErrorAction SilentlyContinue
         # Disable Windows Store Automatic Updates
-        Write-Output "Adding Registry key to Disable Windows Store Automatic Updates"
+        Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
         If (!(Test-Path $registryPath)) {
             Mkdir $registryPath -ErrorAction SilentlyContinue
-            New-ItemProperty $registryPath -Name AutoDownload -Value 2 -Verbose -ErrorAction SilentlyContinue
+            New-ItemProperty $registryPath -Name AutoDownload -Value 2 -ErrorAction SilentlyContinue
         }
         Else {
-            Set-ItemProperty $registryPath -Name AutoDownload -Value 2 -Verbose -ErrorAction SilentlyContinue
+            Set-ItemProperty $registryPath -Name AutoDownload -Value 2 -ErrorAction SilentlyContinue
         }
         # Disable Microsoft Consumer Experience
-        Write-Output "Adding Registry key to prevent bloatware apps from returning"
+        Write-Verbose -Message "Adding Registry key to prevent bloatware apps from returning"
         #Prevents bloatware applications from returning
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
         If (!(Test-Path $registryPath)) {
             Mkdir $registryPath -ErrorAction SilentlyContinue
-            New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+            New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -ErrorAction SilentlyContinue
         }
         Else {
-            Set-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+            Set-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -ErrorAction SilentlyContinue
         }
         #Stop WindowsStore Installer Service and set to Disabled
+        Write-Verbose -Message ('Stopping InstallService')
         Stop-Service InstallService
+        Write-Verbose -Message ('Setting InstallService Startup to Disabled')
         & sc config InstallService start=disabled
     }
 }
@@ -115,6 +120,7 @@ Function Start-Debloat {
     IF ($Debloat) {
         #Removes AppxPackages
         #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
+        Write-Verbose -Message ('Starting Debloat')
         [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
         Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
         Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
@@ -172,8 +178,9 @@ Function Remove-Keys {
 
 Function Protect-Privacy {
 
-    Param([switch]$Debloat)
-    if ($Debloat) {
+    Param([switch]$Privacy)
+    if ($Privacy) {
+        Write-Verbose -Message ('Starting Protect Privacy')
         #Creates a PSDrive to be able to access the 'HKCR' tree
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
 
@@ -269,6 +276,7 @@ Function Stop-EdgePDF {
 
     param([switch]$StopEdgePDF)
     IF ($StopEdgePDF) {
+        Write-Verbose -Message ('Starting StopEdge PDF')
         #Stops edge from taking over as the default .PDF viewer
         Write-Output "Stopping Edge from taking over as the default .PDF viewer"
         $NoOpen = 'HKCR:\.pdf'
@@ -311,8 +319,9 @@ Function Stop-EdgePDF {
 
 Function FixWhitelistedApps {
 
-    Param([switch]$Debloat)
-    IF ($Debloat) {
+    Param([switch]$Debloat, [switch]$SysPrep)
+    IF ($Debloat -or $SysPrep) {
+        Write-Verbose -Message ('Starting Fix Whitelisted Apps')
         If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
 
             #Credit to abulgatz for the 4 lines of code
