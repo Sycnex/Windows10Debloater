@@ -12,7 +12,6 @@ Function Remove-AppxPackagesForSysprep {
 
         #Unnecessary Windows 10 AppX Apps
         "*Microsoft.BingNews*"
-        "*Microsoft.DesktopAppInstaller*"
         "*Microsoft.GetHelp*"
         "*Microsoft.Getstarted*"
         "*Microsoft.Messaging*"
@@ -25,7 +24,7 @@ Function Remove-AppxPackagesForSysprep {
         "*Microsoft.OneConnect*"
         "*Microsoft.People*"
         "*Microsoft.Print3D*"
-        "*Microsoft.RemoteDesktop*"
+        "**"
         "*Microsoft.SkypeApp*"
         "*Microsoft.StorePurchaseApp*"
         "*Microsoft.WindowsAlarms*"
