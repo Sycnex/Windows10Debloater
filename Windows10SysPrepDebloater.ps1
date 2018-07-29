@@ -24,7 +24,6 @@ Function Remove-AppxPackagesForSysprep {
         "*Microsoft.OneConnect*"
         "*Microsoft.People*"
         "*Microsoft.Print3D*"
-        "**"
         "*Microsoft.SkypeApp*"
         "*Microsoft.StorePurchaseApp*"
         "*Microsoft.WindowsAlarms*"
