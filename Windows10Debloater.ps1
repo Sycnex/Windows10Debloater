@@ -23,6 +23,67 @@ Function Start-Debloat {
         
     Param()
     
+    $AppXApps = @(
+
+        #Unnecessary Windows 10 AppX Apps
+        "*Microsoft.BingNews*"
+        "*Microsoft.GetHelp*"
+        "*Microsoft.Getstarted*"
+        "*Microsoft.Messaging*"
+        "*Microsoft.Microsoft3DViewer*"
+        "*Microsoft.MicrosoftOfficeHub*"
+        "*Microsoft.MicrosoftSolitaireCollection*"
+        "*Microsoft.NetworkSpeedTest*"
+        "*Microsoft.Office.Sway*"
+        "*Microsoft.OneConnect*"
+        "*Microsoft.People*"
+        "*Microsoft.Print3D*"
+        "*Microsoft.SkypeApp*"
+        "*Microsoft.WindowsAlarms*"
+        "*Microsoft.WindowsCamera*"
+        "*microsoft.windowscommunicationsapps*"
+        "*Microsoft.WindowsFeedbackHub*"
+        "*Microsoft.WindowsMaps*"
+        "*Microsoft.WindowsSoundRecorder*"
+        "*Microsoft.Xbox.TCUI*"
+        "*Microsoft.XboxApp*"
+        "*Microsoft.XboxGameOverlay*"
+        "*Microsoft.XboxIdentityProvider*"
+        "*Microsoft.XboxSpeechToTextOverlay*"
+        "*Microsoft.ZuneMusic*"
+        "*Microsoft.ZuneVideo*"
+
+        #Sponsored Windows 10 AppX Apps
+        #Add sponsored/featured apps to remove in the "*AppName*" format
+        "*EclipseManager*"
+        "*ActiproSoftwareLLC*"
+        "*AdobeSystemsIncorporated.AdobePhotoshopExpress*"
+        "*Duolingo-LearnLanguagesforFree*"
+        "*PandoraMediaInc*"
+        "*CandyCrush*"
+        "*Wunderlist*"
+        "*Flipboard*"
+        "*Twitter*"
+        "*Facebook*"
+        "*Spotify*"
+
+        #Optional: Typically not removed but you can if you need to for some reason
+        #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
+        #"*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
+        #"*Microsoft.BingWeather*"
+        #"*Microsoft.MSPaint*"
+        #"*Microsoft.MicrosoftStickyNotes*"
+        #"*Microsoft.Windows.Photos*"
+        #"*Microsoft.WindowsCalculator*"
+        #"*Microsoft.WindowsStore*"
+    )
+    foreach ($App in $AppXApps) {
+        Write-Verbose -Message ('Removing Package {0}' -f $App)
+        Get-AppxPackage -Name $App | Remove-AppxPackage -ErrorAction SilentlyContinue
+        Get-AppxPackage -Name $App -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $App | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+    }
+    
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
     [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint*'
@@ -510,7 +571,7 @@ Switch ($Prompt1) {
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         Start-Sleep 1
-        Write-Output "Uninstalling bloatware, please wait."
+        Write-Output "Uninstalling bloatware, please wait. The first step is to identify and remove them via a blacklist, and then to use the whitelist approach."
         Start-Debloat
         Write-Output "Bloatware removed."
         Start-Sleep 1
