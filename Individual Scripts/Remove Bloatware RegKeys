@@ -29,3 +29,10 @@ $Keys = @(
                
         #Windows Share Target
         "HKCR:\Extensions\ContractId\Windows.ShareTarget\PackageId\ActiproSoftwareLLC.562882FEEB491_2.6.18.18_neutral__24pqs290vpjk0"
+    )
+        
+    #This writes the output of each key it is removing and also removes the keys listed above.
+    ForEach ($Key in $Keys) {
+        Write-Output "Removing $Key from registry"
+        Remove-Item $Key -Recurse
+    }
