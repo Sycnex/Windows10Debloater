@@ -148,6 +148,6 @@ Thank you to a60wattfish, abulgatz and Reddit user /u/GavinEke for some of the s
 
 # Donate 
 
-If you like and appreciate my work then consider a donation for a cup of tea.
+If you like and appreciate my work then please consider a donation for a cup of coffee. :)
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/syncrn)
