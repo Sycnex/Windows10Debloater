@@ -122,3 +122,13 @@
     Get-ScheduledTask  UsbCeip | Disable-ScheduledTask
     Get-ScheduledTask  DmClient | Disable-ScheduledTask
     Get-ScheduledTask  DmClientOnScenarioDownload | Disable-ScheduledTask
+    
+    Write-Output "Stopping and disabling WAP Push Service"
+    #Stop and disable WAP Push Service
+	Stop-Service "dmwappushservice"
+	Set-Service "dmwappushservice" -StartupType Disabled
+
+    Write-Output "Stopping and disabling Diagnostics Tracking Service"
+    #Disabling the Diagnostics Tracking Service
+	Stop-Service "DiagTrack"
+	Set-Service "DiagTrack" -StartupType Disabled
