@@ -270,6 +270,16 @@ Function Protect-Privacy {
     Get-ScheduledTask  UsbCeip | Disable-ScheduledTask
     Get-ScheduledTask  DmClient | Disable-ScheduledTask
     Get-ScheduledTask  DmClientOnScenarioDownload | Disable-ScheduledTask
+
+    Write-Output "Stopping and disabling WAP Push Service"
+    #Stop and disable WAP Push Service
+	Stop-Service "dmwappushservice"
+	Set-Service "dmwappushservice" -StartupType Disabled
+
+    Write-Output "Stopping and disabling Diagnostics Tracking Service"
+    #Disabling the Diagnostics Tracking Service
+	Stop-Service "DiagTrack"
+	Set-Service "DiagTrack" -StartupType Disabled
 }
 
 Function DisableCortana {
@@ -289,7 +299,8 @@ Function DisableCortana {
 	If (!(Test-Path $Cortana3)) {
 		New-Item $Cortana3
 	}
-	Set-ItemProperty $Cortana3 HarvestContacts -Value 0
+    Set-ItemProperty $Cortana3 HarvestContacts -Value 0
+    
 }
 
 Function EnableCortana {
@@ -433,6 +444,16 @@ Function Revert-Changes {
     Get-ScheduledTask  UsbCeip | Enable-ScheduledTask 
     Get-ScheduledTask  DmClient | Enable-ScheduledTask 
     Get-ScheduledTask  DmClientOnScenarioDownload | Enable-ScheduledTask 
+
+    Write-Output "Re-enabling and starting WAP Push Service"
+    #Enable and start WAP Push Service
+	Set-Service "dmwappushservice" -StartupType Automatic
+    Start-Service "dmwappushservice"
+    
+    Write-Output "Re-enabling and starting the Diagnostics Tracking Service"
+    #Enabling the Diagnostics Tracking Service
+	Set-Service "DiagTrack" -StartupType Automatic
+	Start-Service "DiagTrack"
 }
     
 Function Enable-EdgePDF {
@@ -481,34 +502,6 @@ Function FixWhitelistedApps {
         Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
         Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
     } 
-}
-
-Function DisableDiagTrack {
-	Write-Output "Stopping and disabling Diagnostics Tracking Service"
-    #Disabling the Diagnostics Tracking Service
-	Stop-Service "DiagTrack"
-	Set-Service "DiagTrack" -StartupType Disabled
-}
-
-Function EnableDiagTrack {
-	Write-Output "Re-enabling and starting the Diagnostics Tracking Service"
-    #Enabling the Diagnostics Tracking Service
-	Set-Service "DiagTrack" -StartupType Automatic
-	Start-Service "DiagTrack"
-}
-
-Function DisableWAPPush {
-	Write-Output "Stopping and disabling WAP Push Service"
-    #Stop and disable WAP Push Service
-	Stop-Service "dmwappushservice"
-	Set-Service "dmwappushservice" -StartupType Disabled
-}
-
-Function EnableWAPPush {
-	Write-Output "Re-enabling and starting WAP Push Service"
-    #Enable and start WAP Push Service
-	Set-Service "dmwappushservice" -StartupType Automatic
-	Start-Service "dmwappushservice"
 }
 
 Function UninstallOneDrive {
@@ -600,16 +593,16 @@ Switch ($Prompt1) {
         Start-Sleep 1
         DisableWAPPush
         Write-Output "WAP push service stopped and disabled"
-        Start-Sleep 1; $PublishSettings = $Debloat
+        Start-Sleep 1;  = $Debloat
 
         $Prompt2 = [Windows.MessageBox]::Show($EdgePdf,"Edge PDF",$Button,$Warn)
         Switch ($Prompt2) {
             Yes {
                 Stop-EdgePDF
-                Write-Output "Edge will no longer take over as the default PDF viewer."; $PublishSettings = $Yes
+                Write-Output "Edge will no longer take over as the default PDF viewer."; = $Yes
             }
             No {
-                $PublishSettings = $No
+                 = $No
             }
             Cancel {
             Exit-PSSession
@@ -620,10 +613,10 @@ Switch ($Prompt1) {
         Switch ($Prompt3) {
             Yes {
                 UninstallOneDrive
-                Write-Output "OneDrive is now removed from the computer."; $PublishSettings = $Yes
+                Write-Output "OneDrive is now removed from the computer."; = $Yes
             }
             No {
-                $PublishSettings = $No
+                 = $No
             }
             Cancel {
             Exit-PSSession
@@ -639,7 +632,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Initiating reboot."
                 Start-Sleep 2
-                Restart-Computer; $PublishSettings = $Yes
+                Restart-Computer; = $Yes
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -648,7 +641,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Script has finished. Exiting."
                 Start-Sleep 2
-                Exit; $PublishSettings = $No
+                Exit; = $No
             }
             Cancel {
             Exit-PSSession
@@ -659,15 +652,15 @@ Switch ($Prompt1) {
         Write-Output "Reverting changes..."
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Revert-Changes; $PublishSettings = $Revert
+        Revert-Changes; = $Revert
         #Prompt asking to revert edge changes as well
         $Prompt5 = [Windows.MessageBox]::Show($EdgePdf2,"Revert Edge",$Button,$ErrorIco)
         Switch ($Prompt5) {
             Yes {
                 Enable-EdgePDF
-                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; $PublishSettings = $Yes
+                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; = $Yes
             }
-            No {$PublishSettings = $No
+            No { = $No
             }
             Cancel {
             Exit-PSSession
@@ -683,7 +676,7 @@ Switch ($Prompt1) {
                 Write-Output "Initiating reboot."
                 Stop-Transcript
                 Start-Sleep 2
-                Restart-Computer; $PublishSettings = $Yes
+                Restart-Computer; = $Yes
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -692,7 +685,7 @@ Switch ($Prompt1) {
                 Write-Output "Script has finished. Exiting."
                 Stop-Transcript
                 Start-Sleep 2
-                Exit; $PublishSettings = $No
+                Exit; = $No
             }
             Cancel {
             Exit-PSSession
