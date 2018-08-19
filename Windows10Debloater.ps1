@@ -512,11 +512,14 @@ Function EnableWAPPush {
 }
 
 Function UninstallOneDrive {
-	Write-Output "Uninstalling OneDrive"
+
+    Write-Output "Uninstalling OneDrive"
+    
+    New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
     $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
     $ExplorerReg2 = "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
-	Stop-Process OneDrive
+	Stop-Process -Name "OneDrive*"
 	Start-Sleep 2
 	If (!(Test-Path $onedrive)) {
 		$onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
