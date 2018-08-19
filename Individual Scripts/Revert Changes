@@ -80,3 +80,13 @@
     Get-ScheduledTask  UsbCeip | Enable-ScheduledTask 
     Get-ScheduledTask  DmClient | Enable-ScheduledTask 
     Get-ScheduledTask  DmClientOnScenarioDownload | Enable-ScheduledTask 
+
+    Write-Output "Re-enabling and starting WAP Push Service"
+    #Enable and start WAP Push Service
+	Set-Service "dmwappushservice" -StartupType Automatic
+    Start-Service "dmwappushservice"
+    
+    Write-Output "Re-enabling and starting the Diagnostics Tracking Service"
+    #Enabling the Diagnostics Tracking Service
+	Set-Service "DiagTrack" -StartupType Automatic
+	Start-Service "DiagTrack"
