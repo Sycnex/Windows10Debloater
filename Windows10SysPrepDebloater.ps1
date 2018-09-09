@@ -50,20 +50,20 @@ Function Begin-SysPrep {
 Function Start-Debloat {
 
     param([switch]$Debloat)
-    IF ($Debloat) {
+            
         #Removes AppxPackages
         #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
         Write-Verbose -Message ('Starting Debloat')
         [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
         Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
         Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
-    }
+    
 }
 
 Function Remove-Keys {
 
     Param([switch]$Debloat)
-    if ($Debloat) {
+    
         #Creates a PSDrive to be able to access the 'HKCR' tree
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         #These are the registry keys that it will delete.
@@ -105,14 +105,13 @@ Function Remove-Keys {
         ForEach ($Key in $Keys) {
             Write-Output "Removing $Key from registry"
             Remove-Item $Key -Recurse -ErrorAction SilentlyContinue
-        }
     }
 }
 
 Function Protect-Privacy {
 
     Param([switch]$Privacy)
-    if ($Privacy) {
+
         Write-Verbose -Message ('Starting Protect Privacy')
         #Creates a PSDrive to be able to access the 'HKCR' tree
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -202,13 +201,12 @@ Function Protect-Privacy {
         Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask -ErrorAction SilentlyContinue
         Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
         Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
-    }
 }
 
 Function Stop-EdgePDF {
 
     param([switch]$StopEdgePDF)
-    IF ($StopEdgePDF) {
+    
         Write-Verbose -Message ('Starting StopEdge PDF')
         #Stops edge from taking over as the default .PDF viewer
         Write-Output "Stopping Edge from taking over as the default .PDF viewer"
@@ -246,14 +244,14 @@ Function Stop-EdgePDF {
         $Edge = 'HKCR:\AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723'
         If (Test-Path $Edge) {
             Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ -Verbose
-        }
+        
     }
 }
 
 Function FixWhitelistedApps {
 
     Param([switch]$Debloat, [switch]$SysPrep)
-    IF ($Debloat -or $SysPrep) {
+    
         Write-Verbose -Message ('Starting Fix Whitelisted Apps')
         If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
 
@@ -262,20 +260,19 @@ Function FixWhitelistedApps {
             Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
             Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
             Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-        }
     }
 }
 
 Write-Output "Initiating Sysprep"
-Begin-SysPrep @PSBoundParameters
+Begin-SysPrep 
 Write-Output "Removing bloatware apps."
-Start-Debloat @PSBoundParameters
+Start-Debloat 
 Write-Output "Removing leftover bloatware registry keys."
-Remove-Keys @PSBoundParameters
+Remove-Keys 
 Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
-FixWhitelistedApps @PSBoundParameters
+FixWhitelistedApps 
 Write-Output "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
-Protect-Privacy @PSBoundParameters
+Protect-Privacy 
 Write-Output "Stopping Edge from taking over as the default PDF Viewer."
-Stop-EdgePDF @PSBoundParameters
+Stop-EdgePDF 
 Write-Output "Finished all tasks."
