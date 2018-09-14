@@ -3,29 +3,30 @@
 
 #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
 
+$ErrorActionPreference = 'SilentlyContinue'
+
 param (
     [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF, [Switch]$Privacy
 )
-$ErrorActionPreference = 'SilentlyContinue'
+
 
 #This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 Function Begin-SysPrep {
 
     param([switch]$SysPrep)
-    IF ($SysPrep) {
         Write-Verbose -Message ('Starting Sysprep Fixes')
         Write-Verbose -Message ('Removing AppXPackages for current user')
-        get-appxpackage | remove-appxpackage -ErrorAction SilentlyContinue
-        Remove-AppxPackagesForSysprep -ErrorAction SilentlyContinue
+        get-appxpackage | remove-appxpackage 
+ 
         # Disable Windows Store Automatic Updates
         Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
         If (!(Test-Path $registryPath)) {
             Mkdir $registryPath -ErrorAction SilentlyContinue
-            New-ItemProperty $registryPath -Name AutoDownload -Value 2 -ErrorAction SilentlyContinue
+            New-ItemProperty $registryPath -Name AutoDownload -Value 2 
         }
         Else {
-            Set-ItemProperty $registryPath -Name AutoDownload -Value 2 -ErrorAction SilentlyContinue
+            Set-ItemProperty $registryPath -Name AutoDownload -Value 2 
         }
         # Disable Microsoft Consumer Experience
         Write-Verbose -Message "Adding Registry key to prevent bloatware apps from returning"
@@ -33,10 +34,10 @@ Function Begin-SysPrep {
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
         If (!(Test-Path $registryPath)) {
             Mkdir $registryPath -ErrorAction SilentlyContinue
-            New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -ErrorAction SilentlyContinue
+            New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 
         }
         Else {
-            Set-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -ErrorAction SilentlyContinue
+            Set-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 
         }
         #Stop WindowsStore Installer Service and set to Disabled
         Write-Verbose -Message ('Stopping InstallService')
@@ -54,7 +55,7 @@ Function Start-Debloat {
         #Removes AppxPackages
         #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
         Write-Verbose -Message ('Starting Debloat')
-        [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
+        [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
         Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
         Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
     
@@ -253,10 +254,11 @@ Function FixWhitelistedApps {
     Param([switch]$Debloat, [switch]$SysPrep)
     
         Write-Verbose -Message ('Starting Fix Whitelisted Apps')
-        If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
+        If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.MSPaint, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
 
             #Credit to abulgatz for the 4 lines of code
             Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+            Get-AppxPackage -allusers Microsoft.MSPaint | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
             Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
             Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
             Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
