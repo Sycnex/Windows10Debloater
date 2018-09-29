@@ -44,8 +44,7 @@ Function Begin-SysPrep {
         Stop-Service InstallService
         Write-Verbose -Message ('Setting InstallService Startup to Disabled')
         & sc config InstallService start=disabled
-    }
-}
+ }
 
 
 Function Start-Debloat {
