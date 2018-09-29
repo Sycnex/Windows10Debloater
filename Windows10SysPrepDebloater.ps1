@@ -9,14 +9,10 @@ param (
     [switch]$Debloat, [switch]$SysPrep, [switch]$StopEdgePDF, [Switch]$Privacy
 )
 
-
-#This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 Function Begin-SysPrep {
 
     param([switch]$SysPrep)
         Write-Verbose -Message ('Starting Sysprep Fixes')
-        Write-Verbose -Message ('Removing AppXPackages for current user')
-        get-appxpackage | remove-appxpackage 
  
         # Disable Windows Store Automatic Updates
         Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
@@ -253,16 +249,13 @@ Function FixWhitelistedApps {
     Param([switch]$Debloat, [switch]$SysPrep)
     
         Write-Verbose -Message ('Starting Fix Whitelisted Apps')
-        If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.MSPaint, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
 
-            #Credit to abulgatz for the 4 lines of code
-            Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.MSPaint | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-    }
-}
+    #Credit to abulgatz for the 4 lines of code
+    Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.MSPaint | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
+    Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
 
 Write-Output "Initiating Sysprep"
 Begin-SysPrep 
