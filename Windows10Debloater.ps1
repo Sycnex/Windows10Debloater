@@ -18,7 +18,7 @@ Start-Transcript -OutputDirectory "C:\Windows10Debloater"
 
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
-Function DebloatAllApps {
+Function DebloatAll {
     
     [CmdletBinding()]
         
@@ -586,7 +586,7 @@ Switch ($Prompt1) {
                 New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
                 Start-Sleep 1
                 Write-Output "Uninstalling bloatware, please wait."
-                DebloatAllApps
+                DebloatAll
                 Write-Output "Bloatware removed."
                 Start-Sleep 1
                 Write-Output "Removing specific registry keys."
