@@ -7,14 +7,27 @@ param (
   [switch]$Debloat, [switch]$SysPrep
 )
 
-#This will run get-appxpackage | remove-appxpackage which is required for sysprep to provision the apps.
 Function Begin-SysPrep {
 
     param([switch]$SysPrep)
-
-    get-appxpackage | remove-appxpackage -ErrorAction SilentlyContinue
-
-}
+        Write-Verbose -Message ('Starting Sysprep Fixes')
+ 
+        # Disable Windows Store Automatic Updates
+        Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
+        $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+        If (!(Test-Path $registryPath)) {
+            Mkdir $registryPath -ErrorAction SilentlyContinue
+            New-ItemProperty $registryPath -Name AutoDownload -Value 2 
+        }
+        Else {
+            Set-ItemProperty $registryPath -Name AutoDownload -Value 2 
+        }
+        #Stop WindowsStore Installer Service and set to Disabled
+        Write-Verbose -Message ('Stopping InstallService')
+        Stop-Service InstallService
+        Write-Verbose -Message ('Setting InstallService Startup to Disabled')
+        & sc config InstallService start=disabled
+ }
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
