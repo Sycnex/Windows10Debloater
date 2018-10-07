@@ -29,8 +29,7 @@ You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either
 
 The Debloat switch choice runs the following functions:
 
-DebloatAll,
-DebloatBlacklist,
+Debloat,
 Remove-Keys,
 Protect-Privacy,
 Stop-EdgePDF (If chosen)
@@ -123,21 +122,17 @@ ContactSupport.
 
 # Silent and Interactive
 
-There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameters: -Sysprep, -DebloatAllApps, -DebloatBlacklist, -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
 The interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters.
 
 # Switch Parameters
 
-There are 5 switch parameters in the Windows10SysPrepDebloater.ps1 script.
+There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
 
 The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
 
-The second switch parameter is -DebloatAll, which does as it suggests. It runs the following functions: DebloatAll, Remove-Keys, and Protect-Privacy.
-
-DebloatAll removes all bloatware apps (that are listed above) without removing Store, Photos, Paint3d, and Calculator.
-
-DebloatBlacklist removes everything located in the blacklist and nothing more. DebloatAll is more of a nuking option.
+The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
 
 Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
 
@@ -147,7 +142,7 @@ Finally, there is an optional switch parameter which is Stop-EdgePDF. This just 
 
 # Credit
 
-Thank you to a60wattfish, abulgatz and Reddit user /u/GavinEke for some of the suggestions/fixes that I have placed into my scripts. 
+Thank you to a60wattfish, abulgatz, xsisbest and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
 
 # Donate 
 
