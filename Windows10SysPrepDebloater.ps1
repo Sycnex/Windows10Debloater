@@ -26,7 +26,7 @@ Function Begin-SysPrep {
         Write-Verbose -Message ('Stopping InstallService')
         Stop-Service InstallService
         Write-Verbose -Message ('Setting InstallService Startup to Disabled')
-        & sc config InstallService start=disabled
+        & Set-Service -Name InstallService -StartupType Disabled
  }
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
@@ -38,6 +38,8 @@ Function Start-Debloat {
     #Removes AppxPackages
     #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
     [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.MicrosoftStickyNotes|Microsoft.WindowsSoundRecorder|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
+    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
+    # Run this again to avoid error on 1803 or having to reboot.
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
 }
