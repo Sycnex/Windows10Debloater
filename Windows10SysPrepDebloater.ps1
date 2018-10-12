@@ -201,6 +201,13 @@ Function FixWhitelistedApps {
     Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} }
 }
 
+Function CheckService {
+
+  Param([switch]$Debloat)
+  
+  If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+        Start-Service -Name dmwappushservice }
+
 Write-Output "Initiating Sysprep"
 Begin-SysPrep
 Write-Output "Removing bloatware apps."
