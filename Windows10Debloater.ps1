@@ -98,7 +98,7 @@ Function DebloatBlacklist {
         #"*Microsoft.WindowsStore*"
     )
     foreach ($Bloat in $Bloatware) {
-        Get-AppxPackage -Name $App | Remove-AppxPackage -ErrorAction SilentlyContinue
+        Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
         Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $App | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
         Write-Output "Trying to remove $Bloat."
     }
