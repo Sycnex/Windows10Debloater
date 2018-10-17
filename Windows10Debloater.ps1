@@ -657,8 +657,6 @@ Switch ($Prompt1) {
             No {
                 = $No
             }
-            Cancel {
-            }
         }
         #Prompt asking to delete OneDrive
         $Prompt4 = [Windows.MessageBox]::Show($OneDriveDelete, "Delete OneDrive", $Button, $ErrorIco) 
@@ -669,8 +667,6 @@ Switch ($Prompt1) {
             }
             No {
                 = $No
-            }
-            Cancel {
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -694,8 +690,6 @@ Switch ($Prompt1) {
                 Start-Sleep 2
                 Exit; = $No
             }
-            Cancel {
-            }
         }
     }
     No {
@@ -712,8 +706,6 @@ Switch ($Prompt1) {
             }
             No {
                 = $No
-            }
-            Cancel {
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -737,10 +729,6 @@ Switch ($Prompt1) {
                 Start-Sleep 2
                 Exit; = $No
             }
-            Cancel {
-            }
         }
-    }
-    Cancel {
     }
 }
