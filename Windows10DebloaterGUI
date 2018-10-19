@@ -1,8 +1,3 @@
-<# This form was created using POSHGUI.com  a free online gui designer for PowerShell
-.NAME
-    Untitled
-#>
-
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
@@ -1143,8 +1138,5 @@ $RemoveOnedrive.Add_Click( {
 #endregion events }
 
 #endregion GUI }
-
-
-#Write your logic code here
 
 [void]$Form.ShowDialog()
