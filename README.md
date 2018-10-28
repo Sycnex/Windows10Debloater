@@ -120,7 +120,7 @@ Xbox Game CallableUI,
 Xbox Identity Provider, and
 ContactSupport.
 
-# Silent, Interactive, and GUI Applciation
+# Silent, Interactive, and GUI Application
 
 There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
