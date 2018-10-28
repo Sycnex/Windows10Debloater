@@ -126,7 +126,7 @@ There are now 2 versions of my Windows10Debloater - There is an interactive vers
 
 The interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters.
 
-There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code.
+There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code. You need to download the file, and then just right click it and hit "Run as Powershell" and the application will load up! 
 
 # Switch Parameters
 
