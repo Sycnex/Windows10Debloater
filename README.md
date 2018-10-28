@@ -1,5 +1,5 @@
 # Windows10Debloater
-Script/Utility to debloat Windows 10
+Script/Utility/Application to debloat Windows 10
 
 # Purpose
 
