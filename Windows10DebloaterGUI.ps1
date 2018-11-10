@@ -717,6 +717,15 @@ $RemoveBloatNoBlacklist.Add_Click( {
                 Start-Service -Name dmwappushservice 
             }
         }
+        
+        Function CheckInstallService {
+  
+            If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
+            Start-Service -Name InstallService
+            Set-Service -Name InstallService -StartupType Automatic 
+            }
+          }
+          
         Begin-SysPrep
         Write-Host "Removing bloatware apps."
         Start-Debloat
@@ -729,6 +738,7 @@ $RemoveBloatNoBlacklist.Add_Click( {
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         Write-Host "Checking to make sure that the service 'dmwappushservice' has been started."
         CheckService
+        Write-Output "Setting the 'InstallService' Windows service back to started and setting the Startup Type to "Automatic".
         Write-Host "Finished all tasks. `n"
   
     })
