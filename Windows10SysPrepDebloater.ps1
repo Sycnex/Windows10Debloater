@@ -209,6 +209,14 @@ Function CheckService {
         Start-Service -Name dmwappushservice }
 }
 
+Function CheckInstallService {
+
+  Param([switch]$Debloat)
+  
+  If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
+      Start-Service -Name InstallService
+      Set-Service -Name InstallService -StartupType Automatic
+
 Write-Output "Initiating Sysprep"
 Begin-SysPrep
 Write-Output "Removing bloatware apps."
