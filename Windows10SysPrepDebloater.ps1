@@ -216,6 +216,8 @@ Function CheckInstallService {
   If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
       Start-Service -Name InstallService
       Set-Service -Name InstallService -StartupType Automatic
+      }
+ }
 
 Write-Output "Initiating Sysprep"
 Begin-SysPrep
