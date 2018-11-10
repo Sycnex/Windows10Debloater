@@ -472,6 +472,14 @@ $RemoveAllBloatware.Add_Click( {
                 Start-Service -Name dmwappushservice 
             }
         }
+        
+        Function CheckInstallService {
+  
+            If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
+            Start-Service -Name InstallService
+            Set-Service -Name InstallService -StartupType Automatic 
+            }
+          }
   
         Write-Host "Initiating Sysprep"
         Begin-SysPrep
@@ -486,6 +494,8 @@ $RemoveAllBloatware.Add_Click( {
         Protect-Privacy
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         #Stop-EdgePDF
+        Write-Output "Setting the 'InstallService' Windows service back to "Started" and the Startup Type "Automatic".
+        CheckInstallService
         Write-Host "Finished all tasks. `n"
   
     } )
