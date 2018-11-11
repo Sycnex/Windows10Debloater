@@ -466,7 +466,7 @@ $RemoveAllBloatware.Add_Click( {
             }
         }
   
-        Function CheckService {
+        Function CheckDMWService {
     
             If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
                 Start-Service -Name dmwappushservice 
@@ -495,6 +495,7 @@ $RemoveAllBloatware.Add_Click( {
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         #Stop-EdgePDF
         Write-Output "Setting the 'InstallService' Windows service back to "Started" and the Startup Type "Automatic".
+        CheckDMWService
         CheckInstallService
         Write-Host "Finished all tasks. `n"
   
@@ -709,7 +710,7 @@ $RemoveBloatNoBlacklist.Add_Click( {
             }
         }
   
-        Function CheckService {
+        Function CheckDMWService {
   
             Param([switch]$Debloat)
     
@@ -737,8 +738,9 @@ $RemoveBloatNoBlacklist.Add_Click( {
         Protect-Privacy
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         Write-Host "Checking to make sure that the service 'dmwappushservice' has been started."
-        CheckService
+        CheckDMWService
         Write-Output "Setting the 'InstallService' Windows service back to started and setting the Startup Type to "Automatic".
+        CheckInstallService
         Write-Host "Finished all tasks. `n"
   
     })
