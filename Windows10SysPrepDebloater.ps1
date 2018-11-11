@@ -201,7 +201,7 @@ Function FixWhitelistedApps {
     Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} }
 }
 
-Function CheckService {
+Function CheckDMWService {
 
   Param([switch]$Debloat)
   
@@ -210,14 +210,12 @@ Function CheckService {
 }
 
 Function CheckInstallService {
-
   Param([switch]$Debloat)
-  
-  If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
-      Start-Service -Name InstallService
-      Set-Service -Name InstallService -StartupType Automatic
-      }
- }
+          If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+            Start-Service -Name InstallService
+            Set-Service -Name InstallService -StartupType Automatic 
+            }
+        }
 
 Write-Output "Initiating Sysprep"
 Begin-SysPrep
@@ -231,4 +229,6 @@ Write-Output "Stopping telemetry, disabling unneccessary scheduled tasks, and pr
 Protect-Privacy
 #Write-Output "Stopping Edge from taking over as the default PDF Viewer."
 #Stop-EdgePDF
+CheckDMWService
+CheckInstallService
 Write-Output "Finished all tasks."
