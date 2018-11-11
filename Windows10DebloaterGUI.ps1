@@ -475,10 +475,10 @@ $RemoveAllBloatware.Add_Click( {
         
         Function CheckInstallService {
   
-            If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
-            Start-Service -Name InstallService
-            Set-Service -Name InstallService -StartupType Automatic 
-            }
+            If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+              Start-Service -Name InstallService
+              Set-Service -Name InstallService -StartupType Automatic 
+              }
           }
   
         Write-Host "Initiating Sysprep"
@@ -720,10 +720,10 @@ $RemoveBloatNoBlacklist.Add_Click( {
         
         Function CheckInstallService {
   
-            If (Get-Service -Name InstallService | Where-Object ($_.Status -eq "Stopped"}) {
-            Start-Service -Name InstallService
-            Set-Service -Name InstallService -StartupType Automatic 
-            }
+            If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+              Start-Service -Name InstallService
+              Set-Service -Name InstallService -StartupType Automatic 
+              }
           }
           
         Begin-SysPrep
