@@ -518,7 +518,7 @@ Function FixWhitelistedApps {
 
 Function UninstallOneDrive {
 
-    Write-Output "Checking for pre-existing files located in the OneDrive folders..."
+    Write-Output "Checking for pre-existing files and folders located in the OneDrive folders..."
     Start-Sleep 1
     If (Get-Item -Path "$env:USERPROFILE\OneDrive\*") {
         Write-Output "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
@@ -536,7 +536,7 @@ Function UninstallOneDrive {
         }
         Start-Sleep 1
         Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
-        Write-Output "Successfully moved all files from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
+        Write-Output "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
         Start-Sleep 1
         Write-Output "Proceeding with the removal of OneDrive."
         Start-Sleep 1
