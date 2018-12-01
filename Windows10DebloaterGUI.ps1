@@ -431,6 +431,15 @@ $RemoveAllBloatware.Add_Click( {
             If (Test-Path $Suggestions) {
                 Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
             }
+            
+            
+            Write-Output "Removing CloudStore from registry if it exists"
+            $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+            If (Test-Path $CloudStore) {
+            Stop-Process Explorer.exe -Force
+            Remove-Item $CloudStore
+            Start-Process Explorer.exe -Wait
+            }
   
             #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
             reg load HKU\Default_User C:\Users\Default\NTUSER.DAT
@@ -673,6 +682,14 @@ $RemoveBloatNoBlacklist.Add_Click( {
             $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'    
             If (Test-Path $Suggestions) {
                 Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
+            }
+            
+            Write-Output "Removing CloudStore from registry if it exists"
+            $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+            If (Test-Path $CloudStore) {
+            Stop-Process Explorer.exe -Force
+            Remove-Item $CloudStore
+            Start-Process Explorer.exe -Wait
             }
   
             #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
