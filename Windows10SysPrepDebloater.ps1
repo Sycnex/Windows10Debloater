@@ -37,7 +37,7 @@ Function Start-Debloat {
 
     #Removes AppxPackages
     #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.MicrosoftStickyNotes|Microsoft.WindowsSoundRecorder|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows'
+    [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.MicrosoftStickyNotes|Microsoft.WindowsSoundRecorder|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.WindowsCamera'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
     # Run this again to avoid error on 1803 or having to reboot.
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
@@ -165,6 +165,15 @@ Function Protect-Privacy {
     $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'    
     If (Test-Path $Suggestions) {
         Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
+    }
+    
+    
+     Write-Output "Removing CloudStore from registry if it exists"
+     $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+     If (Test-Path $CloudStore) {
+     Stop-Process Explorer.exe -Force
+     Remove-Item $CloudStore
+     Start-Process Explorer.exe -Wait
     }
 
     #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
