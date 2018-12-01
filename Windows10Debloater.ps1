@@ -293,10 +293,14 @@ Function Protect-Privacy {
     Stop-Service "DiagTrack"
     Set-Service "DiagTrack" -StartupType Disabled
 
-    Write-Output "Removing CloudStore from registry if it exists"
-    Stop-Process Explorer.exe -Force
-    Remove-Item "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\CloudStore"
-    Start-Process Explorer.exe -Wait
+    
+     Write-Output "Removing CloudStore from registry if it exists"
+     $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+     If (Test-Path $CloudStore) {
+     Stop-Process Explorer.exe -Force
+     Remove-Item $CloudStore
+     Start-Process Explorer.exe -Wait
+   }
 }
 
 Function DisableCortana {
