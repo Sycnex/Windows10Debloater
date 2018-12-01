@@ -26,7 +26,7 @@ Function DebloatAll {
     
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera'
+    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
@@ -58,7 +58,7 @@ Function DebloatBlacklist {
         "Microsoft.SkypeApp"
         "Microsoft.StorePurchaseApp"
         "Microsoft.WindowsAlarms"
-        #"Microsoft.WindowsCamera"
+        "Microsoft.WindowsCamera"
         "microsoft.windowscommunicationsapps"
         "Microsoft.WindowsFeedbackHub"
         "Microsoft.WindowsMaps"
@@ -292,6 +292,11 @@ Function Protect-Privacy {
     #Disabling the Diagnostics Tracking Service
     Stop-Service "DiagTrack"
     Set-Service "DiagTrack" -StartupType Disabled
+
+    Write-Output "Removing CloudStore from registry if it exists"
+    Stop-Process Explorer.exe -Force
+    Remove-Item "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\CloudStore"
+    Start-Process Explorer.exe -Wait
 }
 
 Function DisableCortana {
