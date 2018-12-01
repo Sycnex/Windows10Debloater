@@ -641,7 +641,7 @@ Switch ($Prompt1) {
                 Start-Sleep 1
                 DisableWAPPush
                 Write-Output "WAP push service stopped and disabled"
-                Start-Sleep 1; = $Debloat
+                Start-Sleep 1
             }
             No {
                 #Creates a "drive" to access the HKCR (HKEY_CLASSES_ROOT)
@@ -674,7 +674,7 @@ Switch ($Prompt1) {
                 Start-Sleep 1
                 DisableWAPPush
                 Write-Output "WAP push service stopped and disabled"
-                Start-Sleep 1; = $Debloat
+                Start-Sleep 1
             }
         }
 
@@ -682,10 +682,10 @@ Switch ($Prompt1) {
         Switch ($Prompt3) {
             Yes {
                 Stop-EdgePDF
-                Write-Output "Edge will no longer take over as the default PDF viewer."; = $Yes
+                Write-Output "Edge will no longer take over as the default PDF viewer."
             }
             No {
-                = $No
+                Write-Output "You chose not to stop Edge from taking over as the default PDF viewer."
             }
         }
         #Prompt asking to delete OneDrive
@@ -693,10 +693,10 @@ Switch ($Prompt1) {
         Switch ($Prompt4) {
             Yes {
                 UninstallOneDrive
-                Write-Output "OneDrive is now removed from the computer."; = $Yes
+                Write-Output "OneDrive is now removed from the computer."
             }
             No {
-                = $No
+                Write-Output "You have chosen to skip removing OneDrive from your machine."
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -709,7 +709,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Initiating reboot."
                 Start-Sleep 2
-                Restart-Computer; = $Yes
+                Restart-Computer
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -718,7 +718,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Script has finished. Exiting."
                 Start-Sleep 2
-                Exit; = $No
+                Exit
             }
         }
     }
@@ -732,10 +732,10 @@ Switch ($Prompt1) {
         Switch ($Prompt6) {
             Yes {
                 Enable-EdgePDF
-                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; = $Yes
+                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."
             }
             No {
-                = $No
+               Write-Output "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -748,7 +748,7 @@ Switch ($Prompt1) {
                 Write-Output "Initiating reboot."
                 Stop-Transcript
                 Start-Sleep 2
-                Restart-Computer; = $Yes
+                Restart-Computer
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -757,7 +757,7 @@ Switch ($Prompt1) {
                 Write-Output "Script has finished. Exiting."
                 Stop-Transcript
                 Start-Sleep 2
-                Exit; = $No
+                Exit
             }
         }
     }
