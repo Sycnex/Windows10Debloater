@@ -726,7 +726,7 @@ Switch ($Prompt1) {
         Write-Output "Reverting changes..."
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Revert-Changes; = $Revert
+        Revert-Changes
         #Prompt asking to revert edge changes as well
         $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
         Switch ($Prompt6) {
