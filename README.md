@@ -128,6 +128,10 @@ The interactive version is what it implies - a Windows10Debloater script with in
 
 There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code. You need to download the file, and then just right click it and hit "Run as Powershell" and the application will load up! 
 
+The Remove all bloatware option - This uses both of the following functions - DebloatBlacklist and DebloatAll. The DebloatAll function which uses a whitelist will remove any appxpackages/appxprovisionedpackages that aren't whitelisted. The DebloatBlacklist function should theoretically remove anything possibly missed by the DebloatAll function. I also implemented this per a feature request.
+
+The Remove All Bloatware without Blacklist option - This only uses the DebloatAll function.
+
 # Switch Parameters
 
 There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
