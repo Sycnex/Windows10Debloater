@@ -118,6 +118,17 @@ $RemoveBloatNoBlacklist.Font = 'Microsoft Sans Serif,10'
 
 $Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist))
 
+$DebloatFolder = "C:\Temp\Windows10Debloater"
+If (Test-Path $DebloatFolder) {
+    Write-Output "$DebloatFolder exists. Skipping."
+}
+Else {
+    Write-Output "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Start-Sleep 1
+    New-Item -Path "$DebloatFolder" -ItemType Directory
+    Write-Output "The folder $DebloatFolder was successfully created."
+}
+
 #region gui events {
 $RemoveBlacklist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -224,6 +235,18 @@ $RemoveAllBloatware.Add_Click( {
             Write-Host -Message ('Setting InstallService Startup to Disabled')
             & Set-Service -Name InstallService -StartupType Disabled
         }
+        
+        Function CheckDMWService {
+
+  Param([switch]$Debloat)
+  
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
+  }
+}
 
         Function DebloatAll {
     
@@ -476,11 +499,16 @@ $RemoveAllBloatware.Add_Click( {
         }
   
         Function CheckDMWService {
-    
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-                Start-Service -Name dmwappushservice 
-            }
-        }
+
+  Param([switch]$Debloat)
+  
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
+  }
+}
         
         Function CheckInstallService {
   
@@ -728,13 +756,16 @@ $RemoveBloatNoBlacklist.Add_Click( {
         }
   
         Function CheckDMWService {
+
+  Param([switch]$Debloat)
   
-            Param([switch]$Debloat)
-    
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-                Start-Service -Name dmwappushservice 
-            }
-        }
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
+  }
+}
         
         Function CheckInstallService {
   
