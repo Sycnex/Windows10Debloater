@@ -240,14 +240,16 @@ $RemoveAllBloatware.Add_Click( {
         
         Function CheckDMWService {
 
-  Param([switch]$Debloat)
+            Param([switch]$Debloat)
   
-If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-    Set-Service -Name dmwappushservice -StartupType Automatic}
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service -Name dmwappushservice -StartupType Automatic
+            }
 
-If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-   Start-Service -Name dmwappushservice} 
-  }
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service -Name dmwappushservice
+            } 
+        }
 
 
         Function DebloatAll {
@@ -461,9 +463,9 @@ If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) 
             Write-Output "Removing CloudStore from registry if it exists"
             $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
             If (Test-Path $CloudStore) {
-            Stop-Process Explorer.exe -Force
-            Remove-Item $CloudStore
-            Start-Process Explorer.exe -Wait
+                Stop-Process Explorer.exe -Force
+                Remove-Item $CloudStore
+                Start-Process Explorer.exe -Wait
             }
   
             #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
@@ -502,13 +504,15 @@ If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) 
   
         Function CheckDMWService {
 
-        Param([switch]$Debloat)
+            Param([switch]$Debloat)
   
-        If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-            Set-Service -Name dmwappushservice -StartupType Automatic}
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service -Name dmwappushservice -StartupType Automatic
+            }
 
-        If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-        Start-Service -Name dmwappushservice} 
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service -Name dmwappushservice
+            } 
         }
         
         Function CheckInstallService {
@@ -532,7 +536,7 @@ If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) 
         Protect-Privacy
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         #Stop-EdgePDF
-        Write-Output "Setting the 'InstallService' Windows service back to "Started" and the Startup Type "Automatic".
+        Write-Output "Setting the 'InstallService' Windows service back to 'Started' and the Startup Type 'Automatic'."
         CheckDMWService
         CheckInstallService
         Write-Host "Finished all tasks. `n"
@@ -716,9 +720,9 @@ $RemoveBloatNoBlacklist.Add_Click( {
             Write-Output "Removing CloudStore from registry if it exists"
             $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
             If (Test-Path $CloudStore) {
-            Stop-Process Explorer.exe -Force
-            Remove-Item $CloudStore
-            Start-Process Explorer.exe -Wait
+                Stop-Process Explorer.exe -Force
+                Remove-Item $CloudStore
+                Start-Process Explorer.exe -Wait
             }
   
             #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
@@ -758,23 +762,24 @@ $RemoveBloatNoBlacklist.Add_Click( {
   
         Function CheckDMWService {
 
-  Param([switch]$Debloat)
+            Param([switch]$Debloat)
   
-If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-    Set-Service -Name dmwappushservice -StartupType Automatic}
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service -Name dmwappushservice -StartupType Automatic
+            }
 
-If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-   Start-Service -Name dmwappushservice} 
-  }
-}
+            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service -Name dmwappushservice
+            } 
+        }
         
         Function CheckInstallService {
   
             If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
-              Start-Service -Name InstallService
-              Set-Service -Name InstallService -StartupType Automatic 
-              }
-          }
+                Start-Service -Name InstallService
+                Set-Service -Name InstallService -StartupType Automatic 
+            }
+        }
           
         Begin-SysPrep
         Write-Host "Removing bloatware apps."
@@ -788,7 +793,7 @@ If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) 
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         Write-Host "Checking to make sure that the service 'dmwappushservice' has been started."
         CheckDMWService
-        Write-Output "Setting the 'InstallService' Windows service back to started and setting the Startup Type to "Automatic".
+        Write-Output "Setting the 'InstallService' Windows service back to started and setting the Startup Type to 'Automatic'."
         CheckInstallService
         Write-Host "Finished all tasks. `n"
   
@@ -1228,6 +1233,17 @@ $RemoveOnedrive.Add_Click( {
                 Write-Output "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
                 Start-Sleep 1
             }
+
+            Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+            $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+            If (!(Test-Path $OneDriveKey)) {
+                Mkdir $OneDriveKey 
+            }
+
+            $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+            If (Test-Path $DisableAllOneDrive) {
+                New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
+            }
         }
 
         Write-Host "Uninstalling OneDrive. Please wait..."
@@ -1266,6 +1282,17 @@ $RemoveOnedrive.Add_Click( {
         Write-Host "Restarting Explorer that was shut down before."
         Start-Process explorer.exe -NoNewWindow
         Write-Host "OneDrive has been successfully uninstalled! `n"
+
+        Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+        $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (!(Test-Path $OneDriveKey)) {
+            Mkdir $OneDriveKey 
+        }
+
+        $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (Test-Path $DisableAllOneDrive) {
+            New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
+        }
     })
 #endregion events }
 
