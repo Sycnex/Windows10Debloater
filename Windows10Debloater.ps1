@@ -4,17 +4,18 @@
 #no errors throughout
 $ErrorActionPreference = 'silentlycontinue'
 
-If (Test-Path "C:\Windows10Debloater") {
-    Write-Output "C:\Windows10Debloater exists. Skipping."
+$DebloatFolder = "C:\Temp\Windows10Debloater"
+If (Test-Path $DebloatFolder) {
+    Write-Output "$DebloatFolder exists. Skipping."
 }
 Else {
-    Write-Output "The folder 'C:\Windows10Debloater' doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Write-Output "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
     Start-Sleep 1
-    New-Item -Path "C:\Windows10Debloater" -ItemType Directory
-    Write-Output "The folder C:\Windows10Debloater was successfully created."
+    New-Item -Path "$DebloatFolder" -ItemType Directory
+    Write-Output "The folder $DebloatFolder was successfully created."
 }
 
-Start-Transcript -OutputDirectory "C:\Windows10Debloater"
+Start-Transcript -OutputDirectory "$DebloatFolder"
 
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
