@@ -599,6 +599,17 @@ Function UninstallOneDrive {
     Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
     Write-Output "Restarting Explorer that was shut down before."
     Start-Process explorer.exe -NoNewWindow
+    
+    Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+        $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (!(Test-Path $OneDriveKey)) {
+            Mkdir $OneDriveKey 
+        }
+
+        $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (Test-Path $DisableAllOneDrive) {
+            New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
+        }
 }
 
 #GUI prompt Debloat/Revert options and GUI variables
