@@ -217,6 +217,7 @@ If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disable
 
 If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
    Start-Service -Name dmwappushservice} 
+  }
 }
 
 Function CheckInstallService {
