@@ -284,11 +284,6 @@ Function Protect-Privacy {
     Get-ScheduledTask  DmClient | Disable-ScheduledTask
     Get-ScheduledTask  DmClientOnScenarioDownload | Disable-ScheduledTask
 
-    Write-Output "Stopping and disabling WAP Push Service"
-    #Stop and disable WAP Push Service
-    Stop-Service "dmwappushservice"
-    Set-Service "dmwappushservice" -StartupType Disabled
-
     Write-Output "Stopping and disabling Diagnostics Tracking Service"
     #Disabling the Diagnostics Tracking Service
     Stop-Service "DiagTrack"
@@ -477,6 +472,18 @@ Function Revert-Changes {
     Set-Service "DiagTrack" -StartupType Automatic
     Start-Service "DiagTrack"
 }
+
+Function CheckDMWService {
+
+  Param([switch]$Debloat)
+  
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
+  }
+}
     
 Function Enable-EdgePDF {
     Write-Output "Setting Edge back to default"
@@ -650,7 +657,8 @@ Switch ($Prompt1) {
                 Write-Output "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
-                Write-Output "WAP push service stopped and disabled"
+                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                CheckDMWService
                 Start-Sleep 1
             }
             No {
@@ -683,7 +691,8 @@ Switch ($Prompt1) {
                 Write-Output "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
-                Write-Output "WAP push service stopped and disabled"
+                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                CheckDMWService
                 Start-Sleep 1
             }
         }
