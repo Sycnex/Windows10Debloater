@@ -25,8 +25,6 @@ Function Begin-SysPrep {
         #Stop WindowsStore Installer Service and set to Disabled
         Write-Verbose -Message ('Stopping InstallService')
         Stop-Service InstallService
-        Write-Verbose -Message ('Setting InstallService Startup to Disabled')
-        & Set-Service -Name InstallService -StartupType Disabled
  }
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
@@ -214,8 +212,11 @@ Function CheckDMWService {
 
   Param([switch]$Debloat)
   
-  If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-        Start-Service -Name dmwappushservice }
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
 }
 
 Function CheckInstallService {
