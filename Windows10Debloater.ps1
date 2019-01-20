@@ -4,17 +4,18 @@
 #no errors throughout
 $ErrorActionPreference = 'silentlycontinue'
 
-If (Test-Path "C:\Windows10Debloater") {
-    Write-Output "C:\Windows10Debloater exists. Skipping."
+$DebloatFolder = "C:\Temp\Windows10Debloater"
+If (Test-Path $DebloatFolder) {
+    Write-Output "$DebloatFolder exists. Skipping."
 }
 Else {
-    Write-Output "The folder 'C:\Windows10Debloater' doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Write-Output "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
     Start-Sleep 1
-    New-Item -Path "C:\Windows10Debloater" -ItemType Directory
-    Write-Output "The folder C:\Windows10Debloater was successfully created."
+    New-Item -Path "$DebloatFolder" -ItemType Directory
+    Write-Output "The folder $DebloatFolder was successfully created."
 }
 
-Start-Transcript -OutputDirectory "C:\Windows10Debloater"
+Start-Transcript -OutputDirectory "$DebloatFolder"
 
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
@@ -26,7 +27,7 @@ Function DebloatAll {
     
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint'
+    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
@@ -58,7 +59,7 @@ Function DebloatBlacklist {
         "Microsoft.SkypeApp"
         "Microsoft.StorePurchaseApp"
         "Microsoft.WindowsAlarms"
-        "Microsoft.WindowsCamera"
+        #"Microsoft.WindowsCamera"
         "microsoft.windowscommunicationsapps"
         "Microsoft.WindowsFeedbackHub"
         "Microsoft.WindowsMaps"
@@ -99,7 +100,7 @@ Function DebloatBlacklist {
     )
     foreach ($Bloat in $Bloatware) {
         Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
-        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Debloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
         Write-Output "Trying to remove $Bloat."
     }
 }
@@ -283,15 +284,19 @@ Function Protect-Privacy {
     Get-ScheduledTask  DmClient | Disable-ScheduledTask
     Get-ScheduledTask  DmClientOnScenarioDownload | Disable-ScheduledTask
 
-    Write-Output "Stopping and disabling WAP Push Service"
-    #Stop and disable WAP Push Service
-    Stop-Service "dmwappushservice"
-    Set-Service "dmwappushservice" -StartupType Disabled
-
     Write-Output "Stopping and disabling Diagnostics Tracking Service"
     #Disabling the Diagnostics Tracking Service
     Stop-Service "DiagTrack"
     Set-Service "DiagTrack" -StartupType Disabled
+
+    
+     Write-Output "Removing CloudStore from registry if it exists"
+     $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+     If (Test-Path $CloudStore) {
+     Stop-Process Explorer.exe -Force
+     Remove-Item $CloudStore
+     Start-Process Explorer.exe -Wait
+   }
 }
 
 Function DisableCortana {
@@ -467,6 +472,17 @@ Function Revert-Changes {
     Set-Service "DiagTrack" -StartupType Automatic
     Start-Service "DiagTrack"
 }
+
+Function CheckDMWService {
+
+  Param([switch]$Debloat)
+  
+If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+    Set-Service -Name dmwappushservice -StartupType Automatic}
+
+If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+   Start-Service -Name dmwappushservice} 
+  }
     
 Function Enable-EdgePDF {
     Write-Output "Setting Edge back to default"
@@ -518,6 +534,36 @@ Function FixWhitelistedApps {
 
 Function UninstallOneDrive {
 
+    Write-Output "Checking for pre-existing files and folders located in the OneDrive folders..."
+    Start-Sleep 1
+    If (Get-Item -Path "$env:USERPROFILE\OneDrive\*") {
+        Write-Output "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
+        Start-Sleep 1
+              
+        If (Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue) {
+            Write-Output "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
+        }
+        else {
+            If (!(Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue)) {
+                Write-Output "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
+                New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
+                Write-Output "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
+            }
+        }
+        Start-Sleep 1
+        Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
+        Write-Output "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
+        Start-Sleep 1
+        Write-Output "Proceeding with the removal of OneDrive."
+        Start-Sleep 1
+    }
+    Else {
+        If (!(Get-Item -Path "$env:USERPROFILE\OneDrive\*")) {
+            Write-Output "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
+            Start-Sleep 1
+        }
+    }
+
     Write-Output "Uninstalling OneDrive"
     
     New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -553,6 +599,17 @@ Function UninstallOneDrive {
     Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
     Write-Output "Restarting Explorer that was shut down before."
     Start-Process explorer.exe -NoNewWindow
+    
+    Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+        $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (!(Test-Path $OneDriveKey)) {
+            Mkdir $OneDriveKey 
+        }
+
+        $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (Test-Path $DisableAllOneDrive) {
+            New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
+        }
 }
 
 #GUI prompt Debloat/Revert options and GUI variables
@@ -610,8 +667,9 @@ Switch ($Prompt1) {
                 Write-Output "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
-                Write-Output "WAP push service stopped and disabled"
-                Start-Sleep 1; = $Debloat
+                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                CheckDMWService
+                Start-Sleep 1
             }
             No {
                 #Creates a "drive" to access the HKCR (HKEY_CLASSES_ROOT)
@@ -643,8 +701,9 @@ Switch ($Prompt1) {
                 Write-Output "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
-                Write-Output "WAP push service stopped and disabled"
-                Start-Sleep 1; = $Debloat
+                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                CheckDMWService
+                Start-Sleep 1
             }
         }
 
@@ -652,10 +711,10 @@ Switch ($Prompt1) {
         Switch ($Prompt3) {
             Yes {
                 Stop-EdgePDF
-                Write-Output "Edge will no longer take over as the default PDF viewer."; = $Yes
+                Write-Output "Edge will no longer take over as the default PDF viewer."
             }
             No {
-                = $No
+                Write-Output "You chose not to stop Edge from taking over as the default PDF viewer."
             }
         }
         #Prompt asking to delete OneDrive
@@ -663,10 +722,10 @@ Switch ($Prompt1) {
         Switch ($Prompt4) {
             Yes {
                 UninstallOneDrive
-                Write-Output "OneDrive is now removed from the computer."; = $Yes
+                Write-Output "OneDrive is now removed from the computer."
             }
             No {
-                = $No
+                Write-Output "You have chosen to skip removing OneDrive from your machine."
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -679,7 +738,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Initiating reboot."
                 Start-Sleep 2
-                Restart-Computer; = $Yes
+                Restart-Computer
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -688,7 +747,7 @@ Switch ($Prompt1) {
                 Stop-Transcript
                 Write-Output "Script has finished. Exiting."
                 Start-Sleep 2
-                Exit; = $No
+                Exit
             }
         }
     }
@@ -696,16 +755,16 @@ Switch ($Prompt1) {
         Write-Output "Reverting changes..."
         Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Revert-Changes; = $Revert
+        Revert-Changes
         #Prompt asking to revert edge changes as well
         $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
         Switch ($Prompt6) {
             Yes {
                 Enable-EdgePDF
-                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."; = $Yes
+                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."
             }
             No {
-                = $No
+               Write-Output "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
             }
         }
         #Prompt asking if you'd like to reboot your machine
@@ -718,7 +777,7 @@ Switch ($Prompt1) {
                 Write-Output "Initiating reboot."
                 Stop-Transcript
                 Start-Sleep 2
-                Restart-Computer; = $Yes
+                Restart-Computer
             }
             No {
                 Write-Output "Unloading the HKCR drive..."
@@ -727,8 +786,57 @@ Switch ($Prompt1) {
                 Write-Output "Script has finished. Exiting."
                 Stop-Transcript
                 Start-Sleep 2
-                Exit; = $No
+                Exit
             }
         }
     }
 }
+
+
+#Function that is in testing. Can't figure out why I cannot delete the C:\Program Files\WindowsApps path
+
+Function DeleteBloatwareSystemFolders {
+    Write-Output "This will delete the folders located at: 
+    
+    C:\Windows\SystemApps and C:\Program Files\WindowsApps. This will prevent the bloatware from coming back by removing the included .xml files as well as`
+    any other files within the folders associated with the bloatware apps."
+    
+    $Windowsapps = @(
+        "*Microsoft.BingWeather*"
+        "*Microsoft.GetHelp*"
+        "*Microsoft.Getstarted*"
+        "*Microsoft.Microsoft3DViewer*"
+        "*Microsoft.MicrosoftOfficeHub*"
+        "*Microsoft.MicrosoftSolitaireCollection*"
+        "*Microsoft.MixedReality.Portal*"
+        #"*Microsoft.Office.OneNote*"
+        "*Microsoft.OneConnect*"
+        "*Microsoft.People*"
+        "*Microsoft.Print3D*"
+        "*Microsoft.ScreenSketch*"
+        "*Microsoft.SkypeApp*"
+        "*Microsoft.WindowsAlarms*"
+        "*microsoft.windowscommunicationsapps*"
+        "*Microsoft.WindowsFeedbackHub*"
+        "*Microsoft.WindowsMaps*"
+        "*Microsoft.WindowsSoundRecorder*"
+        #"*Microsoft.WindowsStore*"
+        "*Microsoft.Xbox*"
+        "*Microsoft.YourPhone*"
+        "*Microsoft.ZuneMusic*"
+    )
+    Start-process Powershell Get-Credential ""
+
+    foreach ($app in $Windowsapps) {
+        Remove-Item -Recurse "C:\Program Files\WindowsApps\$app" -force
+        Write-Output "Trying to remove $app."
+    }
+
+    #This works to take ownership of the path. But I think PS is running as system and not myself.
+    #takeown.exe /f 'C:\Program Files\WindowsApps'
+
+}
+
+Start-Process powershell.exe -Credential "domain\username" -NoNewWindow -ArgumentList "Start-Process powershell.exe -Verb runAs"
+
+
