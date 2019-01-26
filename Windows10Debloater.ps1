@@ -50,6 +50,8 @@ Function DebloatBlacklist {
         "Microsoft.MicrosoftOfficeHub"
         "Microsoft.MicrosoftSolitaireCollection"
         "Microsoft.NetworkSpeedTest"
+        "Microsoft.News"
+        "Microsoft.Office.Lens"
         "Microsoft.Office.OneNote"
         "Microsoft.Office.Sway"
         "Microsoft.OneConnect"
@@ -58,6 +60,8 @@ Function DebloatBlacklist {
         "Microsoft.RemoteDesktop"
         "Microsoft.SkypeApp"
         "Microsoft.StorePurchaseApp"
+        "Microsoft.Office.Todo.List"
+        "Microsoft.Whiteboard"
         "Microsoft.WindowsAlarms"
         #"Microsoft.WindowsCamera"
         "microsoft.windowscommunicationsapps"
@@ -87,6 +91,8 @@ Function DebloatBlacklist {
         "*Spotify*"
         "*Minecraft*"
         "*Royal Revolt*"
+        "*Sway*"
+        "*Speed Test*"
              
         #Optional: Typically not removed but you can if you need to for some reason
         #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
