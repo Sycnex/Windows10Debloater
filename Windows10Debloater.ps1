@@ -36,7 +36,9 @@ Function DebloatAll {
     
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET'
+    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+    Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|`
+    Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
@@ -51,7 +53,6 @@ Function DebloatBlacklist {
 
         #Unnecessary Windows 10 AppX Apps
         "Microsoft.BingNews"
-        "Microsoft.DesktopAppInstaller"
         "Microsoft.GetHelp"
         "Microsoft.Getstarted"
         "Microsoft.Messaging"
@@ -84,7 +85,7 @@ Function DebloatBlacklist {
         "Microsoft.XboxSpeechToTextOverlay"
         "Microsoft.ZuneMusic"
         "Microsoft.ZuneVideo"
-             
+
         #Sponsored Windows 10 AppX Apps
         #Add sponsored/featured apps to remove in the "*AppName*" format
         "*EclipseManager*"
