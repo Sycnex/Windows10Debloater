@@ -151,6 +151,8 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.MicrosoftOfficeHub"
                 "Microsoft.MicrosoftSolitaireCollection"
                 "Microsoft.NetworkSpeedTest"
+                "Microsoft.News"
+                "Microsoft.Office.Lens"
                 "Microsoft.Office.OneNote"
                 "Microsoft.Office.Sway"
                 "Microsoft.OneConnect"
@@ -159,6 +161,8 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.RemoteDesktop"
                 "Microsoft.SkypeApp"
                 "Microsoft.StorePurchaseApp"
+                "Microsoft.Office.Todo.List"
+                "Microsoft.Whiteboard"
                 "Microsoft.WindowsAlarms"
                 #"Microsoft.WindowsCamera"
                 "microsoft.windowscommunicationsapps"
@@ -172,7 +176,7 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.XboxSpeechToTextOverlay"
                 "Microsoft.ZuneMusic"
                 "Microsoft.ZuneVideo"
-                 
+
                 #Sponsored Windows 10 AppX Apps
                 #Add sponsored/featured apps to remove in the "*AppName*" format
                 "*EclipseManager*"
@@ -188,6 +192,7 @@ $RemoveBlacklist.Add_Click( {
                 "*Spotify*"
                 "*Minecraft*"
                 "*Royal Revolt*"
+                "*Sway*"
                  
                 #Optional: Typically not removed but you can if you need to for some reason
                 #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
@@ -283,6 +288,8 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.MicrosoftOfficeHub"
                 "Microsoft.MicrosoftSolitaireCollection"
                 "Microsoft.NetworkSpeedTest"
+                "Microsoft.News"
+                "Microsoft.Office.Lens"
                 "Microsoft.Office.OneNote"
                 "Microsoft.Office.Sway"
                 "Microsoft.OneConnect"
@@ -291,6 +298,8 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.RemoteDesktop"
                 "Microsoft.SkypeApp"
                 "Microsoft.StorePurchaseApp"
+                "Microsoft.Office.Todo.List"
+                "Microsoft.Whiteboard"
                 "Microsoft.WindowsAlarms"
                 #"Microsoft.WindowsCamera"
                 "microsoft.windowscommunicationsapps"
@@ -304,7 +313,7 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.XboxSpeechToTextOverlay"
                 "Microsoft.ZuneMusic"
                 "Microsoft.ZuneVideo"
-             
+
                 #Sponsored Windows 10 AppX Apps
                 #Add sponsored/featured apps to remove in the "*AppName*" format
                 "*EclipseManager*"
@@ -320,6 +329,7 @@ $RemoveAllBloatware.Add_Click( {
                 "*Spotify*"
                 "*Minecraft*"
                 "*Royal Revolt*"
+                "*Sway*"
              
                 #Optional: Typically not removed but you can if you need to for some reason
                 #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
