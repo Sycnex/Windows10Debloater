@@ -268,12 +268,10 @@ Function Protect-Privacy {
     Set-ItemProperty $LocationConfig Status -Value 0 
         
     #Disables People icon on Taskbar
-        #Disables People icon on Taskbar
     Write-Output "Disabling People icon on Taskbar"
     $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
-    If (!(Test-Path $People)) {
-        mkdir $People -ErrorAction SilentlyContinue
-        New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+    If (Test-Path $People) {
+        Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
     }
         
     #Disables scheduled tasks that are considered unnecessary 
