@@ -152,10 +152,9 @@ Function Protect-Privacy {
     
     #Disables People icon on Taskbar
     Write-Output "Disabling People icon on Taskbar"
-    $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-    If (!(Test-Path $People)) {
-        mkdir $People -ErrorAction SilentlyContinue
-        New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+    $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+    If (Test-Path $People) {
+        Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
     }
 
     #Disables suggestions on start menu
