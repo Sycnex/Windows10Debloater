@@ -152,7 +152,6 @@ $RemoveBlacklist.Add_Click( {
     
                 #Unnecessary Windows 10 AppX Apps
                 "Microsoft.BingNews"
-                "Microsoft.DesktopAppInstaller"
                 "Microsoft.GetHelp"
                 "Microsoft.Getstarted"
                 "Microsoft.Messaging"
@@ -291,7 +290,6 @@ $RemoveAllBloatware.Add_Click( {
                 
                 #Unnecessary Windows 10 AppX Apps
                 "Microsoft.BingNews"
-                "Microsoft.DesktopAppInstaller"
                 "Microsoft.GetHelp"
                 "Microsoft.Getstarted"
                 "Microsoft.Messaging"
