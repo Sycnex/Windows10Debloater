@@ -446,10 +446,9 @@ $RemoveAllBloatware.Add_Click( {
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
-            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-            If (!(Test-Path $People)) {
-                mkdir $People -ErrorAction SilentlyContinue
-                New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+            If (Test-Path $People) {
+                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
             }
   
             #Disables suggestions on start menu
@@ -704,10 +703,9 @@ $RemoveBloatNoBlacklist.Add_Click( {
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
-            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-            If (!(Test-Path $People)) {
-                mkdir $People -ErrorAction SilentlyContinue
-                New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+            If (Test-Path $People) {
+                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
             }
   
             #Disables suggestions on start menu
@@ -859,12 +857,11 @@ $RevertChange.Add_Click( {
         Set-ItemProperty $DataCollection  AllowTelemetry -Value 1
         
         #Re-enables People Icon on Taskbar
-        Write-Host "Enabling People icon on Taskbar"
-        $People = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People"
-        If (!(Test-Path $People)) {
-            New-Item $People 
+        Write-Host "Enabling People Icon on Taskbar"
+        $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+        If (Test-Path $People) {
+            Set-ItemProperty $People -Name PeopleBand -Value 1 -Verbose
         }
-        Set-ItemProperty $People  PeopleBand -Value 1 
     
         #Re-enables suggestions on start menu
         Write-Host "Enabling suggestions on the Start Menu"
@@ -1128,11 +1125,10 @@ $DisableTelemetry.Add_Click( {
         
         #Disables People icon on Taskbar
         Write-Host "Disabling People icon on Taskbar"
-        $People = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People"    
-        If (!(Test-Path $People)) {
-            New-Item $People
-        }
-        Set-ItemProperty $People  PeopleBand -Value 0 
+        $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+        If (Test-Path $People) {
+            Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+        } 
         
         #Disables scheduled tasks that are considered unnecessary 
         Write-Host "Disabling scheduled tasks"
