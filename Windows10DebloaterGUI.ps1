@@ -7,6 +7,10 @@ If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Break
 }
 
+<# This form was created using POSHGUI.com  a free online gui designer for PowerShell
+.NAME
+    Untitled
+#>
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
