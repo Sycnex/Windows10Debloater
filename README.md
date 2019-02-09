@@ -154,4 +154,6 @@ Thank you to a60wattfish, abulgatz, xsisbest, Damian and Reddit user /u/GavinEke
 
 If you like and appreciate my work then please consider a donation for a cup of coffee. :)
 
+(This is a donation, and not for continued development/support of my work)
+
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/syncrn)
