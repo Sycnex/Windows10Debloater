@@ -1,3 +1,16 @@
+#This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
+If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
+    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
+    Start-Sleep 1
+    Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
+    Break
+}
+
+<# This form was created using POSHGUI.com  a free online gui designer for PowerShell
+.NAME
+    Untitled
+#>
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
@@ -143,7 +156,6 @@ $RemoveBlacklist.Add_Click( {
     
                 #Unnecessary Windows 10 AppX Apps
                 "Microsoft.BingNews"
-                "Microsoft.DesktopAppInstaller"
                 "Microsoft.GetHelp"
                 "Microsoft.Getstarted"
                 "Microsoft.Messaging"
@@ -151,6 +163,8 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.MicrosoftOfficeHub"
                 "Microsoft.MicrosoftSolitaireCollection"
                 "Microsoft.NetworkSpeedTest"
+                "Microsoft.News"
+                "Microsoft.Office.Lens"
                 "Microsoft.Office.OneNote"
                 "Microsoft.Office.Sway"
                 "Microsoft.OneConnect"
@@ -159,6 +173,8 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.RemoteDesktop"
                 "Microsoft.SkypeApp"
                 "Microsoft.StorePurchaseApp"
+                "Microsoft.Office.Todo.List"
+                "Microsoft.Whiteboard"
                 "Microsoft.WindowsAlarms"
                 #"Microsoft.WindowsCamera"
                 "microsoft.windowscommunicationsapps"
@@ -172,7 +188,7 @@ $RemoveBlacklist.Add_Click( {
                 "Microsoft.XboxSpeechToTextOverlay"
                 "Microsoft.ZuneMusic"
                 "Microsoft.ZuneVideo"
-                 
+
                 #Sponsored Windows 10 AppX Apps
                 #Add sponsored/featured apps to remove in the "*AppName*" format
                 "*EclipseManager*"
@@ -188,6 +204,7 @@ $RemoveBlacklist.Add_Click( {
                 "*Spotify*"
                 "*Minecraft*"
                 "*Royal Revolt*"
+                "*Sway*"
                  
                 #Optional: Typically not removed but you can if you need to for some reason
                 #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
@@ -260,7 +277,9 @@ $RemoveAllBloatware.Add_Click( {
     
             #Removes AppxPackages
             #Credit to /u/GavinEke for a modified version of my whitelist code
-            [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET'
+            [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+            Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|`
+            Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry'
             Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
             Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
             Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
@@ -275,7 +294,6 @@ $RemoveAllBloatware.Add_Click( {
                 
                 #Unnecessary Windows 10 AppX Apps
                 "Microsoft.BingNews"
-                "Microsoft.DesktopAppInstaller"
                 "Microsoft.GetHelp"
                 "Microsoft.Getstarted"
                 "Microsoft.Messaging"
@@ -283,6 +301,8 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.MicrosoftOfficeHub"
                 "Microsoft.MicrosoftSolitaireCollection"
                 "Microsoft.NetworkSpeedTest"
+                "Microsoft.News"
+                "Microsoft.Office.Lens"
                 "Microsoft.Office.OneNote"
                 "Microsoft.Office.Sway"
                 "Microsoft.OneConnect"
@@ -291,6 +311,8 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.RemoteDesktop"
                 "Microsoft.SkypeApp"
                 "Microsoft.StorePurchaseApp"
+                "Microsoft.Office.Todo.List"
+                "Microsoft.Whiteboard"
                 "Microsoft.WindowsAlarms"
                 #"Microsoft.WindowsCamera"
                 "microsoft.windowscommunicationsapps"
@@ -304,7 +326,7 @@ $RemoveAllBloatware.Add_Click( {
                 "Microsoft.XboxSpeechToTextOverlay"
                 "Microsoft.ZuneMusic"
                 "Microsoft.ZuneVideo"
-             
+
                 #Sponsored Windows 10 AppX Apps
                 #Add sponsored/featured apps to remove in the "*AppName*" format
                 "*EclipseManager*"
@@ -320,6 +342,7 @@ $RemoveAllBloatware.Add_Click( {
                 "*Spotify*"
                 "*Minecraft*"
                 "*Royal Revolt*"
+                "*Sway*"
              
                 #Optional: Typically not removed but you can if you need to for some reason
                 #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
@@ -446,10 +469,9 @@ $RemoveAllBloatware.Add_Click( {
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
-            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-            If (!(Test-Path $People)) {
-                mkdir $People -ErrorAction SilentlyContinue
-                New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+            If (Test-Path $People) {
+                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
             }
   
             #Disables suggestions on start menu
@@ -585,7 +607,9 @@ $RemoveBloatNoBlacklist.Add_Click( {
   
             #Removes AppxPackages
             #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
-            [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.MicrosoftStickyNotes|Microsoft.WindowsSoundRecorder|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.WindowsCamera|.NET'
+            [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+            Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|`
+            Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry'
             Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
             # Run this again to avoid error on 1803 or having to reboot.
             Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
@@ -704,10 +728,9 @@ $RemoveBloatNoBlacklist.Add_Click( {
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
-            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-            If (!(Test-Path $People)) {
-                mkdir $People -ErrorAction SilentlyContinue
-                New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+            If (Test-Path $People) {
+                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
             }
   
             #Disables suggestions on start menu
@@ -859,12 +882,11 @@ $RevertChange.Add_Click( {
         Set-ItemProperty $DataCollection  AllowTelemetry -Value 1
         
         #Re-enables People Icon on Taskbar
-        Write-Host "Enabling People icon on Taskbar"
-        $People = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People"
-        If (!(Test-Path $People)) {
-            New-Item $People 
+        Write-Host "Enabling People Icon on Taskbar"
+        $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+        If (Test-Path $People) {
+            Set-ItemProperty $People -Name PeopleBand -Value 1 -Verbose
         }
-        Set-ItemProperty $People  PeopleBand -Value 1 
     
         #Re-enables suggestions on start menu
         Write-Host "Enabling suggestions on the Start Menu"
@@ -1128,11 +1150,10 @@ $DisableTelemetry.Add_Click( {
         
         #Disables People icon on Taskbar
         Write-Host "Disabling People icon on Taskbar"
-        $People = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People"    
-        If (!(Test-Path $People)) {
-            New-Item $People
-        }
-        Set-ItemProperty $People  PeopleBand -Value 0 
+        $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+        If (Test-Path $People) {
+            Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+        } 
         
         #Disables scheduled tasks that are considered unnecessary 
         Write-Host "Disabling scheduled tasks"

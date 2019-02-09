@@ -1,6 +1,15 @@
 #This function finds any AppX/AppXProvisioned package and uninstalls it, except for Freshpaint, Windows Calculator, Windows Store, and Windows Photos.
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
+#This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
+If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
+    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
+    Start-Sleep 1
+    Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
+    Break
+}
+
 #no errors throughout
 $ErrorActionPreference = 'silentlycontinue'
 
@@ -27,7 +36,9 @@ Function DebloatAll {
     
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET'
+    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+    Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|`
+    Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
     Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
@@ -42,7 +53,6 @@ Function DebloatBlacklist {
 
         #Unnecessary Windows 10 AppX Apps
         "Microsoft.BingNews"
-        "Microsoft.DesktopAppInstaller"
         "Microsoft.GetHelp"
         "Microsoft.Getstarted"
         "Microsoft.Messaging"
@@ -50,6 +60,8 @@ Function DebloatBlacklist {
         "Microsoft.MicrosoftOfficeHub"
         "Microsoft.MicrosoftSolitaireCollection"
         "Microsoft.NetworkSpeedTest"
+        "Microsoft.News"
+        "Microsoft.Office.Lens"
         "Microsoft.Office.OneNote"
         "Microsoft.Office.Sway"
         "Microsoft.OneConnect"
@@ -58,6 +70,8 @@ Function DebloatBlacklist {
         "Microsoft.RemoteDesktop"
         "Microsoft.SkypeApp"
         "Microsoft.StorePurchaseApp"
+        "Microsoft.Office.Todo.List"
+        "Microsoft.Whiteboard"
         "Microsoft.WindowsAlarms"
         #"Microsoft.WindowsCamera"
         "microsoft.windowscommunicationsapps"
@@ -71,7 +85,7 @@ Function DebloatBlacklist {
         "Microsoft.XboxSpeechToTextOverlay"
         "Microsoft.ZuneMusic"
         "Microsoft.ZuneVideo"
-             
+
         #Sponsored Windows 10 AppX Apps
         #Add sponsored/featured apps to remove in the "*AppName*" format
         "*EclipseManager*"
@@ -87,6 +101,8 @@ Function DebloatBlacklist {
         "*Spotify*"
         "*Minecraft*"
         "*Royal Revolt*"
+        "*Sway*"
+        "*Speed Test*"
              
         #Optional: Typically not removed but you can if you need to for some reason
         #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
@@ -269,11 +285,10 @@ Function Protect-Privacy {
         
     #Disables People icon on Taskbar
     Write-Output "Disabling People icon on Taskbar"
-    $People = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People"    
-    If (!(Test-Path $People)) {
-        New-Item $People
+    $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+    If (Test-Path $People) {
+        Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
     }
-    Set-ItemProperty $People  PeopleBand -Value 0 
         
     #Disables scheduled tasks that are considered unnecessary 
     Write-Output "Disabling scheduled tasks"

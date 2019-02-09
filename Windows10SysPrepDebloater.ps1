@@ -35,7 +35,9 @@ Function Start-Debloat {
 
     #Removes AppxPackages
     #Credit to Reddit user /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.Paint3D|Microsoft.MSPaint|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.MicrosoftStickyNotes|Microsoft.WindowsSoundRecorder|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|Microsoft.WindowsCamera|.NET'
+    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+    Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|`
+    Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller'
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
     # Run this again to avoid error on 1803 or having to reboot.
     Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
@@ -152,10 +154,9 @@ Function Protect-Privacy {
     
     #Disables People icon on Taskbar
     Write-Output "Disabling People icon on Taskbar"
-    $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'    
-    If (!(Test-Path $People)) {
-        mkdir $People -ErrorAction SilentlyContinue
-        New-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+    $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+    If (Test-Path $People) {
+        Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
     }
 
     #Disables suggestions on start menu
