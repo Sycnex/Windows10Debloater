@@ -149,11 +149,3 @@ Finally, there is an optional switch parameter which is Stop-EdgePDF. This just 
 # Credit
 
 Thank you to a60wattfish, abulgatz, xsisbest, Damian and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
-
-# Donate 
-
-If you like and appreciate my work then please consider a donation for a cup of coffee. :)
-
-(This is a donation, and not for continued development/support of my work)
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/syncrn)
