@@ -1,11 +1,11 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
-If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+<#If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
     Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
     Start-Sleep 1
     Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
     Break
-}
+}#>
 
 <# This form was created using POSHGUI.com  a free online gui designer for PowerShell
 .NAME
@@ -59,7 +59,7 @@ $RevertChange.location = New-Object System.Drawing.Point(254, 32)
 $RevertChange.Font = 'Microsoft Sans Serif,10'
 
 $Label2 = New-Object system.Windows.Forms.Label
-$Label2.text = "Optional Privacy Changes/Fixes"
+$Label2.text = "Optional Changes/Fixes"
 $Label2.AutoSize = $true
 $Label2.width = 25
 $Label2.height = 10
@@ -82,15 +82,15 @@ $EnableCortana.Font = 'Microsoft Sans Serif,10'
 
 $StopEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $StopEdgePDFTakeover.text = "Stop Edge PDF Takeover"
-$StopEdgePDFTakeover.width = 161
+$StopEdgePDFTakeover.width = 175
 $StopEdgePDFTakeover.height = 38
 $StopEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 217)
 $StopEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
 $EnableEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $EnableEdgePDFTakeover.text = "Enable Edge PDF Takeover"
-$EnableEdgePDFTakeover.width = 177
-$EnableEdgePDFTakeover.height = 39
+$EnableEdgePDFTakeover.width = 185
+$EnableEdgePDFTakeover.height = 38
 $EnableEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 260)
 $EnableEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
@@ -98,21 +98,28 @@ $DisableTelemetry = New-Object system.Windows.Forms.Button
 $DisableTelemetry.text = "Disable Telemetry/Tasks"
 $DisableTelemetry.width = 152
 $DisableTelemetry.height = 35
-$DisableTelemetry.location = New-Object System.Drawing.Point(9, 303)
+$DisableTelemetry.location = New-Object System.Drawing.Point(9, 345)
 $DisableTelemetry.Font = 'Microsoft Sans Serif,10'
 
 $RemoveRegkeys = New-Object system.Windows.Forms.Button
 $RemoveRegkeys.text = "Remove Bloatware Regkeys"
-$RemoveRegkeys.width = 177
-$RemoveRegkeys.height = 40
-$RemoveRegkeys.location = New-Object System.Drawing.Point(169, 303)
+$RemoveRegkeys.width = 188
+$RemoveRegkeys.height = 35
+$RemoveRegkeys.location = New-Object System.Drawing.Point(169, 345)
 $RemoveRegkeys.Font = 'Microsoft Sans Serif,10'
+
+$UnpinStartMenuTiles = New-Object system.Windows.Forms.Button
+$UnpinStartMenuTiles.text = "Unpin Tiles From Start Menu"
+$UnpinStartMenuTiles.width = 190
+$UnpinStartMenuTiles.height = 35
+$UnpinStartMenuTiles.location = New-Object System.Drawing.Point(169, 303)
+$UnpinStartMenuTiles.Font = 'Microsoft Sans Serif,10'
 
 $RemoveOnedrive = New-Object system.Windows.Forms.Button
 $RemoveOnedrive.text = "Uninstall OneDrive"
-$RemoveOnedrive.width = 117
+$RemoveOnedrive.width = 152
 $RemoveOnedrive.height = 35
-$RemoveOnedrive.location = New-Object System.Drawing.Point(9, 345)
+$RemoveOnedrive.location = New-Object System.Drawing.Point(9, 303)
 $RemoveOnedrive.Font = 'Microsoft Sans Serif,10'
 
 $FixWhitelist = New-Object system.Windows.Forms.Button
@@ -128,8 +135,7 @@ $RemoveBloatNoBlacklist.width = 223
 $RemoveBloatNoBlacklist.height = 39
 $RemoveBloatNoBlacklist.location = New-Object System.Drawing.Point(9, 123)
 $RemoveBloatNoBlacklist.Font = 'Microsoft Sans Serif,10'
-
-$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist))
+$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist))
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
@@ -510,6 +516,18 @@ $RemoveAllBloatware.Add_Click( {
             Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
             Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
         }
+
+            Function UnpinStart {
+            #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+            #Unpins all tiles from the Start Menu
+            Write-Host "Unpinning all tiles from the start menu"
+            (New-Object -Com Shell.Application).
+            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+            Items() |
+            %{ $_.Verbs() } |
+            ?{$_.Name -match 'Un.*pin from Start'} |
+            %{$_.DoIt()}
+    }
   
         #This includes fixes by xsisbest
         Function FixWhitelistedApps {
@@ -560,6 +578,8 @@ $RemoveAllBloatware.Add_Click( {
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
+        UnpinStart
+        Write-Host "Unpinning tiles from the Start Menu."
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         #Stop-EdgePDF
         Write-Output "Setting the 'InstallService' Windows service back to 'Started' and the Startup Type 'Automatic'."
@@ -768,6 +788,18 @@ $RemoveBloatNoBlacklist.Add_Click( {
             Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
             Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
         }
+
+            Function UnpinStart {
+            #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+            #Unpins all tiles from the Start Menu
+            Write-Host "Unpinning all tiles from the start menu"
+            (New-Object -Com Shell.Application).
+            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+            Items() |
+            %{ $_.Verbs() } |
+            ?{$_.Name -match 'Un.*pin from Start'} |
+            %{$_.DoIt()}
+    }
   
         #This includes fixes by xsisbest
         Function FixWhitelistedApps {
@@ -817,6 +849,8 @@ $RemoveBloatNoBlacklist.Add_Click( {
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
+        UnpinStart
+        Write-Host "Unpinning tiles from the Start Menu."
         #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         Write-Host "Checking to make sure that the service 'dmwappushservice' has been started."
         CheckDMWService
@@ -1229,6 +1263,18 @@ $RemoveRegkeys.Add_Click( {
         }
         Write-Host "Additional bloatware keys have been removed! `n"
     })
+$UnpinStartMenuTiles.Add_Click( {
+        #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+        #Unpins all tiles from the Start Menu
+            Write-Host "Unpinning all tiles from the start menu"
+            (New-Object -Com Shell.Application).
+            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+            Items() |
+            %{ $_.Verbs() } |
+            ?{$_.Name -match 'Un.*pin from Start'} |
+            %{$_.DoIt()}
+    })
+
 $RemoveOnedrive.Add_Click( { 
         Write-Output "Checking for pre-existing files and folders located in the OneDrive folders..."
         Start-Sleep 1
