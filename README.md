@@ -1,20 +1,74 @@
 # Windows10Debloater
 Script/Utility/Application to debloat Windows 10
 
-# Purpose
+# How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
 
-I have found many different solutions online to debloat Windows 10 and many either worked but caused issues in the long run, or they did so little that it wasn't enough of a "debloat" experience. I decided to create a script that will debloat Windows 10 the way that I envision it, with the option of even being able to revert changes.
+There are different methods of running the PowerShell script. The methods are as follows:
 
-This comes in hand when setting up new Windows 10 machines without needing to manually remove the bloatware found within Windows 10, along with some "fail safe" features via the Revert-Changes function, and even stops Windows from installing the bloatware in new user profiles.
+First Method:
+
+1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
+2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
+3) On the propmt, change to the directory where you extracted the files:
+  e.g. - cd c:\temp
+4) Next, to run either script, enter in the following:
+  e.g. - .\Windows10DebloaterGUI.ps1
+  
+
+Second Method:
+
+1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
+2) Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
+3) This will allow the script to run without having to do the above steps
 
 
-# How To Run
+Third Method:
+
+This method has an issue because my script will launch a PowerShell session as an Administrator if you didn't do so, and if you didn't then this method won't work properly unless you remove the code at the very top that does this.
+
+1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
+2) Open the files and copy and paste the source code into either PowerShell.exe or PowerShell ISE.
+3) Click "RUN" (or F5) and the script will run
 
 
+# How To Run the Windows10SysPrepDebloater.ps1 file
 
-Download the Windows10Debloater.ps1 file. Next, open PowerShell ISE/VSCode as an Administrator, copy the source code from Windows10Debloater.ps1 and throw it into PowerShell ISE/VSCode/etc and run it.
+For the WindowsSysPrepDebloater.ps1 file, there are a couple of paramters that you can run so that you can specify which functions are used. The parameters are:
+-SysPrep, -Debloat, and -StopEdgePDF. 
 
-Alternatively, download the Windows10SysPrepDebloater.ps1 file, place it in any directory of your choice, load PowerShell ISE or PowerShell (64-Bit)/VSCode as an administrator, change to the directory where you placed the Windows10SysPrepDebloater.ps1 file, and run one (or all) of the 3 switch parameters: -SysPrep, -Debloat, and -StopEdgePDF. E.g., C:\Windows10SysPrepDebloater.ps1 -SysPrep -Debloat -StopEdgePDF.
+To run this with parameters, do the following:
+
+1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
+2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
+3) On the propmt, change to the directory where you extracted the files:
+  e.g. - cd c:\temp
+4) Next, to run either script, enter in the following:
+  e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy and -StopEdgePDF
+  
+
+# Sysprep, Interactive, and GUI Application
+
+There are now 3 versions of my Windows10Debloater - There is an interactive version, a GUI app version, and a pure silent version.
+
+Windows10SysPrepDebloater.ps1 - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+
+Windows10Debloater.ps1 - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
+
+Windows10DebloaterGUI.ps1 There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
+
+# Switch Parameters
+
+There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
+
+The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
+
+The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
+
+Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
+
+Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
+
+Finally, there is an optional switch parameter which is Stop-EdgePDF. This just stops Edge from taking over as the default PDF viewer. I made this optional since some do not find this necessary for them or their organization.
 
 # This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
 
@@ -120,32 +174,6 @@ Xbox Game CallableUI,
 Xbox Identity Provider, and
 ContactSupport.
 
-# Silent, Interactive, and GUI Application
-
-There are now 2 versions of my Windows10Debloater - There is an interactive version, and a pure silent version. The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
-
-The interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters.
-
-There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code. You need to download the file, and then just right click it and hit "Run as Powershell" and the application will load up! 
-
-The Remove all bloatware option - This uses both of the following functions - DebloatBlacklist and DebloatAll. The DebloatAll function which uses a whitelist will remove any appxpackages/appxprovisionedpackages that aren't whitelisted. The DebloatBlacklist function should theoretically remove anything possibly missed by the DebloatAll function. I also implemented this per a feature request.
-
-The Remove All Bloatware without Blacklist option - This only uses the DebloatAll function.
-
-# Switch Parameters
-
-There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
-
-The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
-
-The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
-
-Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
-
-Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
-
-Finally, there is an optional switch parameter which is Stop-EdgePDF. This just stops Edge from taking over as the default PDF viewer. I made this optional since some do not find this necessary for them or their organization.
-
 # Credit
 
-Thank you to a60wattfish, abulgatz, xsisbest, Damian and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
+Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
