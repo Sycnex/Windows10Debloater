@@ -83,14 +83,14 @@ $EnableCortana.Font = 'Microsoft Sans Serif,10'
 $StopEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $StopEdgePDFTakeover.text = "Stop Edge PDF Takeover"
 $StopEdgePDFTakeover.width = 175
-$StopEdgePDFTakeover.height = 38
+$StopEdgePDFTakeover.height = 35
 $StopEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 217)
 $StopEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
 $EnableEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $EnableEdgePDFTakeover.text = "Enable Edge PDF Takeover"
 $EnableEdgePDFTakeover.width = 185
-$EnableEdgePDFTakeover.height = 38
+$EnableEdgePDFTakeover.height = 35
 $EnableEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 260)
 $EnableEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
@@ -518,6 +518,7 @@ $RemoveAllBloatware.Add_Click( {
         }
 
             Function UnpinStart {
+            #Credit to Vikingat-Rage
             #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
             #Unpins all tiles from the Start Menu
             Write-Host "Unpinning all tiles from the start menu"
@@ -790,6 +791,7 @@ $RemoveBloatNoBlacklist.Add_Click( {
         }
 
             Function UnpinStart {
+            #Credit to Vikingat-Rage
             #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
             #Unpins all tiles from the Start Menu
             Write-Host "Unpinning all tiles from the start menu"
