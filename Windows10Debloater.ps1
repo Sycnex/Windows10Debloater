@@ -629,6 +629,18 @@ Function UninstallOneDrive {
         }
 }
 
+Function UnpinStart {
+#https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+#Unpins all tiles from the Start Menu
+    Write-Output "Unpinning all tiles from the start menu"
+    (New-Object -Com Shell.Application).
+    NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+    Items() |
+    %{ $_.Verbs() } |
+    ?{$_.Name -match 'Un.*pin from Start'} |
+    %{$_.DoIt()}
+}
+
 #GUI prompt Debloat/Revert options and GUI variables
 $Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
@@ -646,7 +658,7 @@ $EdgePdf = "Do you want to stop edge from taking over as the default PDF viewer?
 $EdgePdf2 = "Do you want to revert changes that disabled Edge as the default PDF viewer?"
 $Reboot = "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
 $OneDriveDelete = "Do you want to uninstall One Drive?"
-
+$Unpin = "Do you want to unpin all items from the Start menu?"
 $Prompt1 = [Windows.MessageBox]::Show($Ask, "Debloat or Revert", $Button, $ErrorIco) 
 Switch ($Prompt1) {
     #This will debloat Windows 10
@@ -745,9 +757,21 @@ Switch ($Prompt1) {
                 Write-Output "You have chosen to skip removing OneDrive from your machine."
             }
         }
-        #Prompt asking if you'd like to reboot your machine
-        $Prompt5 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
+				#Prompt asking if you'd like to unpin all start items
+		$Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
         Switch ($Prompt5) {
+            Yes {
+                UnpinStart
+				Write-Output "Start Apps unpined."
+            }
+            No {
+				Write-Output "You have chosen to skip removing OneDrive from your machine."
+
+            }
+        }
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt6 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
+        Switch ($Prompt6) {
             Yes {
                 Write-Output "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
