@@ -13,7 +13,7 @@ Function Begin-SysPrep {
         Write-Verbose -Message ('Starting Sysprep Fixes')
  
         # Disable Windows Store Automatic Updates
-        Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
+       <# Write-Verbose -Message "Adding Registry key to Disable Windows Store Automatic Updates"
         $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
         If (!(Test-Path $registryPath)) {
             Mkdir $registryPath -ErrorAction SilentlyContinue
@@ -24,8 +24,8 @@ Function Begin-SysPrep {
         }
         #Stop WindowsStore Installer Service and set to Disabled
         Write-Verbose -Message ('Stopping InstallService')
-        Stop-Service InstallService
- }
+        Stop-Service InstallService 
+ } #>
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
