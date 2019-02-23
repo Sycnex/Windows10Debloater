@@ -118,7 +118,7 @@ Function DebloatBlacklist {
     )
     foreach ($Bloat in $Bloatware) {
         Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
-        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Debloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
         Write-Output "Trying to remove $Bloat."
     }
 }
