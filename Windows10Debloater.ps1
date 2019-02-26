@@ -659,6 +659,7 @@ $EdgePdf2 = "Do you want to revert changes that disabled Edge as the default PDF
 $Reboot = "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
 $OneDriveDelete = "Do you want to uninstall One Drive?"
 $Unpin = "Do you want to unpin all items from the Start menu?"
+$InstallNET = "Do you want to install .NET 3.5?"
 $Prompt1 = [Windows.MessageBox]::Show($Ask, "Debloat or Revert", $Button, $ErrorIco) 
 Switch ($Prompt1) {
     #This will debloat Windows 10
@@ -769,9 +770,21 @@ Switch ($Prompt1) {
 
             }
         }
-        #Prompt asking if you'd like to reboot your machine
-        $Prompt6 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
+        $Prompt6 = [Windows.MessageBox]::Show($InstallNET, "Install .Net", $Button, $Warn)
         Switch ($Prompt6) {
+            Yes {
+                Write-Output "Initializing the installation of .NET 3.5..."
+                Try {
+                DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+                Write-Output ".NET 3.5 has been successfully installed!" }
+                Catch {
+                    $_
+                }
+            }
+        }
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
+        Switch ($Prompt7) {
             Yes {
                 Write-Output "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
