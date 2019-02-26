@@ -135,7 +135,16 @@ $RemoveBloatNoBlacklist.width = 223
 $RemoveBloatNoBlacklist.height = 39
 $RemoveBloatNoBlacklist.location = New-Object System.Drawing.Point(9, 123)
 $RemoveBloatNoBlacklist.Font = 'Microsoft Sans Serif,10'
-$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist))
+
+$InstallNet35 = New-Object system.Windows.Forms.Button
+$InstallNet35.text = "Install .NET v3.5"
+$InstallNet35.width = 152
+$InstallNet35.height = 39
+$InstallNet35.location = New-Object System.Drawing.Point(9, 387)
+$InstallNet35.Font = 'Microsoft Sans Serif,10'
+
+
+$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35))
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
@@ -1367,6 +1376,21 @@ $RemoveOnedrive.Add_Click( {
             New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
         }
     })
+
+$InstallNet35.Add_Click( {
+
+        Write-Host "Initializing the installation of .NET 3.5..."
+        Try {
+            Write-Host "Installing now. Please wait..."
+            DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+            Write-Host ".NET 3.5 has been successfully installed!" 
+        }
+        Catch {
+            $_
+        }
+    } )
+
+
 #endregion events }
 
 #endregion GUI }
