@@ -9,9 +9,13 @@ First Method:
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) On the propmt, change to the directory where you extracted the files:
+3) Enable PowerShell execution
+<code>Set-ExecutionPolicy Unrestricted</code>
+4) Ubnlock all powershell script
+<code>ls -Recurse *.ps1 | Unblock-File</code>
+5) On the propmt, change to the directory where you extracted the files:
   e.g. - cd c:\temp
-4) Next, to run either script, enter in the following:
+6) Next, to run either script, enter in the following:
   e.g. - .\Windows10DebloaterGUI.ps1
   
 
