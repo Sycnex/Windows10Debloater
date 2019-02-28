@@ -2,12 +2,11 @@
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
-If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
-    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
-    Start-Sleep 1
-    Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
-    Break
+If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
+    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
+    Start-Sleep 2
+    Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+    Exit
 }
 
 #no errors throughout
@@ -488,6 +487,10 @@ Function Revert-Changes {
     #Enabling the Diagnostics Tracking Service
     Set-Service "DiagTrack" -StartupType Automatic
     Start-Service "DiagTrack"
+    
+    Write-Output "Restoring 3D Objects in the 'My Computer' submenu in explorer"
+    #Restoring 3D Objects in the 'My Computer' submenu in explorer
+    Restore3dObjects
 }
 
 Function CheckDMWService {
@@ -641,7 +644,33 @@ Function UnpinStart {
     %{$_.DoIt()}
 }
 
-#GUI prompt Debloat/Revert options and GUI variables
+Function Remove3dObjects {
+#Removes 3D Objects from the 'My Computer' submenu in explorer
+    Write-Output "Removing 3D Objects from explorer 'My Computer' submenu"
+    $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    If (Test-Path $Objects32) {
+        Remove-Item $Objects32 -Recurse 
+    }
+    If (Test-Path $Objects64) {
+        Remove-Item $Objects64 -Recurse 
+    }
+}
+
+Function Restore3dObjects {
+#Restores 3D Objects from the 'My Computer' submenu in explorer
+    Write-Output "Restoring 3D Objects from explorer 'My Computer' submenu"
+    $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    If (!(Test-Path $Objects32)) {
+        New-Item $Objects32
+    }
+    If (!(Test-Path $Objects64)) {
+        New-Item $Objects64
+    }
+}
+
+#Interactive prompt Debloat/Revert options
 $Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
 $Warn = [Windows.MessageBoxImage]::Warning
@@ -695,10 +724,13 @@ Switch ($Prompt1) {
                 Write-Output "Diagnostics Tracking Service disabled"
                 Start-Sleep 1
                 Write-Output "Disabling WAP push service"
-                Start-Sleep 1
                 DisableWAPPush
+                Start-Sleep 1
                 Write-Output "Re-enabling DMWAppushservice if it was disabled"
                 CheckDMWService
+                Start-Sleep 1
+                Write-Output "Removing 3D Objects from the 'My Computer' submenu in explorer"
+                Remove3dObjects
                 Start-Sleep 1
             }
             No {

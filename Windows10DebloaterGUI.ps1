@@ -1,21 +1,16 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
-If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
-    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
-    Start-Sleep 1
-    Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
-    Break
+If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
+    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
+    Start-Sleep 2
+    Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+    Exit
 }
 
-<# This form was created using POSHGUI.com  a free online gui designer for PowerShell
-.NAME
-    Untitled
-#>
+# This form was created using POSHGUI.com  a free online gui designer for PowerShell
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-#region begin GUI{ 
-
+#region begin GUI 
 $Form = New-Object system.Windows.Forms.Form
 $Form.ClientSize = '408,523'
 $Form.text = "Windows10Debloater"
@@ -148,13 +143,13 @@ $Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Labe
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
-    Write-Output "$DebloatFolder exists. Skipping."
+    Write-Host "$DebloatFolder exists. Skipping."
 }
 Else {
-    Write-Output "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Write-Host "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
     Start-Sleep 1
     New-Item -Path "$DebloatFolder" -ItemType Directory
-    Write-Output "The folder $DebloatFolder was successfully created."
+    Write-Host "The folder $DebloatFolder was successfully created."
 }
 
 Start-Transcript -OutputDirectory "$DebloatFolder"
@@ -234,10 +229,10 @@ $RemoveBlacklist.Add_Click( {
                 #"*Microsoft.WindowsStore*"
             )
             foreach ($Bloat in $Bloatware) {
-                Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
-                Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+                Get-AppxPackage -Name $Bloat| Remove-AppxPackage
+                Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
                 Write-Host "Trying to remove $Bloat."
-                Write-Host "Bloatware removed! `n"
+                Write-Host "Bloatware removed!"
             }
         }
         Write-Host "Removing Bloatware with a specific blacklist."
@@ -253,38 +248,36 @@ $RemoveAllBloatware.Add_Click( {
         Function Begin-SysPrep {
             $ErrorActionPreference = 'silentlycontinue'
 
-            Write-Host -Message ('Starting Sysprep Fixes')
+            Write-Host "Starting Sysprep Fixes"
    
             # Disable Windows Store Automatic Updates
-            Write-Host -Message "Adding Registry key to Disable Windows Store Automatic Updates"
+            Write-Host "Adding Registry key to Disable Windows Store Automatic Updates"
             $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
             If (!(Test-Path $registryPath)) {
-                Mkdir $registryPath -ErrorAction SilentlyContinue
-                New-ItemProperty $registryPath -Name AutoDownload -Value 2 
+                Mkdir $registryPath
+                New-ItemProperty $registryPath AutoDownload -Value 2 
             }
-            Else {
-                Set-ItemProperty $registryPath -Name AutoDownload -Value 2 
-            }
+            Set-ItemProperty $registryPath AutoDownload -Value 2
+
             #Stop WindowsStore Installer Service and set to Disabled
-            Write-Host -Message ('Stopping InstallService')
+            Write-Host "Stopping InstallService"
             Stop-Service InstallService
-            Write-Host -Message ('Setting InstallService Startup to Disabled')
-            & Set-Service -Name InstallService -StartupType Disabled
+            Write-Host "Setting InstallService Startup to Disabled"
+            Set-Service InstallService -StartupType Disabled
         }
         
         Function CheckDMWService {
 
             Param([switch]$Debloat)
   
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-                Set-Service -Name dmwappushservice -StartupType Automatic
+            If (Get-Service dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service dmwappushservice -StartupType Automatic
             }
 
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-                Start-Service -Name dmwappushservice
+            If (Get-Service dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service dmwappushservice
             } 
         }
-
 
         Function DebloatAll {
     
@@ -304,85 +297,8 @@ $RemoveAllBloatware.Add_Click( {
   
         #Creates a PSDrive to be able to access the 'HKCR' tree
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Function DebloatBlacklist {
-            $ErrorActionPreference = 'silentlycontinue'
-
-            $Bloatware = @(
-                
-                #Unnecessary Windows 10 AppX Apps
-                "Microsoft.BingNews"
-                "Microsoft.GetHelp"
-                "Microsoft.Getstarted"
-                "Microsoft.Messaging"
-                "Microsoft.Microsoft3DViewer"
-                "Microsoft.MicrosoftOfficeHub"
-                "Microsoft.MicrosoftSolitaireCollection"
-                "Microsoft.NetworkSpeedTest"
-                "Microsoft.News"
-                "Microsoft.Office.Lens"
-                "Microsoft.Office.OneNote"
-                "Microsoft.Office.Sway"
-                "Microsoft.OneConnect"
-                "Microsoft.People"
-                "Microsoft.Print3D"
-                "Microsoft.RemoteDesktop"
-                "Microsoft.SkypeApp"
-                "Microsoft.StorePurchaseApp"
-                "Microsoft.Office.Todo.List"
-                "Microsoft.Whiteboard"
-                "Microsoft.WindowsAlarms"
-                #"Microsoft.WindowsCamera"
-                "microsoft.windowscommunicationsapps"
-                "Microsoft.WindowsFeedbackHub"
-                "Microsoft.WindowsMaps"
-                "Microsoft.WindowsSoundRecorder"
-                "Microsoft.Xbox.TCUI"
-                "Microsoft.XboxApp"
-                "Microsoft.XboxGameOverlay"
-                "Microsoft.XboxIdentityProvider"
-                "Microsoft.XboxSpeechToTextOverlay"
-                "Microsoft.ZuneMusic"
-                "Microsoft.ZuneVideo"
-                "*Windows.CBSPreview*"
-
-                #Sponsored Windows 10 AppX Apps
-                #Add sponsored/featured apps to remove in the "*AppName*" format
-                "*EclipseManager*"
-                "*ActiproSoftwareLLC*"
-                "*AdobeSystemsIncorporated.AdobePhotoshopExpress*"
-                "*Duolingo-LearnLanguagesforFree*"
-                "*PandoraMediaInc*"
-                "*CandyCrush*"
-                "*Wunderlist*"
-                "*Flipboard*"
-                "*Twitter*"
-                "*Facebook*"
-                "*Spotify*"
-                "*Minecraft*"
-                "*Royal Revolt*"
-                "*Sway*"
-                "*Dolby*"
-             
-                #Optional: Typically not removed but you can if you need to for some reason
-                #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
-                #"*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
-                #"*Microsoft.BingWeather*"
-                #"*Microsoft.MSPaint*"
-                #"*Microsoft.MicrosoftStickyNotes*"
-                #"*Microsoft.Windows.Photos*"
-                #"*Microsoft.WindowsCalculator*"
-                #"*Microsoft.WindowsStore*"
-            )
-            foreach ($Bloat in $Bloatware) {
-                Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
-                Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
-                Write-Host "Trying to remove $Bloat."
-            }
-        }
   
-        Function Remove-Keys {   
-            $ErrorActionPreference = 'silentlycontinue' 
-      
+        Function Remove-Keys {         
             #These are the registry keys that it will delete.
           
             $Keys = @(
@@ -421,12 +337,11 @@ $RemoveAllBloatware.Add_Click( {
             #This writes the output of each key it is removing and also removes the keys listed above.
             ForEach ($Key in $Keys) {
                 Write-Host "Removing $Key from registry"
-                Remove-Item $Key -Recurse -ErrorAction SilentlyContinue
+                Remove-Item $Key -Recurse
             }
         }
           
         Function Protect-Privacy { 
-            $ErrorActionPreference = 'silentlycontinue'
   
             #Creates a PSDrive to be able to access the 'HKCR' tree
             New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -435,14 +350,14 @@ $RemoveAllBloatware.Add_Click( {
             Write-Host "Disabling Windows Feedback Experience program"
             $Advertising = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo'
             If (Test-Path $Advertising) {
-                Set-ItemProperty $Advertising -Name Enabled -Value 0 -Verbose
+                Set-ItemProperty $Advertising Enabled -Value 0
             }
           
             #Stops Cortana from being used as part of your Windows Search Function
             Write-Host "Stopping Cortana from being used as part of your Windows Search Function"
             $Search = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search'
             If (Test-Path $Search) {
-                Set-ItemProperty $Search -Name AllowCortana -Value 0 -Verbose
+                Set-ItemProperty $Search AllowCortana -Value 0
             }
           
             #Stops the Windows Feedback Experience from sending anonymous data
@@ -451,57 +366,57 @@ $RemoveAllBloatware.Add_Click( {
             $Period2 = 'HKCU:\Software\Microsoft\Siuf\Rules'
             $Period3 = 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
             If (!(Test-Path $Period3)) { 
-                mkdir $Period1 -ErrorAction SilentlyContinue
-                mkdir $Period2 -ErrorAction SilentlyContinue
-                mkdir $Period3 -ErrorAction SilentlyContinue
-                New-ItemProperty $Period3 -Name PeriodInNanoSeconds -Value 0 -Verbose -ErrorAction SilentlyContinue
+                mkdir $Period1
+                mkdir $Period2
+                mkdir $Period3
+                New-ItemProperty $Period3 PeriodInNanoSeconds -Value 0
             }
                  
             Write-Host "Adding Registry key to prevent bloatware apps from returning"
             #Prevents bloatware applications from returning
             $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
             If (!(Test-Path $registryPath)) {
-                Mkdir $registryPath -ErrorAction SilentlyContinue
-                New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+                Mkdir $registryPath
+                New-ItemProperty $registryPath DisableWindowsConsumerFeatures -Value 1 
             }          
       
             Write-Host "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
             $Holo = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Holographic'    
             If (Test-Path $Holo) {
-                Set-ItemProperty $Holo -Name FirstRunSucceeded -Value 0 -Verbose
+                Set-ItemProperty $Holo FirstRunSucceeded -Value 0
             }
       
             #Disables live tiles
             Write-Host "Disabling live tiles"
             $Live = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'    
             If (!(Test-Path $Live)) {
-                mkdir $Live -ErrorAction SilentlyContinue     
-                New-ItemProperty $Live -Name NoTileApplicationNotification -Value 1 -Verbose
+                mkdir $Live  
+                New-ItemProperty $Live NoTileApplicationNotification -Value 1
             }
       
             #Turns off Data Collection via the AllowTelemtry key by changing it to 0
             Write-Host "Turning off Data Collection"
             $DataCollection = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection'    
             If (Test-Path $DataCollection) {
-                Set-ItemProperty $DataCollection -Name AllowTelemetry -Value 0 -Verbose
+                Set-ItemProperty $DataCollection AllowTelemetry -Value 0
             }
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
             $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
             If (Test-Path $People) {
-                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+                Set-ItemProperty $People PeopleBand -Value 0
             }
   
             #Disables suggestions on start menu
             Write-Host "Disabling suggestions on the Start Menu"
             $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'    
             If (Test-Path $Suggestions) {
-                Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
+                Set-ItemProperty $Suggestions SystemPaneSuggestionsEnabled -Value 0
             }
             
             
-            Write-Output "Removing CloudStore from registry if it exists"
+            Write-Host "Removing CloudStore from registry if it exists"
             $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
             If (Test-Path $CloudStore) {
                 Stop-Process Explorer.exe -Force
@@ -518,15 +433,15 @@ $RemoveAllBloatware.Add_Click( {
       
             #Disables scheduled tasks that are considered unnecessary 
             Write-Host "Disabling scheduled tasks"
-            #Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
+            #Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask
         }
 
-            Function UnpinStart {
+        Function UnpinStart {
             #Credit to Vikingat-Rage
             #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
             #Unpins all tiles from the Start Menu
@@ -538,6 +453,19 @@ $RemoveAllBloatware.Add_Click( {
             ?{$_.Name -match 'Un.*pin from Start'} |
             %{$_.DoIt()}
     }
+
+        Function Remove3dObjects {
+        #Removes 3D Objects from the 'My Computer' submenu in explorer
+            Write-Output "Removing 3D Objects from explorer 'My Computer' submenu"
+            $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+            $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+            If (Test-Path $Objects32) {
+                Remove-Item $Objects32 -Recurse 
+            }
+            If (Test-Path $Objects64) {
+                Remove-Item $Objects64 -Recurse 
+            }
+}
   
         #This includes fixes by xsisbest
         Function FixWhitelistedApps {
@@ -560,20 +488,20 @@ $RemoveAllBloatware.Add_Click( {
 
             Param([switch]$Debloat)
   
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-                Set-Service -Name dmwappushservice -StartupType Automatic
+            If (Get-Service dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service dmwappushservice -StartupType Automatic
             }
 
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-                Start-Service -Name dmwappushservice
+            If (Get-Service dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service dmwappushservice
             } 
         }
         
         Function CheckInstallService {
   
-            If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
-                Start-Service -Name InstallService
-                Set-Service -Name InstallService -StartupType Automatic 
+            If (Get-Service InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+                Start-Service InstallService
+                Set-Service InstallService -StartupType Automatic 
             }
         }
   
@@ -581,18 +509,15 @@ $RemoveAllBloatware.Add_Click( {
         Begin-SysPrep
         Write-Host "Removing bloatware apps."
         DebloatAll
-        DebloatBlacklist
         Write-Host "Removing leftover bloatware registry keys."
         Remove-Keys
         Write-Host "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
-        UnpinStart
         Write-Host "Unpinning tiles from the Start Menu."
-        #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
-        #Stop-EdgePDF
-        Write-Output "Setting the 'InstallService' Windows service back to 'Started' and the Startup Type 'Automatic'."
+        UnpinStart
+        Write-Host "Setting the 'InstallService' Windows service back to 'Started' and the Startup Type 'Automatic'."
         CheckDMWService
         CheckInstallService
         Write-Host "Finished all tasks. `n"
@@ -613,23 +538,22 @@ $RemoveBloatNoBlacklist.Add_Click( {
             $ErrorActionPreference = 'silentlycontinue'
   
             param([switch]$SysPrep)
-            Write-Host -Message ('Starting Sysprep Fixes')
+            Write-Host "Starting Sysprep Fixes"
    
             # Disable Windows Store Automatic Updates
-            Write-Host -Message "Adding Registry key to Disable Windows Store Automatic Updates"
+            Write-Host "Adding Registry key to Disable Windows Store Automatic Updates"
             $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
             If (!(Test-Path $registryPath)) {
-                Mkdir $registryPath -ErrorAction SilentlyContinue
-                New-ItemProperty $registryPath -Name AutoDownload -Value 2 
+                Mkdir $registryPath
+                New-ItemProperty $registryPath AutoDownload -Value 2 
             }
-            Else {
-                Set-ItemProperty $registryPath -Name AutoDownload -Value 2 
-            }
+            Set-ItemProperty $registryPath AutoDownload -Value 2
+
             #Stop WindowsStore Installer Service and set to Disabled
-            Write-Host -Message ('Stopping InstallService')
+            Write-Host "Stopping InstallService"
             Stop-Service InstallService
-            Write-Host -Message ('Setting InstallService Startup to Disabled')
-            & Set-Service -Name InstallService -StartupType Disabled
+            Write-Host "Setting InstallService Startup to Disabled"
+            & Set-Service InstallService -StartupType Disabled
         }
   
         #Creates a PSDrive to be able to access the 'HKCR' tree
@@ -644,10 +568,10 @@ $RemoveBloatNoBlacklist.Add_Click( {
             [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
             Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|Framework|`
             Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry|Slack'
-            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
+            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
             # Run this again to avoid error on 1803 or having to reboot.
-            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage -ErrorAction SilentlyContinue
-            Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
+            Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
         }
   
         Function Remove-Keys {
@@ -693,7 +617,7 @@ $RemoveBloatNoBlacklist.Add_Click( {
             #This writes the output of each key it is removing and also removes the keys listed above.
             ForEach ($Key in $Keys) {
                 Write-Host "Removing $Key from registry"
-                Remove-Item $Key -Recurse -ErrorAction SilentlyContinue
+                Remove-Item $Key -Recurse
             }
         }
           
@@ -709,14 +633,14 @@ $RemoveBloatNoBlacklist.Add_Click( {
             Write-Host "Disabling Windows Feedback Experience program"
             $Advertising = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo'
             If (Test-Path $Advertising) {
-                Set-ItemProperty $Advertising -Name Enabled -Value 0 -Verbose
+                Set-ItemProperty $Advertising Enabled -Value 0 -Verbose
             }
           
             #Stops Cortana from being used as part of your Windows Search Function
             Write-Host "Stopping Cortana from being used as part of your Windows Search Function"
             $Search = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search'
             If (Test-Path $Search) {
-                Set-ItemProperty $Search -Name AllowCortana -Value 0 -Verbose
+                Set-ItemProperty $Search AllowCortana -Value 0 -Verbose
             }
           
             #Stops the Windows Feedback Experience from sending anonymous data
@@ -725,56 +649,56 @@ $RemoveBloatNoBlacklist.Add_Click( {
             $Period2 = 'HKCU:\Software\Microsoft\Siuf\Rules'
             $Period3 = 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
             If (!(Test-Path $Period3)) { 
-                mkdir $Period1 -ErrorAction SilentlyContinue
-                mkdir $Period2 -ErrorAction SilentlyContinue
-                mkdir $Period3 -ErrorAction SilentlyContinue
-                New-ItemProperty $Period3 -Name PeriodInNanoSeconds -Value 0 -Verbose -ErrorAction SilentlyContinue
+                mkdir $Period1
+                mkdir $Period2
+                mkdir $Period3
+                New-ItemProperty $Period3 PeriodInNanoSeconds -Value 0 -Verbose
             }
                  
             Write-Host "Adding Registry key to prevent bloatware apps from returning"
             #Prevents bloatware applications from returning
             $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
             If (!(Test-Path $registryPath)) {
-                Mkdir $registryPath -ErrorAction SilentlyContinue
-                New-ItemProperty $registryPath -Name DisableWindowsConsumerFeatures -Value 1 -Verbose -ErrorAction SilentlyContinue
+                Mkdir $registryPath
+                New-ItemProperty $registryPath DisableWindowsConsumerFeatures -Value 1 -Verbose
             }          
       
             Write-Host "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
             $Holo = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Holographic'    
             If (Test-Path $Holo) {
-                Set-ItemProperty $Holo -Name FirstRunSucceeded -Value 0 -Verbose
+                Set-ItemProperty $Holo FirstRunSucceeded -Value 0 -Verbose
             }
       
             #Disables live tiles
             Write-Host "Disabling live tiles"
             $Live = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'    
             If (!(Test-Path $Live)) {
-                mkdir $Live -ErrorAction SilentlyContinue     
-                New-ItemProperty $Live -Name NoTileApplicationNotification -Value 1 -Verbose
+                mkdir $Live     
+                New-ItemProperty $Live NoTileApplicationNotification -Value 1 -Verbose
             }
       
             #Turns off Data Collection via the AllowTelemtry key by changing it to 0
             Write-Host "Turning off Data Collection"
             $DataCollection = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection'    
             If (Test-Path $DataCollection) {
-                Set-ItemProperty $DataCollection -Name AllowTelemetry -Value 0 -Verbose
+                Set-ItemProperty $DataCollection AllowTelemetry -Value 0 -Verbose
             }
       
             #Disables People icon on Taskbar
             Write-Host "Disabling People icon on Taskbar"
             $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
             If (Test-Path $People) {
-                Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+                Set-ItemProperty $People PeopleBand -Value 0 -Verbose
             }
   
             #Disables suggestions on start menu
             Write-Host "Disabling suggestions on the Start Menu"
             $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'    
             If (Test-Path $Suggestions) {
-                Set-ItemProperty $Suggestions -Name SystemPaneSuggestionsEnabled -Value 0 -Verbose
+                Set-ItemProperty $Suggestions SystemPaneSuggestionsEnabled -Value 0 -Verbose
             }
             
-            Write-Output "Removing CloudStore from registry if it exists"
+            Write-Host "Removing CloudStore from registry if it exists"
             $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
             If (Test-Path $CloudStore) {
                 Stop-Process Explorer.exe -Force
@@ -791,12 +715,12 @@ $RemoveBloatNoBlacklist.Add_Click( {
       
             #Disables scheduled tasks that are considered unnecessary 
             Write-Host "Disabling scheduled tasks"
-            #Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask -ErrorAction SilentlyContinue
-            Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask -ErrorAction SilentlyContinue
+            Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask 
+            Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask
         }
 
             Function UnpinStart {
@@ -834,20 +758,20 @@ $RemoveBloatNoBlacklist.Add_Click( {
 
             Param([switch]$Debloat)
   
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-                Set-Service -Name dmwappushservice -StartupType Automatic
+            If (Get-Service dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+                Set-Service dmwappushservice -StartupType Automatic
             }
 
-            If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-                Start-Service -Name dmwappushservice
+            If (Get-Service dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+                Start-Service dmwappushservice
             } 
         }
         
         Function CheckInstallService {
   
-            If (Get-Service -Name InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
-                Start-Service -Name InstallService
-                Set-Service -Name InstallService -StartupType Automatic 
+            If (Get-Service InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+                Start-Service InstallService
+                Set-Service InstallService -StartupType Automatic 
             }
         }
           
@@ -860,12 +784,12 @@ $RemoveBloatNoBlacklist.Add_Click( {
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
-        UnpinStart
         Write-Host "Unpinning tiles from the Start Menu."
-        #Write-Host "Stopping Edge from taking over as the default PDF Viewer."
+        UnpinStart
+        Write-Host "Stopping Edge from taking over as the default PDF Viewer."
         Write-Host "Checking to make sure that the service 'dmwappushservice' has been started."
         CheckDMWService
-        Write-Output "Setting the 'InstallService' Windows service back to started and setting the Startup Type to 'Automatic'."
+        Write-Host "Setting the 'InstallService' Windows service back to started and setting the Startup Type to 'Automatic'."
         CheckInstallService
         Write-Host "Finished all tasks. `n"
   
@@ -963,7 +887,18 @@ $RevertChange.Add_Click( {
         #Enabling the Diagnostics Tracking Service
         Set-Service "DiagTrack" -StartupType Automatic
         Start-Service "DiagTrack"
-        Write-Host "Done reverting changes! `n"
+        Write-Host "Done reverting changes!"
+
+        #
+        Write-Output "Restoring 3D Objects from explorer 'My Computer' submenu"
+        $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+        $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+        If (!(Test-Path $Objects32)) {
+            New-Item $Objects32
+        }
+        If (!(Test-Path $Objects64)) {
+            New-Item $Objects64
+        }
     })
 $FixWhitelist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -976,7 +911,7 @@ $FixWhitelist.Add_Click( {
             Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
         } 
         
-        Write-Host "Whitelisted apps were either fixed or re-added. `n"
+        Write-Host "Whitelisted apps were either fixed or re-added."
     })
 $DisableCortana.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -997,7 +932,7 @@ $DisableCortana.Add_Click( {
             New-Item $Cortana3
         }
         Set-ItemProperty $Cortana3 HarvestContacts -Value 0
-        Write-Host "Cortana has been disabled. `n"
+        Write-Host "Cortana has been disabled."
     })
 $StopEdgePDFTakeover.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -1030,7 +965,7 @@ $StopEdgePDFTakeover.Add_Click( {
         If (Test-Path $Edge) {
             Set-Item $Edge AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723_ 
         }
-        Write-Host "Edge should no longer take over as the default .PDF. `n"
+        Write-Host "Edge should no longer take over as the default .PDF."
     })
 $EnableCortana.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -1051,7 +986,7 @@ $EnableCortana.Add_Click( {
             New-Item $Cortana3
         }
         Set-ItemProperty $Cortana3 HarvestContacts -Value 1 
-        Write-Host "Cortana has been enabled! `n"
+        Write-Host "Cortana has been enabled!"
     })
 $EnableEdgePDFTakeover.Add_Click( { 
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -1085,7 +1020,7 @@ $EnableEdgePDFTakeover.Add_Click( {
         If (Test-Path $Edge2) {
             Set-Item $Edge2 AppXd4nrz8ff68srnhf9t5a8sbjyar1cr723
         }
-        Write-Host "Edge will now be able to be used for .PDF. `n"
+        Write-Host "Edge will now be able to be used for .PDF."
     })
 $DisableTelemetry.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -1201,12 +1136,12 @@ $DisableTelemetry.Add_Click( {
         Write-Host "Disabling People icon on Taskbar"
         $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
         If (Test-Path $People) {
-            Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+            Set-ItemProperty $People -Name PeopleBand -Value 0
         } 
         
         #Disables scheduled tasks that are considered unnecessary 
         Write-Host "Disabling scheduled tasks"
-        Get-ScheduledTask  XblGameSaveTaskLogon | Disable-ScheduledTask
+        #Get-ScheduledTask  XblGameSaveTaskLogon | Disable-ScheduledTask
         Get-ScheduledTask  XblGameSaveTask | Disable-ScheduledTask
         Get-ScheduledTask  Consolidator | Disable-ScheduledTask
         Get-ScheduledTask  UsbCeip | Disable-ScheduledTask
@@ -1229,7 +1164,7 @@ $DisableTelemetry.Add_Click( {
         #Disabling the Diagnostics Tracking Service
         Stop-Service "DiagTrack"
         Set-Service "DiagTrack" -StartupType Disabled
-        Write-Host "Telemetry has been disabled! `n"
+        Write-Host "Telemetry has been disabled!"
     })
 $RemoveRegkeys.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -1272,7 +1207,7 @@ $RemoveRegkeys.Add_Click( {
             Write-Host "Removing $Key from registry"
             Remove-Item $Key -Recurse
         }
-        Write-Host "Additional bloatware keys have been removed! `n"
+        Write-Host "Additional bloatware keys have been removed!"
     })
 $UnpinStartMenuTiles.Add_Click( {
         #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
@@ -1287,45 +1222,37 @@ $UnpinStartMenuTiles.Add_Click( {
     })
 
 $RemoveOnedrive.Add_Click( { 
-        Write-Output "Checking for pre-existing files and folders located in the OneDrive folders..."
-        Start-Sleep 1
-        If (Get-Item -Path "$env:USERPROFILE\OneDrive\*") {
-            Write-Output "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
+        If (Test-Path "$env:USERPROFILE\OneDrive\*") {
+            Write-Host "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
             Start-Sleep 1
               
-            If (Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue) {
-                Write-Output "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
+            If (Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles") {
+                Write-Host "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
             }
             else {
-                If (!(Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue)) {
-                    Write-Output "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
+                If (!(Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles")) {
+                    Write-Host "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
                     New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
-                    Write-Output "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
+                    Write-Host "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
                 }
             }
             Start-Sleep 1
             Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
-            Write-Output "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
+            Write-Host "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
             Start-Sleep 1
-            Write-Output "Proceeding with the removal of OneDrive."
+            Write-Host "Proceeding with the removal of OneDrive."
             Start-Sleep 1
         }
         Else {
-            If (!(Get-Item -Path "$env:USERPROFILE\OneDrive\*")) {
-                Write-Output "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
-                Start-Sleep 1
-            }
-
+            Write-Host "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
+            Start-Sleep 1
             Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
             $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
             If (!(Test-Path $OneDriveKey)) {
-                Mkdir $OneDriveKey 
+                Mkdir $OneDriveKey
+                Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
             }
-
-            $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
-            If (Test-Path $DisableAllOneDrive) {
-                New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
-            }
+            Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
         }
 
         Write-Host "Uninstalling OneDrive. Please wait..."
@@ -1343,12 +1270,18 @@ $RemoveOnedrive.Add_Click( {
         Start-Sleep 2
         Write-Host "Stopping explorer"
         Start-Sleep 1
-        .\taskkill.exe /F /IM explorer.exe
+        taskkill.exe /F /IM explorer.exe
         Start-Sleep 3
         Write-Host "Removing leftover files"
-        Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
-        Remove-Item "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse
-        Remove-Item "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse
+        If (Test-Path "$env:USERPROFILE\OneDrive") {
+            Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
+        }
+        If (Test-Path "$env:LOCALAPPDATA\Microsoft\OneDrive") {
+            Remove-Item "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse
+        }
+        If (Test-Path "$env:PROGRAMDATA\Microsoft OneDrive") {
+            Remove-Item "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse
+        }
         If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
             Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
         }
@@ -1363,36 +1296,14 @@ $RemoveOnedrive.Add_Click( {
         Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
         Write-Host "Restarting Explorer that was shut down before."
         Start-Process explorer.exe -NoNewWindow
-        Write-Host "OneDrive has been successfully uninstalled! `n"
-
-        Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
-        $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
-        If (!(Test-Path $OneDriveKey)) {
-            Mkdir $OneDriveKey 
-        }
-
-        $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
-        If (Test-Path $DisableAllOneDrive) {
-            New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
-        }
+        Write-Host "OneDrive has been successfully uninstalled!"
     })
 
 $InstallNet35.Add_Click( {
 
         Write-Host "Initializing the installation of .NET 3.5..."
-        Try {
-            Write-Host "Installing now. Please wait..."
-            DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-            Write-Host ".NET 3.5 has been successfully installed!" 
-        }
-        Catch {
-            $_
-        }
+        DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+        Write-Host ".NET 3.5 has been successfully installed!"
     } )
-
-
-#endregion events }
-
-#endregion GUI }
 
 [void]$Form.ShowDialog()
