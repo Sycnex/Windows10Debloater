@@ -1343,7 +1343,7 @@ $RemoveOnedrive.Add_Click( {
         Start-Sleep 2
         Write-Host "Stopping explorer"
         Start-Sleep 1
-        .\taskkill.exe /F /IM explorer.exe
+        taskkill.exe /F /IM explorer.exe
         Start-Sleep 3
         Write-Host "Removing leftover files"
         Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
