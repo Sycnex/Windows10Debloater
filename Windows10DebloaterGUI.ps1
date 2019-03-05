@@ -1,7 +1,13 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
     Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
-    Start-Sleep 2
+    Start-Sleep 1
+    Write-Host "                                               3"
+    Start-Sleep 1
+    Write-Host "                                               2"
+    Start-Sleep 1
+    Write-Host "                                               1"
+    Start-Sleep 1
     Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
     Exit
 }
@@ -138,8 +144,23 @@ $InstallNet35.height = 39
 $InstallNet35.location = New-Object System.Drawing.Point(9, 387)
 $InstallNet35.Font = 'Microsoft Sans Serif,10'
 
+$EnableDarkMode = New-Object system.Windows.Forms.Button
+$EnableDarkMode.text = "Enable Dark Mode"
+$EnableDarkMode.width = 152
+$EnableDarkMode.height = 39
+$EnableDarkMode.location = New-Object System.Drawing.Point(9, 435)
+$EnableDarkMode.Font = 'Microsoft Sans Serif,10'
 
-$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35))
+$DisableDarkMode = New-Object system.Windows.Forms.Button
+$DisableDarkMode.text = "Disable Dark Mode"
+$DisableDarkMode.width = 152
+$DisableDarkMode.height = 39
+$DisableDarkMode.location = New-Object System.Drawing.Point(169, 435)
+$DisableDarkMode.Font = 'Microsoft Sans Serif,10'
+
+
+
+$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35, $EnableDarkMode, $DisableDarkMode))
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
@@ -1297,5 +1318,23 @@ $InstallNet35.Add_Click( {
         DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
         Write-Host ".NET 3.5 has been successfully installed!"
     } )
+
+$EnableDarkMode.Add_Click(  {
+    Write-Host "Enabling Dark Mode"
+    $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+    Set-ItemProperty $Theme AppsUseLightTheme -Value 0
+    Start-Sleep 1
+    Write-Host "Enabled"
+}
+)
+
+$DisableDarkMode.Add_Click(  {
+    Write-Host "Disabling Dark Mode"
+    $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+    Set-ItemProperty $Theme AppsUseLightTheme -Value 1
+    Start-Sleep 1
+    Write-Host "Disabled"
+}
+)
 
 [void]$Form.ShowDialog()
