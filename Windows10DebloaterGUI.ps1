@@ -158,9 +158,6 @@ Start-Transcript -OutputDirectory "$DebloatFolder"
 $RemoveBlacklist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
         Function DebloatBlacklist {
-            [CmdletBinding()]
-    
-            Param ()
     
             $Bloatware = @(
     
@@ -246,7 +243,6 @@ $RemoveAllBloatware.Add_Click( {
         #This is the switch parameter for running this script as a 'silent' script, for use in MDT images or any type of mass deployment without user interaction.
 
         Function Begin-SysPrep {
-            $ErrorActionPreference = 'silentlycontinue'
 
             Write-Host "Starting Sysprep Fixes"
    
@@ -281,18 +277,14 @@ $RemoveAllBloatware.Add_Click( {
 
         Function DebloatAll {
     
-            [CmdletBinding()]
-        
-            Param()
-    
             #Removes AppxPackages
             #Credit to /u/GavinEke for a modified version of my whitelist code
             [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
             Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|Framework|`
             Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry|Slack'
-            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
-            Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
-            Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
+            Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxPackage
+            Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxPackage
+            Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxProvisionedPackage -Online
         }
   
         #Creates a PSDrive to be able to access the 'HKCR' tree
