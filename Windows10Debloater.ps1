@@ -39,9 +39,15 @@ Function DebloatAll {
     $WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
     Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|Framework|`
     Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry|Slack'
-    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxPackage
-    Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxPackage
-    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps -and $_.NonRemovable -eq "False"} | Remove-AppxProvisionedPackage -Online
+    #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
+    $NonRemovable = '1527c705-839a-4832-9118-54d4Bd6a0c89|c5e2524a-ea46-4f67-841f-6a9465d9d515|E2A4F912-2574-4A75-9BB0-0D023378592B|F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE|InputApp|Microsoft.AAD.BrokerPlugin|Microsoft.AccountsControl|`
+    Microsoft.BioEnrollment|Microsoft.CredDialogHost|Microsoft.ECApp|Microsoft.LockApp|Microsoft.MicrosoftEdgeDevToolsClient|Microsoft.MicrosoftEdge|Microsoft.PPIProjection|Microsoft.Win32WebViewHost|Microsoft.Windows.Apprep.ChxApp|`
+    Microsoft.Windows.AssignedAccessLockApp|Microsoft.Windows.CapturePicker|Microsoft.Windows.CloudExperienceHost|Microsoft.Windows.ContentDeliveryManager|Microsoft.Windows.Cortana|Microsoft.Windows.NarratorQuickStart|`
+    Microsoft.Windows.ParentalControls|Microsoft.Windows.PeopleExperienceHost|Microsoft.Windows.PinningConfirmationDialog|Microsoft.Windows.SecHealthUI|Microsoft.Windows.SecureAssessmentBrowser|Microsoft.Windows.ShellExperienceHost|`
+    Microsoft.Windows.XGpuEjectDialog|Microsoft.XboxGameCallableUI|Windows.CBSPreview|windows.immersivecontrolpanel|Windows.PrintDialog|Microsoft.VCLibs.140.00|Microsoft.Services.Store.Engagement|Microsoft.UI.Xaml.2.0'
+    Get-AppxPackage -AllUsers | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
+    Get-AppxPackage | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
+    Get-AppxProvisionedPackage -Online | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxProvisionedPackage -Online
 }
 
 Function DebloatBlacklist {
@@ -676,7 +682,7 @@ $Prompt1 = [Windows.MessageBox]::Show($Ask, "Debloat or Revert", $Button, $Error
 Switch ($Prompt1) {
     #This will debloat Windows 10
     Yes {
-
+        #Everything is specific prompt
         $Prompt2 = [Windows.MessageBox]::Show($EverythingorSpecific, "Everything or Specific", $Button, $Warn)
         switch ($Prompt2) {
             Yes { 
@@ -751,7 +757,7 @@ Switch ($Prompt1) {
                 Start-Sleep 1
             }
         }
-
+        #Disabling EdgePDF prompt
         $Prompt3 = [Windows.MessageBox]::Show($EdgePdf, "Edge PDF", $Button, $Warn)
         Switch ($Prompt3) {
             Yes {
@@ -773,7 +779,7 @@ Switch ($Prompt1) {
                 Write-Host "You have chosen to skip removing OneDrive from your machine."
             }
         }
-				#Prompt asking if you'd like to unpin all start items
+		#Prompt asking if you'd like to unpin all start items
 		$Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
         Switch ($Prompt5) {
             Yes {
@@ -781,31 +787,31 @@ Switch ($Prompt1) {
 				Write-Host "Start Apps unpined."
             }
             No {
-				Write-Host "You have chosen to skip removing OneDrive from your machine."
+				Write-Host "Apps will remain pinned to the start menu."
 
             }
         }
+        #Prompt asking if you want to install .NET
         $Prompt6 = [Windows.MessageBox]::Show($InstallNET, "Install .Net", $Button, $Warn)
         Switch ($Prompt6) {
             Yes {
                 Write-Host "Initializing the installation of .NET 3.5..."
-                Try {
                 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-                Write-Host ".NET 3.5 has been successfully installed!" }
-                Catch {
-                    $_
+                Write-Host ".NET 3.5 has been successfully installed!"
                 }
+            No {
+                Write-Host "Skipping .NET install."
             }
-        }
+            }
         #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
+        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
         Switch ($Prompt7) {
             Yes {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
                 Start-Sleep 1
-                Stop-Transcript
                 Write-Host "Initiating reboot."
+                Stop-Transcript
                 Start-Sleep 2
                 Restart-Computer
             }
@@ -813,13 +819,15 @@ Switch ($Prompt1) {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
                 Start-Sleep 1
-                Stop-Transcript
                 Write-Host "Script has finished. Exiting."
+                Stop-Transcript
                 Start-Sleep 2
                 Exit
             }
         }
     }
+}
+
     No {
         Write-Host "Reverting changes..."
         Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
@@ -859,4 +867,3 @@ Switch ($Prompt1) {
             }
         }
     }
-}
