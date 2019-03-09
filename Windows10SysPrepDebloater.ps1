@@ -25,7 +25,8 @@ Function Begin-SysPrep {
         #Stop WindowsStore Installer Service and set to Disabled
         Write-Verbose -Message ('Stopping InstallService')
         Stop-Service InstallService 
- } #>
+        #>
+ } 
 
 #Creates a PSDrive to be able to access the 'HKCR' tree
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
