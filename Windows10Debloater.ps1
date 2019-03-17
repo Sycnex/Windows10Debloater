@@ -596,7 +596,7 @@ Function UninstallOneDrive {
     Start-Sleep 2
     Write-Output "Stopping explorer"
     Start-Sleep 1
-    .\taskkill.exe /F /IM explorer.exe
+    taskkill.exe /F /IM explorer.exe
     Start-Sleep 3
     Write-Output "Removing leftover files"
     Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
