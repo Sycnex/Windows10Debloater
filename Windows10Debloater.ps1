@@ -302,13 +302,13 @@ Function Protect-Privacy {
     Set-Service "DiagTrack" -StartupType Disabled
 
     
-     Write-Output "Removing CloudStore from registry if it exists"
-     $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
-     If (Test-Path $CloudStore) {
-     Stop-Process Explorer.exe -Force
-     Remove-Item $CloudStore
-     Start-Process Explorer.exe -Wait
-   }
+    Write-Output "Removing CloudStore from registry if it exists"
+    $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+    If (Test-Path $CloudStore) {
+        Stop-Process Explorer.exe -Force
+        Remove-Item $CloudStore
+        Start-Process Explorer.exe -Wait
+    }
 }
 
 Function DisableCortana {
@@ -487,14 +487,16 @@ Function Revert-Changes {
 
 Function CheckDMWService {
 
-  Param([switch]$Debloat)
+    Param([switch]$Debloat)
   
-If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
-    Set-Service -Name dmwappushservice -StartupType Automatic}
+    If (Get-Service -Name dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+        Set-Service -Name dmwappushservice -StartupType Automatic
+    }
 
-If(Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
-   Start-Service -Name dmwappushservice} 
-  }
+    If (Get-Service -Name dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+        Start-Service -Name dmwappushservice
+    } 
+}
     
 Function Enable-EdgePDF {
     Write-Output "Setting Edge back to default"
@@ -545,49 +547,40 @@ Function UninstallOneDrive {
     Write-Host "Checking for pre-existing files and folders located in the OneDrive folders..."
     Start-Sleep 1
     If (Test-Path "$env:USERPROFILE\OneDrive\*") {
-            Write-Host "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
-            Start-Sleep 1
+        Write-Host "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
+        Start-Sleep 1
               
-            If (Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles") {
-                Write-Host "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
-            }
-            else {
-                If (!(Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles")) {
-                    Write-Host "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
-                    New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
-                    Write-Host "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
-                }
-            }
-            Start-Sleep 1
-            Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
-            Write-Host "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
-            Start-Sleep 1
-            Write-Host "Proceeding with the removal of OneDrive."
-            Start-Sleep 1
+        If (Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles") {
+            Write-Host "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
         }
-        Else {
-            Write-Host "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
-            Start-Sleep 1
-            Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
-            $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
-            If (!(Test-Path $OneDriveKey)) {
-                Mkdir $OneDriveKey
-                Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
+        else {
+            If (!(Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles")) {
+                Write-Host "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
+                New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
+                Write-Host "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
             }
+        }
+        Start-Sleep 1
+        Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
+        Write-Host "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
+        Start-Sleep 1
+        Write-Host "Proceeding with the removal of OneDrive."
+        Start-Sleep 1
+    }
+    Else {
+        Write-Host "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
+        Start-Sleep 1
+        Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+        $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+        If (!(Test-Path $OneDriveKey)) {
+            Mkdir $OneDriveKey
             Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
         }
+        Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
+    }
 
-        Write-Host "Uninstalling OneDrive. Please wait..."
+    Write-Host "Uninstalling OneDrive. Please wait..."
     
-
-        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
-        $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
-        $ExplorerReg2 = "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
-        Stop-Process -Name "OneDrive*"
-        Start-Sleep 2
-        If (!(Test-Path $onedrive)) {
-            $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
 
     New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
@@ -597,33 +590,42 @@ Function UninstallOneDrive {
     Start-Sleep 2
     If (!(Test-Path $onedrive)) {
         $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
-    }
-    Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
-    Start-Sleep 2
-    Write-Output "Stopping explorer"
-    Start-Sleep 1
-    taskkill.exe /F /IM explorer.exe
-    Start-Sleep 3
-    Write-Output "Removing leftover files"
-    Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
-    Remove-Item "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse
-    Remove-Item "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse
-    If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
-        Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
-    }
-    Write-Output "Removing OneDrive from windows explorer"
-    If (!(Test-Path $ExplorerReg1)) {
-        New-Item $ExplorerReg1
-    }
-    Set-ItemProperty $ExplorerReg1 System.IsPinnedToNameSpaceTree -Value 0 
-    If (!(Test-Path $ExplorerReg2)) {
-        New-Item $ExplorerReg2
-    }
-    Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
-    Write-Output "Restarting Explorer that was shut down before."
-    Start-Process explorer.exe -NoNewWindow
+
+        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+        $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
+        $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
+        $ExplorerReg2 = "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
+        Stop-Process -Name "OneDrive*"
+        Start-Sleep 2
+        If (!(Test-Path $onedrive)) {
+            $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
+        }
+        Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
+        Start-Sleep 2
+        Write-Output "Stopping explorer"
+        Start-Sleep 1
+        taskkill.exe /F /IM explorer.exe
+        Start-Sleep 3
+        Write-Output "Removing leftover files"
+        Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
+        Remove-Item "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse
+        Remove-Item "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse
+        If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
+            Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
+        }
+        Write-Output "Removing OneDrive from windows explorer"
+        If (!(Test-Path $ExplorerReg1)) {
+            New-Item $ExplorerReg1
+        }
+        Set-ItemProperty $ExplorerReg1 System.IsPinnedToNameSpaceTree -Value 0 
+        If (!(Test-Path $ExplorerReg2)) {
+            New-Item $ExplorerReg2
+        }
+        Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
+        Write-Output "Restarting Explorer that was shut down before."
+        Start-Process explorer.exe -NoNewWindow
     
-    Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+        Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
         $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
         If (!(Test-Path $OneDriveKey)) {
             Mkdir $OneDriveKey 
@@ -659,22 +661,23 @@ Function UninstallOneDrive {
         Write-Host "Restarting Explorer that was shut down before."
         Start-Process explorer.exe -NoNewWindow
         Write-Host "OneDrive has been successfully uninstalled!"
+    }
 }
 
 Function UnpinStart {
-#https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
-#Unpins all tiles from the Start Menu
+    #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+    #Unpins all tiles from the Start Menu
     Write-Host "Unpinning all tiles from the start menu"
     (New-Object -Com Shell.Application).
     NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
     Items() |
-    %{ $_.Verbs() } |
-    ?{$_.Name -match 'Un.*pin from Start'} |
-    %{$_.DoIt()}
+        % { $_.Verbs() } |
+        ? {$_.Name -match 'Un.*pin from Start'} |
+        % {$_.DoIt()}
 }
 
 Function Remove3dObjects {
-#Removes 3D Objects from the 'My Computer' submenu in explorer
+    #Removes 3D Objects from the 'My Computer' submenu in explorer
     Write-Host "Removing 3D Objects from explorer 'My Computer' submenu"
     $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
     $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
@@ -687,7 +690,7 @@ Function Remove3dObjects {
 }
 
 Function Restore3dObjects {
-#Restores 3D Objects from the 'My Computer' submenu in explorer
+    #Restores 3D Objects from the 'My Computer' submenu in explorer
     Write-Host "Restoring 3D Objects from explorer 'My Computer' submenu"
     $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
     $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
@@ -819,15 +822,15 @@ Switch ($Prompt1) {
                 Write-Host "You have chosen to skip removing OneDrive from your machine."
             }
         }
-		#Prompt asking if you'd like to unpin all start items
-		$Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
+        #Prompt asking if you'd like to unpin all start items
+        $Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
         Switch ($Prompt5) {
             Yes {
                 UnpinStart
-				Write-Host "Start Apps unpined."
+                Write-Host "Start Apps unpined."
             }
             No {
-				Write-Host "Apps will remain pinned to the start menu."
+                Write-Host "Apps will remain pinned to the start menu."
 
             }
         }
@@ -838,11 +841,11 @@ Switch ($Prompt1) {
                 Write-Host "Initializing the installation of .NET 3.5..."
                 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
                 Write-Host ".NET 3.5 has been successfully installed!"
-                }
+            }
             No {
                 Write-Host "Skipping .NET install."
             }
-            }
+        }
         #Prompt asking if you'd like to reboot your machine
         $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
         Switch ($Prompt7) {
@@ -868,42 +871,42 @@ Switch ($Prompt1) {
     }
 }
 
-    No {
-        Write-Host "Reverting changes..."
-        Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
-        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Revert-Changes
-        #Prompt asking to revert edge changes as well
-        $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
-        Switch ($Prompt6) {
-            Yes {
-                Enable-EdgePDF
-                Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
-            }
-            No {
-               Write-Host "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
-            }
+No {
+    Write-Host "Reverting changes..."
+    Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
+    New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    Revert-Changes
+    #Prompt asking to revert edge changes as well
+    $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
+    Switch ($Prompt6) {
+        Yes {
+            Enable-EdgePDF
+            Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
         }
-        #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-        Switch ($Prompt7) {
-            Yes {
-                Write-Host "Unloading the HKCR drive..."
-                Remove-PSDrive HKCR 
-                Start-Sleep 1
-                Write-Host "Initiating reboot."
-                Stop-Transcript
-                Start-Sleep 2
-                Restart-Computer
-            }
-            No {
-                Write-Host "Unloading the HKCR drive..."
-                Remove-PSDrive HKCR 
-                Start-Sleep 1
-                Write-Host "Script has finished. Exiting."
-                Stop-Transcript
-                Start-Sleep 2
-                Exit
-            }
+        No {
+            Write-Host "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
         }
     }
+    #Prompt asking if you'd like to reboot your machine
+    $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+    Switch ($Prompt7) {
+        Yes {
+            Write-Host "Unloading the HKCR drive..."
+            Remove-PSDrive HKCR 
+            Start-Sleep 1
+            Write-Host "Initiating reboot."
+            Stop-Transcript
+            Start-Sleep 2
+            Restart-Computer
+        }
+        No {
+            Write-Host "Unloading the HKCR drive..."
+            Remove-PSDrive HKCR 
+            Start-Sleep 1
+            Write-Host "Script has finished. Exiting."
+            Stop-Transcript
+            Start-Sleep 2
+            Exit
+        }
+    }
+}
