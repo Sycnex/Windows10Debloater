@@ -2,12 +2,17 @@
 #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
-If (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    $arguments = "&" + $MyInvocation.MyCommand.Definition + "" 
-    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator." -ForegroundColor "White"
+If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
+    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
     Start-Sleep 1
-    Start-Process "powershell.exe" -Verb RunAs -ArgumentList $arguments
-    Break
+    Write-Host "                                               3"
+    Start-Sleep 1
+    Write-Host "                                               2"
+    Start-Sleep 1
+    Write-Host "                                               1"
+    Start-Sleep 1
+    Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+    Exit
 }
 
 #no errors throughout
@@ -18,7 +23,7 @@ If (Test-Path $DebloatFolder) {
     Write-Output "$DebloatFolder exists. Skipping."
 }
 Else {
-    Write-Output "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Write-Output "The folder '$DebloatFolder' doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
     Start-Sleep 1
     New-Item -Path "$DebloatFolder" -ItemType Directory
     Write-Output "The folder $DebloatFolder was successfully created."
@@ -29,25 +34,23 @@ Start-Transcript -OutputDirectory "$DebloatFolder"
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
 Function DebloatAll {
-    
-    [CmdletBinding()]
-        
-    Param()
-    
     #Removes AppxPackages
     #Credit to /u/GavinEke for a modified version of my whitelist code
-    [regex]$WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
+    $WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
     Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|Framework|`
     Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry|Slack'
-    Get-AppxPackage -AllUsers | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
-    Get-AppxPackage | Where-Object {$_.Name -NotMatch $WhitelistedApps} | Remove-AppxPackage
-    Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -NotMatch $WhitelistedApps} | Remove-AppxProvisionedPackage -Online
+    #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
+    $NonRemovable = '1527c705-839a-4832-9118-54d4Bd6a0c89|c5e2524a-ea46-4f67-841f-6a9465d9d515|E2A4F912-2574-4A75-9BB0-0D023378592B|F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE|InputApp|Microsoft.AAD.BrokerPlugin|Microsoft.AccountsControl|`
+    Microsoft.BioEnrollment|Microsoft.CredDialogHost|Microsoft.ECApp|Microsoft.LockApp|Microsoft.MicrosoftEdgeDevToolsClient|Microsoft.MicrosoftEdge|Microsoft.PPIProjection|Microsoft.Win32WebViewHost|Microsoft.Windows.Apprep.ChxApp|`
+    Microsoft.Windows.AssignedAccessLockApp|Microsoft.Windows.CapturePicker|Microsoft.Windows.CloudExperienceHost|Microsoft.Windows.ContentDeliveryManager|Microsoft.Windows.Cortana|Microsoft.Windows.NarratorQuickStart|`
+    Microsoft.Windows.ParentalControls|Microsoft.Windows.PeopleExperienceHost|Microsoft.Windows.PinningConfirmationDialog|Microsoft.Windows.SecHealthUI|Microsoft.Windows.SecureAssessmentBrowser|Microsoft.Windows.ShellExperienceHost|`
+    Microsoft.Windows.XGpuEjectDialog|Microsoft.XboxGameCallableUI|Windows.CBSPreview|windows.immersivecontrolpanel|Windows.PrintDialog|Microsoft.VCLibs.140.00|Microsoft.Services.Store.Engagement|Microsoft.UI.Xaml.2.0'
+    Get-AppxPackage -AllUsers | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
+    Get-AppxPackage | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
+    Get-AppxProvisionedPackage -Online | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxProvisionedPackage -Online
 }
 
 Function DebloatBlacklist {
-    [CmdletBinding()]
-
-    Param ()
 
     $Bloatware = @(
 
@@ -117,17 +120,13 @@ Function DebloatBlacklist {
         #"*Microsoft.WindowsStore*"
     )
     foreach ($Bloat in $Bloatware) {
-        Get-AppxPackage -Name $Bloat| Remove-AppxPackage -ErrorAction SilentlyContinue
-        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue
+        Get-AppxPackage -Name $Bloat| Remove-AppxPackage
+        Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
         Write-Output "Trying to remove $Bloat."
     }
 }
 
 Function Remove-Keys {
-        
-    [CmdletBinding()]
-            
-    Param()
         
     #These are the registry keys that it will delete.
             
@@ -172,10 +171,6 @@ Function Remove-Keys {
 }
             
 Function Protect-Privacy {
-        
-    [CmdletBinding()]
-        
-    Param()
             
     #Disables Windows Feedback Experience
     Write-Output "Disabling Windows Feedback Experience program"
@@ -289,7 +284,7 @@ Function Protect-Privacy {
     Write-Output "Disabling People icon on Taskbar"
     $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
     If (Test-Path $People) {
-        Set-ItemProperty $People -Name PeopleBand -Value 0 -Verbose
+        Set-ItemProperty $People -Name PeopleBand -Value 0
     }
         
     #Disables scheduled tasks that are considered unnecessary 
@@ -391,10 +386,6 @@ Function Stop-EdgePDF {
 }
 
 Function Revert-Changes {   
-            
-    [CmdletBinding()]
-            
-    Param()
         
     #This function will revert the changes you made when running the Start-Debloat function.
         
@@ -488,6 +479,10 @@ Function Revert-Changes {
     #Enabling the Diagnostics Tracking Service
     Set-Service "DiagTrack" -StartupType Automatic
     Start-Service "DiagTrack"
+    
+    Write-Output "Restoring 3D Objects in the 'My Computer' submenu in explorer"
+    #Restoring 3D Objects in the 'My Computer' submenu in explorer
+    Restore3dObjects
 }
 
 Function CheckDMWService {
@@ -535,10 +530,6 @@ Function Enable-EdgePDF {
 
 Function FixWhitelistedApps {
     
-    [CmdletBinding()]
-            
-    Param()
-    
     If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos)) {
     
         #Credit to abulgatz for these 4 lines of code
@@ -551,38 +542,53 @@ Function FixWhitelistedApps {
 
 Function UninstallOneDrive {
 
-    Write-Output "Checking for pre-existing files and folders located in the OneDrive folders..."
+    Write-Host "Checking for pre-existing files and folders located in the OneDrive folders..."
     Start-Sleep 1
-    If (Get-Item -Path "$env:USERPROFILE\OneDrive\*") {
-        Write-Output "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
-        Start-Sleep 1
+    If (Test-Path "$env:USERPROFILE\OneDrive\*") {
+            Write-Host "Files found within the OneDrive folder! Checking to see if a folder named OneDriveBackupFiles exists."
+            Start-Sleep 1
               
-        If (Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue) {
-            Write-Output "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
-        }
-        else {
-            If (!(Get-Item "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -ErrorAction SilentlyContinue)) {
-                Write-Output "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
-                New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
-                Write-Output "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
+            If (Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles") {
+                Write-Host "A folder named OneDriveBackupFiles already exists on your desktop. All files from your OneDrive location will be moved to that folder." 
             }
-        }
-        Start-Sleep 1
-        Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
-        Write-Output "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
-        Start-Sleep 1
-        Write-Output "Proceeding with the removal of OneDrive."
-        Start-Sleep 1
-    }
-    Else {
-        If (!(Get-Item -Path "$env:USERPROFILE\OneDrive\*")) {
-            Write-Output "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
+            else {
+                If (!(Test-Path "$env:USERPROFILE\Desktop\OneDriveBackupFiles")) {
+                    Write-Host "A folder named OneDriveBackupFiles will be created and will be located on your desktop. All files from your OneDrive location will be located in that folder."
+                    New-item -Path "$env:USERPROFILE\Desktop" -Name "OneDriveBackupFiles"-ItemType Directory -Force
+                    Write-Host "Successfully created the folder 'OneDriveBackupFiles' on your desktop."
+                }
+            }
+            Start-Sleep 1
+            Move-Item -Path "$env:USERPROFILE\OneDrive\*" -Destination "$env:USERPROFILE\Desktop\OneDriveBackupFiles" -Force
+            Write-Host "Successfully moved all files/folders from your OneDrive folder to the folder 'OneDriveBackupFiles' on your desktop."
+            Start-Sleep 1
+            Write-Host "Proceeding with the removal of OneDrive."
             Start-Sleep 1
         }
-    }
+        Else {
+            Write-Host "Either the OneDrive folder does not exist or there are no files to be found in the folder. Proceeding with removal of OneDrive."
+            Start-Sleep 1
+            Write-Host "Enabling the Group Policy 'Prevent the usage of OneDrive for File Storage'."
+            $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
+            If (!(Test-Path $OneDriveKey)) {
+                Mkdir $OneDriveKey
+                Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
+            }
+            Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
+        }
 
-    Write-Output "Uninstalling OneDrive"
+        Write-Host "Uninstalling OneDrive. Please wait..."
     
+
+        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+        $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
+        $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
+        $ExplorerReg2 = "HKCR:\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
+        Stop-Process -Name "OneDrive*"
+        Start-Sleep 2
+        If (!(Test-Path $onedrive)) {
+            $onedrive = "$env:SYSTEMROOT\System32\OneDriveSetup.exe"
+
     New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     $onedrive = "$env:SYSTEMROOT\SysWOW64\OneDriveSetup.exe"
     $ExplorerReg1 = "HKCR:\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}"
@@ -622,17 +628,43 @@ Function UninstallOneDrive {
         If (!(Test-Path $OneDriveKey)) {
             Mkdir $OneDriveKey 
         }
-
-        $DisableAllOneDrive = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
-        If (Test-Path $DisableAllOneDrive) {
-            New-ItemProperty $DisableAllOneDrive -Name OneDrive -Value DisableFileSyncNGSC -Verbose 
+        Start-Process $onedrive "/uninstall" -NoNewWindow -Wait
+        Start-Sleep 2
+        Write-Host "Stopping explorer"
+        Start-Sleep 1
+        taskkill.exe /F /IM explorer.exe
+        Start-Sleep 3
+        Write-Host "Removing leftover files"
+        If (Test-Path "$env:USERPROFILE\OneDrive") {
+            Remove-Item "$env:USERPROFILE\OneDrive" -Force -Recurse
         }
+        If (Test-Path "$env:LOCALAPPDATA\Microsoft\OneDrive") {
+            Remove-Item "$env:LOCALAPPDATA\Microsoft\OneDrive" -Force -Recurse
+        }
+        If (Test-Path "$env:PROGRAMDATA\Microsoft OneDrive") {
+            Remove-Item "$env:PROGRAMDATA\Microsoft OneDrive" -Force -Recurse
+        }
+        If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
+            Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
+        }
+        Write-Host "Removing OneDrive from windows explorer"
+        If (!(Test-Path $ExplorerReg1)) {
+            New-Item $ExplorerReg1
+        }
+        Set-ItemProperty $ExplorerReg1 System.IsPinnedToNameSpaceTree -Value 0 
+        If (!(Test-Path $ExplorerReg2)) {
+            New-Item $ExplorerReg2
+        }
+        Set-ItemProperty $ExplorerReg2 System.IsPinnedToNameSpaceTree -Value 0
+        Write-Host "Restarting Explorer that was shut down before."
+        Start-Process explorer.exe -NoNewWindow
+        Write-Host "OneDrive has been successfully uninstalled!"
 }
 
 Function UnpinStart {
 #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
 #Unpins all tiles from the Start Menu
-    Write-Output "Unpinning all tiles from the start menu"
+    Write-Host "Unpinning all tiles from the start menu"
     (New-Object -Com Shell.Application).
     NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
     Items() |
@@ -641,7 +673,33 @@ Function UnpinStart {
     %{$_.DoIt()}
 }
 
-#GUI prompt Debloat/Revert options and GUI variables
+Function Remove3dObjects {
+#Removes 3D Objects from the 'My Computer' submenu in explorer
+    Write-Host "Removing 3D Objects from explorer 'My Computer' submenu"
+    $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    If (Test-Path $Objects32) {
+        Remove-Item $Objects32 -Recurse 
+    }
+    If (Test-Path $Objects64) {
+        Remove-Item $Objects64 -Recurse 
+    }
+}
+
+Function Restore3dObjects {
+#Restores 3D Objects from the 'My Computer' submenu in explorer
+    Write-Host "Restoring 3D Objects from explorer 'My Computer' submenu"
+    $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
+    If (!(Test-Path $Objects32)) {
+        New-Item $Objects32
+    }
+    If (!(Test-Path $Objects64)) {
+        New-Item $Objects64
+    }
+}
+
+#Interactive prompt Debloat/Revert options
 $Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
 $Warn = [Windows.MessageBoxImage]::Warning
@@ -664,87 +722,90 @@ $Prompt1 = [Windows.MessageBox]::Show($Ask, "Debloat or Revert", $Button, $Error
 Switch ($Prompt1) {
     #This will debloat Windows 10
     Yes {
-
+        #Everything is specific prompt
         $Prompt2 = [Windows.MessageBox]::Show($EverythingorSpecific, "Everything or Specific", $Button, $Warn)
         switch ($Prompt2) {
             Yes { 
                 #Creates a "drive" to access the HKCR (HKEY_CLASSES_ROOT)
-                Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
+                Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
                 New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
                 Start-Sleep 1
-                Write-Output "Uninstalling bloatware, please wait."
+                Write-Host "Uninstalling bloatware, please wait."
                 DebloatAll
-                Write-Output "Bloatware removed."
+                Write-Host "Bloatware removed."
                 Start-Sleep 1
-                Write-Output "Removing specific registry keys."
+                Write-Host "Removing specific registry keys."
                 Remove-Keys
-                Write-Output "Leftover bloatware registry keys removed."
+                Write-Host "Leftover bloatware registry keys removed."
                 Start-Sleep 1
-                Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+                Write-Host "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
                 Start-Sleep 1
                 FixWhitelistedApps
                 Start-Sleep 1
-                Write-Output "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
+                Write-Host "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
                 Protect-Privacy
                 Start-Sleep 1
                 DisableCortana
-                Write-Output "Cortana disabled and removed from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
+                Write-Host "Cortana disabled and removed from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
                 Start-Sleep 1
-                Write-Output "Stopping and disabling Diagnostics Tracking Service"
+                Write-Host "Stopping and disabling Diagnostics Tracking Service"
                 DisableDiagTrack
-                Write-Output "Diagnostics Tracking Service disabled"
+                Write-Host "Diagnostics Tracking Service disabled"
                 Start-Sleep 1
-                Write-Output "Disabling WAP push service"
-                Start-Sleep 1
+                Write-Host "Disabling WAP push service"
                 DisableWAPPush
-                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                Start-Sleep 1
+                Write-Host "Re-enabling DMWAppushservice if it was disabled"
                 CheckDMWService
+                Start-Sleep 1
+                Write-Host "Removing 3D Objects from the 'My Computer' submenu in explorer"
+                Remove3dObjects
                 Start-Sleep 1
             }
             No {
                 #Creates a "drive" to access the HKCR (HKEY_CLASSES_ROOT)
-                Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
+                Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the removal and modification of specific registry keys."
                 New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
                 Start-Sleep 1
-                Write-Output "Uninstalling bloatware, please wait."
+                Write-Host "Uninstalling bloatware, please wait."
                 DebloatBlacklist
-                Write-Output "Bloatware removed."
+                Write-Host "Bloatware removed."
                 Start-Sleep 1
-                Write-Output "Removing specific registry keys."
+                Write-Host "Removing specific registry keys."
                 Remove-Keys
-                Write-Output "Leftover bloatware registry keys removed."
+                Write-Host "Leftover bloatware registry keys removed."
                 Start-Sleep 1
-                Write-Output "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+                Write-Host "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
                 Start-Sleep 1
                 FixWhitelistedApps
                 Start-Sleep 1
-                Write-Output "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
+                Write-Host "Disabling Cortana from search, disabling feedback to Microsoft, and disabling scheduled tasks that are considered to be telemetry or unnecessary."
                 Protect-Privacy
                 Start-Sleep 1
                 DisableCortana
-                Write-Output "Cortana disabled and removed from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
+                Write-Host "Cortana disabled and removed from search, feedback to Microsoft has been disabled, and scheduled tasks are disabled."
                 Start-Sleep 1
-                Write-Output "Stopping and disabling Diagnostics Tracking Service"
+                Write-Host "Stopping and disabling Diagnostics Tracking Service"
                 DisableDiagTrack
-                Write-Output "Diagnostics Tracking Service disabled"
+                Write-Host "Diagnostics Tracking Service disabled"
                 Start-Sleep 1
-                Write-Output "Disabling WAP push service"
+                Write-Host "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
-                Write-Output "Re-enabling DMWAppushservice if it was disabled"
+                Write-Host "Re-enabling DMWAppushservice if it was disabled"
                 CheckDMWService
                 Start-Sleep 1
             }
         }
-
+        #Disabling EdgePDF prompt
         $Prompt3 = [Windows.MessageBox]::Show($EdgePdf, "Edge PDF", $Button, $Warn)
         Switch ($Prompt3) {
             Yes {
                 Stop-EdgePDF
-                Write-Output "Edge will no longer take over as the default PDF viewer."
+                Write-Host "Edge will no longer take over as the default PDF viewer."
             }
             No {
-                Write-Output "You chose not to stop Edge from taking over as the default PDF viewer."
+                Write-Host "You chose not to stop Edge from taking over as the default PDF viewer."
             }
         }
         #Prompt asking to delete OneDrive
@@ -752,92 +813,53 @@ Switch ($Prompt1) {
         Switch ($Prompt4) {
             Yes {
                 UninstallOneDrive
-                Write-Output "OneDrive is now removed from the computer."
+                Write-Host "OneDrive is now removed from the computer."
             }
             No {
-                Write-Output "You have chosen to skip removing OneDrive from your machine."
+                Write-Host "You have chosen to skip removing OneDrive from your machine."
             }
         }
-				#Prompt asking if you'd like to unpin all start items
+		#Prompt asking if you'd like to unpin all start items
 		$Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
         Switch ($Prompt5) {
             Yes {
                 UnpinStart
-				Write-Output "Start Apps unpined."
+				Write-Host "Start Apps unpined."
             }
             No {
-				Write-Output "You have chosen to skip removing OneDrive from your machine."
+				Write-Host "Apps will remain pinned to the start menu."
 
             }
         }
+        #Prompt asking if you want to install .NET
         $Prompt6 = [Windows.MessageBox]::Show($InstallNET, "Install .Net", $Button, $Warn)
         Switch ($Prompt6) {
             Yes {
-                Write-Output "Initializing the installation of .NET 3.5..."
-                Try {
+                Write-Host "Initializing the installation of .NET 3.5..."
                 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-                Write-Output ".NET 3.5 has been successfully installed!" }
-                Catch {
-                    $_
+                Write-Host ".NET 3.5 has been successfully installed!"
                 }
-            }
-        }
-        #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn) 
-        Switch ($Prompt7) {
-            Yes {
-                Write-Output "Unloading the HKCR drive..."
-                Remove-PSDrive HKCR 
-                Start-Sleep 1
-                Stop-Transcript
-                Write-Output "Initiating reboot."
-                Start-Sleep 2
-                Restart-Computer
-            }
             No {
-                Write-Output "Unloading the HKCR drive..."
-                Remove-PSDrive HKCR 
-                Start-Sleep 1
-                Stop-Transcript
-                Write-Output "Script has finished. Exiting."
-                Start-Sleep 2
-                Exit
+                Write-Host "Skipping .NET install."
             }
-        }
-    }
-    No {
-        Write-Output "Reverting changes..."
-        Write-Output "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
-        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        Revert-Changes
-        #Prompt asking to revert edge changes as well
-        $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
-        Switch ($Prompt6) {
-            Yes {
-                Enable-EdgePDF
-                Write-Output "Edge will no longer be disabled from being used as the default Edge PDF viewer."
             }
-            No {
-               Write-Output "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
-            }
-        }
         #Prompt asking if you'd like to reboot your machine
         $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
         Switch ($Prompt7) {
             Yes {
-                Write-Output "Unloading the HKCR drive..."
+                Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
                 Start-Sleep 1
-                Write-Output "Initiating reboot."
+                Write-Host "Initiating reboot."
                 Stop-Transcript
                 Start-Sleep 2
                 Restart-Computer
             }
             No {
-                Write-Output "Unloading the HKCR drive..."
+                Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
                 Start-Sleep 1
-                Write-Output "Script has finished. Exiting."
+                Write-Host "Script has finished. Exiting."
                 Stop-Transcript
                 Start-Sleep 2
                 Exit
@@ -845,3 +867,43 @@ Switch ($Prompt1) {
         }
     }
 }
+
+    No {
+        Write-Host "Reverting changes..."
+        Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
+        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+        Revert-Changes
+        #Prompt asking to revert edge changes as well
+        $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
+        Switch ($Prompt6) {
+            Yes {
+                Enable-EdgePDF
+                Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
+            }
+            No {
+               Write-Host "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
+            }
+        }
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt7) {
+            Yes {
+                Write-Host "Unloading the HKCR drive..."
+                Remove-PSDrive HKCR 
+                Start-Sleep 1
+                Write-Host "Initiating reboot."
+                Stop-Transcript
+                Start-Sleep 2
+                Restart-Computer
+            }
+            No {
+                Write-Host "Unloading the HKCR drive..."
+                Remove-PSDrive HKCR 
+                Start-Sleep 1
+                Write-Host "Script has finished. Exiting."
+                Stop-Transcript
+                Start-Sleep 2
+                Exit
+            }
+        }
+    }

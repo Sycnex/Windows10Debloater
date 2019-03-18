@@ -10,12 +10,10 @@ First Method:
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
 3) Enable PowerShell execution
-<code>Set-ExecutionPolicy Unrestricted</code>
-4) Ubnlock all powershell script
-<code>ls -Recurse *.ps1 | Unblock-File</code>
-5) On the propmt, change to the directory where you extracted the files:
+<code>Set-ExecutionPolicy Unrestricted -Force</code>
+4) On the propmt, change to the directory where you extracted the files:
   e.g. - cd c:\temp
-6) Next, to run either script, enter in the following:
+5) Next, to run either script, enter in the following:
   e.g. - .\Windows10DebloaterGUI.ps1
   
 
@@ -23,16 +21,9 @@ Second Method:
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
-3) This will allow the script to run without having to do the above steps
+3) This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
 
-
-Third Method:
-
-This method has an issue because my script will launch a PowerShell session as an Administrator if you didn't do so, and if you didn't then this method won't work properly unless you remove the code at the very top that does this.
-
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Open the files and copy and paste the source code into either PowerShell.exe or PowerShell ISE.
-3) Click "RUN" (or F5) and the script will run
+Remember this script NEEDS to be run as admin in order to function properly.
 
 
 # How To Run the Windows10SysPrepDebloater.ps1 file
