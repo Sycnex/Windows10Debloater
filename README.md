@@ -11,7 +11,7 @@ First Method:
 2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
 3) Enable PowerShell execution
 <code>Set-ExecutionPolicy Unrestricted -Force</code>
-4) On the propmt, change to the directory where you extracted the files:
+4) On the prompt, change to the directory where you extracted the files:
   e.g. - cd c:\temp
 5) Next, to run either script, enter in the following:
   e.g. - .\Windows10DebloaterGUI.ps1
@@ -35,7 +35,7 @@ To run this with parameters, do the following:
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) On the propmt, change to the directory where you extracted the files:
+3) On the prompt, change to the directory where you extracted the files:
   e.g. - cd c:\temp
 4) Next, to run either script, enter in the following:
   e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy and -StopEdgePDF
