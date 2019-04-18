@@ -238,6 +238,7 @@ $RemoveBlacklist.Add_Click( {
                 #"*Microsoft.Windows.Photos*"
                 #"*Microsoft.WindowsCalculator*"
                 #"*Microsoft.WindowsStore*"
+                "*SpotifyAB.SpotifyMusic*"
             )
             foreach ($Bloat in $Bloatware) {
                 Get-AppxPackage -Name $Bloat| Remove-AppxPackage
