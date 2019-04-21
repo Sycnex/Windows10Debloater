@@ -18,10 +18,11 @@ $form.AcceptButton = $OKButton
 $form.Controls.Add($OKButton)
 
 $RemoveKeys                = New-Object system.Windows.Forms.Button
-$RemoveKeys.text           = "BRUH"
-$RemoveKeys.width          = 225
+$RemoveKeys.text           = "Remove registry keys associated with Bloatware"
+$RemoveKeys.width          = 265
 $RemoveKeys.height         = 23
-$RemoveKeys.location       = New-Object System.Drawing.Point(275,305)
+$RemoveKeys.location       = New-Object System.Drawing.Point(275,400)
+$form.Controls.Add($RemoveKeys)
 #$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
 
 $label = New-Object System.Windows.Forms.Label
