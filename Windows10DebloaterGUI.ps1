@@ -25,6 +25,14 @@ $RemoveKeys.location       = New-Object System.Drawing.Point(275,400)
 $form.Controls.Add($RemoveKeys)
 #$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
 
+$ProtectPrivacy                = New-Object system.Windows.Forms.Button
+$ProtectPrivacy.text           = "Disable Telemetry"
+$ProtectPrivacy.width          = 265
+$ProtectPrivacy.height         = 23
+$ProtectPrivacy.location       = New-Object System.Drawing.Point(275,365)
+$form.Controls.Add($ProtectPrivacy)
+#$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
+
 $label = New-Object System.Windows.Forms.Label
 $label.Location = New-Object System.Drawing.Point(10,20)
 $label.Size = New-Object System.Drawing.Size(280,20)
@@ -61,7 +69,7 @@ $WhitelistDebloat.height         = 30
 $WhitelistDebloat.location       = New-Object System.Drawing.Point(275,175)
 #$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
 
-$Form.controls.AddRange(@($WhitelistDebloat,$RemoveKeys))
+$Form.controls.AddRange(@($WhitelistDebloat,$RemoveKeys,$ProtectPrivacy))
 
 $WhitelistDebloat.Add_Click({ 
 Function DebloatAll {
@@ -85,8 +93,11 @@ Debloatall
 
  })
 
+ New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
  $RemoveKeys.Add_Click({
  Function Remove-Keys {
+
+ New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         
     #These are the registry keys that it will delete.
             
@@ -128,8 +139,111 @@ Debloatall
         Write-Verbose "Removing $Key from registry"
         Remove-Item $Key -Recurse
     }
-Remove-Keys
 }
+Remove-Keys
+})
+
+$ProtectPrivacy.Add_Click({
+Function ProtectPrivacy { 
+  
+            #Creates a PSDrive to be able to access the 'HKCR' tree
+            New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+          
+            #Disables Windows Feedback Experience
+            Write-Host "Disabling Windows Feedback Experience program"
+            $Advertising = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo'
+            If (Test-Path $Advertising) {
+                Set-ItemProperty $Advertising Enabled -Value 0
+            }
+          
+            #Stops Cortana from being used as part of your Windows Search Function
+            Write-Host "Stopping Cortana from being used as part of your Windows Search Function"
+            $Search = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search'
+            If (Test-Path $Search) {
+                Set-ItemProperty $Search AllowCortana -Value 0
+            }
+          
+            #Stops the Windows Feedback Experience from sending anonymous data
+            Write-Host "Stopping the Windows Feedback Experience program"
+            $Period1 = 'HKCU:\Software\Microsoft\Siuf'
+            $Period2 = 'HKCU:\Software\Microsoft\Siuf\Rules'
+            $Period3 = 'HKCU:\Software\Microsoft\Siuf\Rules\PeriodInNanoSeconds'
+            If (!(Test-Path $Period3)) { 
+                mkdir $Period1
+                mkdir $Period2
+                mkdir $Period3
+                New-ItemProperty $Period3 PeriodInNanoSeconds -Value 0
+            }
+                 
+            Write-Host "Adding Registry key to prevent bloatware apps from returning"
+            #Prevents bloatware applications from returning
+            $registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"
+            If (!(Test-Path $registryPath)) {
+                Mkdir $registryPath
+                New-ItemProperty $registryPath DisableWindowsConsumerFeatures -Value 1 
+            }          
+      
+            Write-Host "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
+            $Holo = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Holographic'    
+            If (Test-Path $Holo) {
+                Set-ItemProperty $Holo FirstRunSucceeded -Value 0
+            }
+      
+            #Disables live tiles
+            Write-Host "Disabling live tiles"
+            $Live = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications'    
+            If (!(Test-Path $Live)) {
+                mkdir $Live  
+                New-ItemProperty $Live NoTileApplicationNotification -Value 1
+            }
+      
+            #Turns off Data Collection via the AllowTelemtry key by changing it to 0
+            Write-Host "Turning off Data Collection"
+            $DataCollection = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection'    
+            If (Test-Path $DataCollection) {
+                Set-ItemProperty $DataCollection AllowTelemetry -Value 0
+            }
+      
+            #Disables People icon on Taskbar
+            Write-Host "Disabling People icon on Taskbar"
+            $People = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People'
+            If (Test-Path $People) {
+                Set-ItemProperty $People PeopleBand -Value 0
+            }
+  
+            #Disables suggestions on start menu
+            Write-Host "Disabling suggestions on the Start Menu"
+            $Suggestions = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'    
+            If (Test-Path $Suggestions) {
+                Set-ItemProperty $Suggestions SystemPaneSuggestionsEnabled -Value 0
+            }
+            
+            
+            Write-Host "Removing CloudStore from registry if it exists"
+            $CloudStore = 'HKCUSoftware\Microsoft\Windows\CurrentVersion\CloudStore'
+            If (Test-Path $CloudStore) {
+                Stop-Process Explorer.exe -Force
+                Remove-Item $CloudStore
+                Start-Process Explorer.exe -Wait
+            }
+  
+            #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
+            reg load HKU\Default_User C:\Users\Default\NTUSER.DAT
+            Set-ItemProperty -Path Registry::HKU\Default_User\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager -Name SystemPaneSuggestionsEnabled -Value 0
+            Set-ItemProperty -Path Registry::HKU\Default_User\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager -Name PreInstalledAppsEnabled -Value 0
+            Set-ItemProperty -Path Registry::HKU\Default_User\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager -Name OemPreInstalledAppsEnabled -Value 0
+            reg unload HKU\Default_User
+      
+            #Disables scheduled tasks that are considered unnecessary 
+            Write-Host "Disabling scheduled tasks"
+            #Get-ScheduledTask -TaskName XblGameSaveTaskLogon | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName XblGameSaveTask | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName Consolidator | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName UsbCeip | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClient | Disable-ScheduledTask
+            Get-ScheduledTask -TaskName DmClientOnScenarioDownload | Disable-ScheduledTask
+        }
+    ProtectPrivacy
 })
 
 
