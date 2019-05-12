@@ -6,7 +6,7 @@ $VerbosePreference = 'Continue'
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Windows10Debloater'
-$form.Size = New-Object System.Drawing.Size(800,600)
+$form.Size = New-Object System.Drawing.Size(1000,600)
 $form.StartPosition = 'CenterScreen'
 
 $OKButton = New-Object System.Windows.Forms.Button
@@ -40,6 +40,23 @@ $RevertChange.height         = 23
 $RevertChange.location       = New-Object System.Drawing.Point(275,435)
 $form.Controls.Add($RevertChange)
 #$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
+
+$EnableCortana                = New-Object system.Windows.Forms.Button
+$EnableCortana.text           = "Enable Cortana"
+$EnableCortana.width          = 265
+$EnableCortana.height         = 23
+$EnableCortana.location       = New-Object System.Drawing.Point(575,365)
+$form.Controls.Add($EnableCortana)
+#$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
+
+$DisableCortana                = New-Object system.Windows.Forms.Button
+$DisableCortana.text           = "Disable Cortana"
+$DisableCortana.width          = 265
+$DisableCortana.height         = 23
+$DisableCortana.location       = New-Object System.Drawing.Point(575,400)
+$form.Controls.Add($DisableCortana)
+#$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
+
 
 $label = New-Object System.Windows.Forms.Label
 $label.Location = New-Object System.Drawing.Point(10,20)
@@ -367,6 +384,56 @@ $RevertChange.Add_Click( {
         }
      }
     RevertChanges
+})
+
+$DisableCortana.Add_Click( { 
+    DisableCortana {
+        $ErrorActionPreference = 'silentlycontinue'
+        Write-Host "Disabling Cortana"
+        $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
+        $Cortana2 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization"
+        $Cortana3 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore"
+        If (!(Test-Path $Cortana1)) {
+            New-Item $Cortana1
+        }
+        Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 0 
+        If (!(Test-Path $Cortana2)) {
+            New-Item $Cortana2
+        }
+        Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 1 
+        Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 1 
+        If (!(Test-Path $Cortana3)) {
+            New-Item $Cortana3
+        }
+        Set-ItemProperty $Cortana3 HarvestContacts -Value 0
+        Write-Host "Cortana has been disabled."
+    }
+DisableCortana
+})
+
+$EnableCortana.Add_Click( { 
+    EnableCortana {
+        $ErrorActionPreference = 'silentlycontinue'
+        Write-Host "Re-enabling Cortana"
+        $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
+        $Cortana2 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization"
+        $Cortana3 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore"
+        If (!(Test-Path $Cortana1)) {
+            New-Item $Cortana1
+        }
+        Set-ItemProperty $Cortana1 AcceptedPrivacyPolicy -Value 1 
+        If (!(Test-Path $Cortana2)) {
+            New-Item $Cortana2
+        }
+        Set-ItemProperty $Cortana2 RestrictImplicitTextCollection -Value 0 
+        Set-ItemProperty $Cortana2 RestrictImplicitInkCollection -Value 0 
+        If (!(Test-Path $Cortana3)) {
+            New-Item $Cortana3
+        }
+        Set-ItemProperty $Cortana3 HarvestContacts -Value 1 
+        Write-Host "Cortana has been enabled!"
+     }
+EnableCortana
 })
 
 
