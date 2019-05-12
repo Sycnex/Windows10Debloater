@@ -57,6 +57,14 @@ $DisableCortana.location       = New-Object System.Drawing.Point(575,400)
 $form.Controls.Add($DisableCortana)
 #$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
 
+$UnpinStartMenuTiles               = New-Object system.Windows.Forms.Button
+$UnpinStartMenuTiles.text           = "Unpin Start Menu Tiles"
+$UnpinStartMenuTiles.width          = 265
+$UnpinStartMenuTiles.height         = 23
+$UnpinStartMenuTiles.location       = New-Object System.Drawing.Point(575,435)
+$form.Controls.Add($UnpinStartMenuTiles)
+#$WhitelistDebloat.Font           = 'Microsoft Sans Serif,10'
+
 
 $label = New-Object System.Windows.Forms.Label
 $label.Location = New-Object System.Drawing.Point(10,20)
@@ -434,6 +442,21 @@ $EnableCortana.Add_Click( {
         Write-Host "Cortana has been enabled!"
      }
 EnableCortana
+})
+
+$UnpinStartMenuTiles.Add_Click( {
+    UnpinStartMenuTiles {
+        #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
+        #Unpins all tiles from the Start Menu
+            Write-Host "Unpinning all tiles from the start menu"
+            (New-Object -Com Shell.Application).
+            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+            Items() |
+            %{ $_.Verbs() } |
+            ?{$_.Name -match 'Un.*pin from Start'} |
+            %{$_.DoIt()}
+        }
+    UnpinStartMenuTiles
 })
 
 
