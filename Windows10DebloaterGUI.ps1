@@ -395,7 +395,7 @@ $RevertChange.Add_Click( {
 })
 
 $DisableCortana.Add_Click( { 
-    DisableCortana {
+    Function DisableCortana {
         $ErrorActionPreference = 'silentlycontinue'
         Write-Host "Disabling Cortana"
         $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
@@ -420,7 +420,7 @@ DisableCortana
 })
 
 $EnableCortana.Add_Click( { 
-    EnableCortana {
+    Function EnableCortana {
         $ErrorActionPreference = 'silentlycontinue'
         Write-Host "Re-enabling Cortana"
         $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
@@ -445,7 +445,7 @@ EnableCortana
 })
 
 $UnpinStartMenuTiles.Add_Click( {
-    UnpinStartMenuTiles {
+   Function UnpinStartMenuTiles {
         #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
         #Unpins all tiles from the Start Menu
             Write-Host "Unpinning all tiles from the start menu"
