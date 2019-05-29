@@ -12,6 +12,175 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     Exit
 }
 
+#Unnecessary Windows 10 AppX apps that will be removed by the blacklist.
+$global:Bloatware = @(
+    "Microsoft.BingNews"
+    "Microsoft.GetHelp"
+    "Microsoft.Getstarted"
+    "Microsoft.Messaging"
+    "Microsoft.Microsoft3DViewer"
+    "Microsoft.MicrosoftOfficeHub"
+    "Microsoft.MicrosoftSolitaireCollection"
+    "Microsoft.NetworkSpeedTest"
+    "Microsoft.News"                                    # Issue 77
+    "Microsoft.Office.Lens"                             # Issue 77
+    "Microsoft.Office.OneNote"
+    "Microsoft.Office.Sway"
+    "Microsoft.OneConnect"
+    "Microsoft.People"
+    "Microsoft.Print3D"
+    "Microsoft.RemoteDesktop"                           # Issue 120
+    "Microsoft.SkypeApp"
+    "Microsoft.StorePurchaseApp"
+    "Microsoft.Office.Todo.List"                        # Issue 77
+    "Microsoft.Whiteboard"                              # Issue 77
+    "Microsoft.WindowsAlarms"
+    #"Microsoft.WindowsCamera"
+    "microsoft.windowscommunicationsapps"
+    "Microsoft.WindowsFeedbackHub"
+    "Microsoft.WindowsMaps"
+    "Microsoft.WindowsSoundRecorder"
+    "Microsoft.Xbox.TCUI"
+    "Microsoft.XboxApp"
+    "Microsoft.XboxGameOverlay"
+    "Microsoft.XboxIdentityProvider"
+    "Microsoft.XboxSpeechToTextOverlay"
+    "Microsoft.ZuneMusic"
+    "Microsoft.ZuneVideo"
+
+    #Sponsored Windows 10 AppX Apps
+    #Add sponsored/featured apps to remove in the "*AppName*" format
+    "EclipseManager"
+    "ActiproSoftwareLLC"
+    "AdobeSystemsIncorporated.AdobePhotoshopExpress"
+    "Duolingo-LearnLanguagesforFree"
+    "PandoraMediaInc"
+    "CandyCrush"
+    "Wunderlist"
+    "Flipboard"
+    "Twitter"
+    "Facebook"
+    "Spotify"                                           # Issue 123
+    "Minecraft"
+    "Royal Revolt"
+    "Sway"                                              # Issue 77
+    "Dolby"                                             # Issue 78
+    "Windows.CBSPreview"                                # Issue 84
+
+    #Optional: Typically not removed but you can if you need to for some reason
+    #"Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe"
+    #"Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe"
+    #"Microsoft.BingWeather"
+    #"Microsoft.MSPaint"
+    #"Microsoft.MicrosoftStickyNotes"
+    #"Microsoft.Windows.Photos"
+    #"Microsoft.WindowsCalculator"
+    #"Microsoft.WindowsStore"
+)
+
+#Valuable Windows 10 AppX apps that most people want to keep. Protected from DeBloat All.
+#Credit to /u/GavinEke for a modified version of my whitelist code
+$global:WhiteListedApps = @(
+    "Microsoft.ScreenSketch"
+    "Microsoft.Paint3D"
+    "Microsoft.WindowsCalculator"               # Microsoft removed legacy calculator
+    "Microsoft.WindowsStore"                    # Issue 1
+    "Microsoft.Windows.Photos"                  # Microsoft disabled/hid legacy photo viewer
+    "CanonicalGroupLimited.UbuntuonWindows"     # Issue 10
+    "Microsoft.XboxGameCallableUI"              # Issue 91
+    "Microsoft.XboxGamingOverlay"               # Issue 25, 91  Many home users want to play games
+    "Microsoft.Xbox.TCUI"                       # Issue 25, 91  Many home users want to play games
+    "Microsoft.XboxGamingOverlay"
+    "Microsoft.XboxIdentityProvider"            # Issue 25, 91  Many home users want to play games
+    "Microsoft.MicrosoftStickyNotes"            # Issue 33  New functionality.
+    "Microsoft.MSPaint"                         # Issue 32  This is Paint3D, legacy paint still exists in Windows 10
+    "Microsoft.WindowsCamera"                   # Issue 65  New functionality.
+    "\.NET"
+    "Framework"
+    "Microsoft.HEIFImageExtension"              # Issue 68
+    "Microsoft.ScreenSketch"                    # Issue 55: Looks like Microsoft will be axing snipping tool and using Snip & Sketch going forward
+    "Microsoft.StorePurchaseApp"                # Issue 68
+    "Microsoft.VP9VideoExtensions"              # Issue 68
+    "Microsoft.WebMediaExtensions"              # Issue 68
+    "Microsoft.WebpImageExtension"              # Issue 68
+    "Microsoft.DesktopAppInstaller"             # Issue 68
+    "WindSynthBerry"                            # Issue 68
+    "MIDIBerry"                                 # Issue 68
+    "Slack"                                     # Issue 83
+)
+
+#NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
+$NonRemovables  = Get-AppxPackage -AllUsers | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.Name}
+$NonRemovables += Get-AppxPackage | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.Name}
+$NonRemovables += Get-AppxProvisionedPackage -Online | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.DisplayName}
+$NonRemovables = $NonRemovables | Sort-Object -unique
+
+if ($NonRemovables -eq $null ) { # the .NonRemovable property doesn't exist until version 18xx. Use a hard-coded list instead.
+    #WARNING: only use exact names here - no short names or wildcards
+    $NonRemovables = @(
+        "1527c705-839a-4832-9118-54d4Bd6a0c89"
+        "c5e2524a-ea46-4f67-841f-6a9465d9d515"
+        "E2A4F912-2574-4A75-9BB0-0D023378592B"
+        "F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE"
+        "InputApp"
+        "Microsoft.AAD.BrokerPlugin"
+        "Microsoft.AccountsControl"
+        "Microsoft.BioEnrollment"
+        "Microsoft.CredDialogHost"
+        "Microsoft.ECApp"
+        "Microsoft.LockApp"
+        "Microsoft.MicrosoftEdgeDevToolsClient"
+        "Microsoft.MicrosoftEdge"
+        "Microsoft.PPIProjection"
+        "Microsoft.Win32WebViewHost"
+        "Microsoft.Windows.Apprep.ChxApp"
+        "Microsoft.Windows.AssignedAccessLockApp"
+        "Microsoft.Windows.CapturePicker"
+        "Microsoft.Windows.CloudExperienceHost"
+        "Microsoft.Windows.ContentDeliveryManager"
+        "Microsoft.Windows.Cortana"
+        "Microsoft.Windows.NarratorQuickStart"
+        "Microsoft.Windows.ParentalControls"
+        "Microsoft.Windows.PeopleExperienceHost"
+        "Microsoft.Windows.PinningConfirmationDialog"
+        "Microsoft.Windows.SecHealthUI"                 # Issue 117 Windows Defender
+        "Microsoft.Windows.SecureAssessmentBrowser"
+        "Microsoft.Windows.ShellExperienceHost"
+        "Microsoft.Windows.XGpuEjectDialog"
+        "Microsoft.XboxGameCallableUI"                  # Issue 91
+        "Windows.CBSPreview"
+        "windows.immersivecontrolpanel"
+        "Windows.PrintDialog"
+        "Microsoft.VCLibs.140.00"
+        "Microsoft.Services.Store.Engagement"
+        "Microsoft.UI.Xaml.2.0"
+    )
+}
+
+# import library code - located relative to this script
+Function dotInclude() {
+    Param(
+        [Parameter(Mandatory)]
+        [string]$includeFile
+    )
+    # Look for the file in the same directory as this script
+    $scriptPath = $PSScriptRoot
+    if ( $PSScriptRoot -eq $null -and $psISE) {
+        $scriptPath = (Split-Path -Path $psISE.CurrentFile.FullPath)
+    }
+    if ( test-path $scriptPath\$includeFile ){
+        # import and immediately execute the requested file
+        . $scriptPath\$includeFile
+    }
+}
+
+# Override built-in blacklist/whitelist with user defined lists
+dotInclude 'custom-lists.ps1'
+
+#convert to regular expression to allow for the super-useful -match operator
+$global:WhiteListedAppsRegex = $global:WhiteListedApps -join '|'
+
+
 # This form was created using POSHGUI.com  a free online gui designer for PowerShell
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
@@ -172,82 +341,15 @@ Start-Transcript -OutputDirectory "$DebloatFolder"
 $RemoveBlacklist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
         Function DebloatBlacklist {
-    
-            $Bloatware = @(
-    
-                #Unnecessary Windows 10 AppX Apps
-                "Microsoft.BingNews"
-                "Microsoft.GetHelp"
-                "Microsoft.Getstarted"
-                "Microsoft.Messaging"
-                "Microsoft.Microsoft3DViewer"
-                "Microsoft.MicrosoftOfficeHub"
-                "Microsoft.MicrosoftSolitaireCollection"
-                "Microsoft.NetworkSpeedTest"
-                "Microsoft.News"
-                "Microsoft.Office.Lens"
-                "Microsoft.Office.OneNote"
-                "Microsoft.Office.Sway"
-                "Microsoft.OneConnect"
-                "Microsoft.People"
-                "Microsoft.Print3D"
-                "Microsoft.RemoteDesktop"
-                "Microsoft.SkypeApp"
-                "Microsoft.StorePurchaseApp"
-                "Microsoft.Office.Todo.List"
-                "Microsoft.Whiteboard"
-                "Microsoft.WindowsAlarms"
-                #"Microsoft.WindowsCamera"
-                "microsoft.windowscommunicationsapps"
-                "Microsoft.WindowsFeedbackHub"
-                "Microsoft.WindowsMaps"
-                "Microsoft.WindowsSoundRecorder"
-                "Microsoft.Xbox.TCUI"
-                "Microsoft.XboxApp"
-                "Microsoft.XboxGameOverlay"
-                "Microsoft.XboxIdentityProvider"
-                "Microsoft.XboxSpeechToTextOverlay"
-                "Microsoft.ZuneMusic"
-                "Microsoft.ZuneVideo"
-
-                #Sponsored Windows 10 AppX Apps
-                #Add sponsored/featured apps to remove in the "*AppName*" format
-                "*EclipseManager*"
-                "*ActiproSoftwareLLC*"
-                "*AdobeSystemsIncorporated.AdobePhotoshopExpress*"
-                "*Duolingo-LearnLanguagesforFree*"
-                "*PandoraMediaInc*"
-                "*CandyCrush*"
-                "*Wunderlist*"
-                "*Flipboard*"
-                "*Twitter*"
-                "*Facebook*"
-                "*Spotify*"
-                "*Minecraft*"
-                "*Royal Revolt*"
-                "*Sway*"
-                "*Dolby*"
-                "*Windows.CBSPreview*"
-                
-                #Optional: Typically not removed but you can if you need to for some reason
-                #"*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*"
-                #"*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*"
-                #"*Microsoft.BingWeather*"
-                #"*Microsoft.MSPaint*"
-                #"*Microsoft.MicrosoftStickyNotes*"
-                #"*Microsoft.Windows.Photos*"
-                #"*Microsoft.WindowsCalculator*"
-                #"*Microsoft.WindowsStore*"
-            )
-            foreach ($Bloat in $Bloatware) {
+            foreach ($Bloat in $global:Bloatware) {
                 Get-AppxPackage -Name $Bloat| Remove-AppxPackage
                 Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
-                Write-Host "Trying to remove $Bloat."
-                Write-Host "Bloatware removed!"
+                Write-Host "Requested removal of $Bloat."
             }
         }
         Write-Host "Removing Bloatware with a specific blacklist."
         DebloatBlacklist
+        Write-Host "Bloatware removed!"
     })
 $RemoveAllBloatware.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
@@ -291,19 +393,9 @@ $RemoveAllBloatware.Add_Click( {
 
         Function DebloatAll {
             #Removes AppxPackages
-            #Credit to /u/GavinEke for a modified version of my whitelist code
-            $WhitelistedApps = 'Microsoft.ScreenSketch|Microsoft.Paint3D|Microsoft.WindowsCalculator|Microsoft.WindowsStore|Microsoft.Windows.Photos|CanonicalGroupLimited.UbuntuonWindows|`
-            Microsoft.XboxGameCallableUI|Microsoft.XboxGamingOverlay|Microsoft.Xbox.TCUI|Microsoft.XboxGamingOverlay|Microsoft.XboxIdentityProvider|Microsoft.MicrosoftStickyNotes|Microsoft.MSPaint|Microsoft.WindowsCamera|.NET|Framework|`
-            Microsoft.HEIFImageExtension|Microsoft.ScreenSketch|Microsoft.StorePurchaseApp|Microsoft.VP9VideoExtensions|Microsoft.WebMediaExtensions|Microsoft.WebpImageExtension|Microsoft.DesktopAppInstaller|WindSynthBerry|MIDIBerry|Slack'
-            #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
-            $NonRemovable = '1527c705-839a-4832-9118-54d4Bd6a0c89|c5e2524a-ea46-4f67-841f-6a9465d9d515|E2A4F912-2574-4A75-9BB0-0D023378592B|F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE|InputApp|Microsoft.AAD.BrokerPlugin|Microsoft.AccountsControl|`
-            Microsoft.BioEnrollment|Microsoft.CredDialogHost|Microsoft.ECApp|Microsoft.LockApp|Microsoft.MicrosoftEdgeDevToolsClient|Microsoft.MicrosoftEdge|Microsoft.PPIProjection|Microsoft.Win32WebViewHost|Microsoft.Windows.Apprep.ChxApp|`
-            Microsoft.Windows.AssignedAccessLockApp|Microsoft.Windows.CapturePicker|Microsoft.Windows.CloudExperienceHost|Microsoft.Windows.ContentDeliveryManager|Microsoft.Windows.Cortana|Microsoft.Windows.NarratorQuickStart|`
-            Microsoft.Windows.ParentalControls|Microsoft.Windows.PeopleExperienceHost|Microsoft.Windows.PinningConfirmationDialog|Microsoft.Windows.SecHealthUI|Microsoft.Windows.SecureAssessmentBrowser|Microsoft.Windows.ShellExperienceHost|`
-            Microsoft.Windows.XGpuEjectDialog|Microsoft.XboxGameCallableUI|Windows.CBSPreview|windows.immersivecontrolpanel|Windows.PrintDialog|Microsoft.VCLibs.140.00|Microsoft.Services.Store.Engagement|Microsoft.UI.Xaml.2.0'
-            Get-AppxPackage -AllUsers | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
-            Get-AppxPackage | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxPackage
-            Get-AppxProvisionedPackage -Online | Where {$_.Name -NotMatch $WhitelistedApps -and $_.Name -NotMatch $NonRemovable} | Remove-AppxProvisionedPackage -Online
+            Get-AppxPackage -AllUsers | Where { !($_.Name -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.Name) } | Remove-AppxPackage
+            Get-AppxPackage | Where { !($_.Name -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.Name) } | Remove-AppxPackage
+            Get-AppxProvisionedPackage -Online | Where { !($_.Name -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.Name) } | Remove-AppxProvisionedPackage -Online
 }
   
         #Creates a PSDrive to be able to access the 'HKCR' tree
