@@ -74,7 +74,6 @@ $global:Bloatware = @(
 #Valuable Windows 10 AppX apps that most people want to keep. Protected from DeBloat All.
 #Credit to /u/GavinEke for a modified version of my whitelist code
 $global:WhiteListedApps = @(
-    "Microsoft.Paint3D"
     "Microsoft.WindowsCalculator"               # Microsoft removed legacy calculator
     "Microsoft.WindowsStore"                    # Issue 1
     "Microsoft.Windows.Photos"                  # Microsoft disabled/hid legacy photo viewer
