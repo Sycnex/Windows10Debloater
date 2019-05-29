@@ -65,7 +65,6 @@ $global:Bloatware = @(
     "Royal Revolt"
     "Sway"                                              # Issue 77
     "Dolby"                                             # Issue 78
-    "Windows.CBSPreview"                                # Issue 84
 
     #Optional: Typically not removed but you can if you need to for some reason
     #"Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe"
