@@ -35,7 +35,6 @@ $global:Bloatware = @(
     "Microsoft.Office.Todo.List"                        # Issue 77
     "Microsoft.Whiteboard"                              # Issue 77
     "Microsoft.WindowsAlarms"
-    #"Microsoft.WindowsCamera"
     "microsoft.windowscommunicationsapps"
     "Microsoft.WindowsFeedbackHub"
     "Microsoft.WindowsMaps"
@@ -70,11 +69,6 @@ $global:Bloatware = @(
     #"Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe"
     #"Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe"
     #"Microsoft.BingWeather"
-    #"Microsoft.MSPaint"
-    #"Microsoft.MicrosoftStickyNotes"
-    #"Microsoft.Windows.Photos"
-    #"Microsoft.WindowsCalculator"
-    #"Microsoft.WindowsStore"
 )
 
 #Valuable Windows 10 AppX apps that most people want to keep. Protected from DeBloat All.
