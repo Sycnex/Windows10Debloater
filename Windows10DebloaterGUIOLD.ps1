@@ -85,7 +85,6 @@ $global:WhiteListedApps = @(
     "Microsoft.MSPaint"                         # Issue 32  This is Paint3D, legacy paint still exists in Windows 10
     "Microsoft.WindowsCamera"                   # Issue 65  New functionality.
     "\.NET"
-    "Framework"
     "Microsoft.HEIFImageExtension"              # Issue 68
     "Microsoft.ScreenSketch"                    # Issue 55: Looks like Microsoft will be axing snipping tool and using Snip & Sketch going forward
     "Microsoft.StorePurchaseApp"                # Issue 68
