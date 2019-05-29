@@ -74,7 +74,6 @@ $global:Bloatware = @(
 #Valuable Windows 10 AppX apps that most people want to keep. Protected from DeBloat All.
 #Credit to /u/GavinEke for a modified version of my whitelist code
 $global:WhiteListedApps = @(
-    "Microsoft.ScreenSketch"
     "Microsoft.Paint3D"
     "Microsoft.WindowsCalculator"               # Microsoft removed legacy calculator
     "Microsoft.WindowsStore"                    # Issue 1
@@ -83,7 +82,6 @@ $global:WhiteListedApps = @(
     "Microsoft.XboxGameCallableUI"              # Issue 91
     "Microsoft.XboxGamingOverlay"               # Issue 25, 91  Many home users want to play games
     "Microsoft.Xbox.TCUI"                       # Issue 25, 91  Many home users want to play games
-    "Microsoft.XboxGamingOverlay"
     "Microsoft.XboxIdentityProvider"            # Issue 25, 91  Many home users want to play games
     "Microsoft.MicrosoftStickyNotes"            # Issue 33  New functionality.
     "Microsoft.MSPaint"                         # Issue 32  This is Paint3D, legacy paint still exists in Windows 10
