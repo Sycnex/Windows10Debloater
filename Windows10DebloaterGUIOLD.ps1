@@ -178,6 +178,7 @@ Function dotInclude() {
 dotInclude 'custom-lists.ps1'
 
 #convert to regular expression to allow for the super-useful -match operator
+$global:BloatwareRegex = $global:Bloatware -join '|'
 $global:WhiteListedAppsRegex = $global:WhiteListedApps -join '|'
 
 
@@ -199,18 +200,26 @@ $Debloat.height = 10
 $Debloat.location = New-Object System.Drawing.Point(9, 8)
 $Debloat.Font = 'Microsoft Sans Serif,12,style=Bold,Underline'
 
+
+$CustomizeBlacklists = New-Object system.Windows.Forms.Button
+$CustomizeBlacklists.text = "Customize Blacklist"
+$CustomizeBlacklists.width = 140
+$CustomizeBlacklists.height = 40
+$CustomizeBlacklists.location = New-Object System.Drawing.Point(9, 32)
+$CustomizeBlacklists.Font = 'Microsoft Sans Serif,10'
+
 $RemoveAllBloatware = New-Object system.Windows.Forms.Button
 $RemoveAllBloatware.text = "Remove All Bloatware"
 $RemoveAllBloatware.width = 142
 $RemoveAllBloatware.height = 40
-$RemoveAllBloatware.location = New-Object System.Drawing.Point(8, 32)
+$RemoveAllBloatware.location = New-Object System.Drawing.Point(8, 79)
 $RemoveAllBloatware.Font = 'Microsoft Sans Serif,10'
 
 $RemoveBlacklist = New-Object system.Windows.Forms.Button
 $RemoveBlacklist.text = "Remove Bloatware With Blacklist"
 $RemoveBlacklist.width = 205
 $RemoveBlacklist.height = 37
-$RemoveBlacklist.location = New-Object System.Drawing.Point(9, 79)
+$RemoveBlacklist.location = New-Object System.Drawing.Point(9, 124)
 $RemoveBlacklist.Font = 'Microsoft Sans Serif,10'
 
 $Label1 = New-Object system.Windows.Forms.Label
@@ -322,7 +331,7 @@ $DisableDarkMode.Font = 'Microsoft Sans Serif,10'
 
 
 
-$Form.controls.AddRange(@($Debloat, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35, $EnableDarkMode, $DisableDarkMode))
+$Form.controls.AddRange(@($Debloat, $CustomizeBlacklists, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35, $EnableDarkMode, $DisableDarkMode))
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
@@ -338,6 +347,149 @@ Else {
 Start-Transcript -OutputDirectory "$DebloatFolder"
 
 #region gui events {
+$CustomizeBlacklists.Add_Click( {
+    $CustomizeForm                            = New-Object system.Windows.Forms.Form
+    $CustomizeForm.ClientSize                 = '600,400'
+    $CustomizeForm.text                       = "Customize Whitelist and Blacklist"
+    $CustomizeForm.TopMost                    = $false
+    $CustomizeForm.AutoScroll = $true
+
+    $SaveList = New-Object system.Windows.Forms.Button
+    $SaveList.text = "Save custom Whitelist and Blacklist to custom-lists.ps1"
+    $SaveList.AutoSize = $true
+    $SaveList.location = New-Object System.Drawing.Point(200, 5)
+    $CustomizeForm.controls.Add($SaveList)
+
+    $SaveList.Add_Click( {
+       $ErrorActionPreference = 'silentlycontinue'
+
+       '$global:WhiteListedApps = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Encoding utf8
+       @($CustomizeForm.controls) | ForEach {
+            if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and !$_.Checked) {
+                "    ""$( $_.Text )""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+            }
+        }
+        ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+
+        '$global:Bloatware = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+        @($CustomizeForm.controls) | ForEach {
+            if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and $_.Checked) {
+                 "    ""$($_.Text)""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+            }
+        }
+        ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+
+        #Over-ride the white/blacklist with the newly saved custom list
+        dotInclude custom-lists.ps1
+
+        #convert to regular expression to allow for the super-useful -match operator
+        $global:BloatwareRegex = $global:Bloatware -join '|'
+        $global:WhiteListedAppsRegex = $global:WhiteListedApps -join '|'
+    })
+
+    Function AddAppToCustomizeForm() {
+        Param(
+            [Parameter(Mandatory)]
+            [int] $position,
+            [Parameter(Mandatory)]
+            [string] $appName,
+            [Parameter(Mandatory)]
+            [bool] $enabled,
+            [Parameter(Mandatory)]
+            [bool] $checked,
+
+            [string] $notes
+        )
+
+        $label=New-Object system.Windows.Forms.Label
+        $label.Location = New-Object System.Drawing.Point(2,(30+$position*16))
+        $label.Text = $notes
+        $label.width = 300
+        $label.height= 16
+        $Label.TextAlign = [System.Drawing.ContentAlignment]::TopRight
+        $CustomizeForm.controls.Add($label)
+
+        $Checkbox = New-Object system.Windows.Forms.CheckBox
+        $Checkbox.text = $appName
+        $Checkbox.location = New-Object System.Drawing.Point(320,(30+$position*16))
+        $Checkbox.Autosize = 1;
+        $Checkbox.Checked = $checked
+        $Checkbox.Enabled = $enabled
+        $CustomizeForm.controls.Add($CheckBox)
+    }
+
+
+    $Installed = @( (Get-AppxPackage).Name )
+    $Online = @( (Get-AppxProvisionedPackage -Online).DisplayName )
+    $AllUsers = @( (Get-AppxPackage -AllUsers).Name )
+    [int]$checkboxCounter = 0
+
+    foreach ($item in $NonRemovables) {
+        $string = ""
+        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {$string += " ConflictBlacklist "}
+        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {$string += " ConflictWhitelist" }
+        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
+        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
+        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
+        $string += "  NONREMOVABLE"
+        AddAppToCustomizeForm $checkboxCounter $item $false $false $string
+        ++$checkboxCounter
+    }
+    foreach ( $item in $global:WhiteListedApps ) {
+        $string = ""
+        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {$string += " Conflict NonRemovables "}
+        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {$string += " ConflictBlacklist "}
+        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
+        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
+        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
+        AddAppToCustomizeForm $checkboxCounter $item $true $false $string
+        ++$checkboxCounter
+    }
+    foreach ( $item in $global:Bloatware ) {
+        $string = ""
+        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {$string += " Conflict NonRemovables "}
+        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {$string += " Conflict Whitelist "}
+        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
+        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
+        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
+        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+        ++$checkboxCounter
+    }
+    foreach ( $item in $AllUsers ) {
+        $string = "NEW   AllUsers"
+        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
+        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
+        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
+        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += " Installed"}
+        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
+        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+        ++$checkboxCounter
+    }
+    foreach ( $item in $Installed ) {
+        $string = "NEW   Installed"
+        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
+        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
+        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
+        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {continue}
+        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
+        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+        ++$checkboxCounter
+    }
+    foreach ( $item in $Online ) {
+        $string = "NEW   Online "
+        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
+        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
+        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
+        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ continue}
+        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { continue}
+        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+        ++$checkboxCounter
+    }
+    [void]$CustomizeForm.ShowDialog()
+
+})
+
+
 $RemoveBlacklist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
         Function DebloatBlacklist {
