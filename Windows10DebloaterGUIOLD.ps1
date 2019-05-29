@@ -128,11 +128,15 @@ if ($NonRemovables -eq $null ) { # the .NonRemovable property doesn't exist unti
         "Microsoft.Windows.CloudExperienceHost"
         "Microsoft.Windows.ContentDeliveryManager"
         "Microsoft.Windows.Cortana"
+        "Microsoft.Windows.HolographicFirstRun"         # Added 1709
         "Microsoft.Windows.NarratorQuickStart"
+        "Microsoft.Windows.OOBENetworkCaptivePortal"    # Added 1709
+        "Microsoft.Windows.OOBENetworkConnectionFlow"   # Added 1709
         "Microsoft.Windows.ParentalControls"
         "Microsoft.Windows.PeopleExperienceHost"
         "Microsoft.Windows.PinningConfirmationDialog"
         "Microsoft.Windows.SecHealthUI"                 # Issue 117 Windows Defender
+        "Microsoft.Windows.SecondaryTileExperience"     # Added 1709
         "Microsoft.Windows.SecureAssessmentBrowser"
         "Microsoft.Windows.ShellExperienceHost"
         "Microsoft.Windows.XGpuEjectDialog"
