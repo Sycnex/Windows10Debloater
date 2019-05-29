@@ -79,7 +79,6 @@ $global:WhiteListedApps = @(
     "Microsoft.WindowsStore"                    # Issue 1
     "Microsoft.Windows.Photos"                  # Microsoft disabled/hid legacy photo viewer
     "CanonicalGroupLimited.UbuntuonWindows"     # Issue 10
-    "Microsoft.XboxGameCallableUI"              # Issue 91
     "Microsoft.XboxGamingOverlay"               # Issue 25, 91  Many home users want to play games
     "Microsoft.Xbox.TCUI"                       # Issue 25, 91  Many home users want to play games
     "Microsoft.XboxIdentityProvider"            # Issue 25, 91  Many home users want to play games
