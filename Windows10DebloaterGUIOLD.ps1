@@ -485,13 +485,15 @@ $CustomizeBlacklists.Add_Click( {
 $RemoveBlacklist.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
         Function DebloatBlacklist {
-            foreach ($Bloat in $global:Bloatware) {
-                Get-AppxPackage -Name $Bloat| Remove-AppxPackage
-                Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like $Bloat | Remove-AppxProvisionedPackage -Online
-                Write-Host "Requested removal of $Bloat."
-            }
+            Write-Host "Requesting removal of $global:BloatwareRegex"
+            Write-Host "--- This may take a while - please be patient ---"
+            Get-AppxPackage | Where-Object Name -cmatch $global:BloatwareRegex | Remove-AppxPackage
+            Write-Host "...now starting the silent ProvisionedPackage bloatware removal..."
+            Get-AppxProvisionedPackage -Online | Where-Object DisplayName -cmatch $global:BloatwareRegex | Remove-AppxProvisionedPackage -Online
+            Write-Host "...and the final cleanup..."
+            Get-AppxPackage -AllUsers | Where-Object Name -cmatch $global:BloatwareRegex | Remove-AppxPackage
         }
-        Write-Host "Removing Bloatware with a specific blacklist."
+        Write-Host "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`nRemoving blacklisted Bloatware.`n"
         DebloatBlacklist
         Write-Host "Bloatware removed!"
     })
