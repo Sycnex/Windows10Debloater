@@ -511,7 +511,6 @@ $listBox.SelectionMode = 'MultiExtended'
 [void] $listBox.Items.Add('*Sway*')
 [void] $listBox.Items.Add('*Speed Test*')
 [void] $listBox.Items.Add('*Dolby*')
-[void] $listBox.Items.Add('*Windows.CBSPreview*')
 [void] $listBox.Items.Add('*Microsoft.Advertising.Xaml_10.1712.5.0_x64__8wekyb3d8bbwe*')
 [void] $listBox.Items.Add('*Microsoft.Advertising.Xaml_10.1712.5.0_x86__8wekyb3d8bbwe*')
 [void] $listBox.Items.Add('*Microsoft.BingWeather*')
