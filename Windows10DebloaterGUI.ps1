@@ -1,13 +1,6 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
     Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
-    Start-Sleep 1
-    Write-Host "                                               3"
-    Start-Sleep 1
-    Write-Host "                                               2"
-    Start-Sleep 1
-    Write-Host "                                               1"
-    Start-Sleep 1
     Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
     Exit
 }
@@ -184,7 +177,7 @@ Add-Type -AssemblyName System.Windows.Forms
 
 #region begin GUI 
 $Form = New-Object system.Windows.Forms.Form
-$Form.ClientSize = '408,523'
+$Form.ClientSize = '800,500'
 $Form.text = "Windows10Debloater"
 $Form.TopMost = $false
 
@@ -212,14 +205,14 @@ $RemoveAllBloatware.location = New-Object System.Drawing.Point(8, 79)
 $RemoveAllBloatware.Font = 'Microsoft Sans Serif,10'
 
 $RemoveBlacklist = New-Object system.Windows.Forms.Button
-$RemoveBlacklist.text = "Remove Bloatware With Blacklist"
+$RemoveBlacklist.text = "Remove Bloatware With Customized Blacklist"
 $RemoveBlacklist.width = 205
 $RemoveBlacklist.height = 37
 $RemoveBlacklist.location = New-Object System.Drawing.Point(9, 124)
 $RemoveBlacklist.Font = 'Microsoft Sans Serif,10'
 
 $Label1 = New-Object system.Windows.Forms.Label
-$Label1.text = "Revert Debloat "
+$Label1.text = "Revert Registry Changes"
 $Label1.AutoSize = $true
 $Label1.width = 25
 $Label1.height = 10
@@ -227,7 +220,7 @@ $Label1.location = New-Object System.Drawing.Point(254, 7)
 $Label1.Font = 'Microsoft Sans Serif,12,style=Bold,Underline'
 
 $RevertChange = New-Object system.Windows.Forms.Button
-$RevertChange.text = "Revert Changes"
+$RevertChange.text = "Revert Registry Changes"
 $RevertChange.width = 113
 $RevertChange.height = 36
 $RevertChange.location = New-Object System.Drawing.Point(254, 32)
@@ -259,70 +252,70 @@ $StopEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $StopEdgePDFTakeover.text = "Stop Edge PDF Takeover"
 $StopEdgePDFTakeover.width = 175
 $StopEdgePDFTakeover.height = 35
-$StopEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 217)
+$StopEdgePDFTakeover.location = New-Object System.Drawing.Point(155, 217)
 $StopEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
 $EnableEdgePDFTakeover = New-Object system.Windows.Forms.Button
 $EnableEdgePDFTakeover.text = "Enable Edge PDF Takeover"
 $EnableEdgePDFTakeover.width = 185
 $EnableEdgePDFTakeover.height = 35
-$EnableEdgePDFTakeover.location = New-Object System.Drawing.Point(130, 260)
+$EnableEdgePDFTakeover.location = New-Object System.Drawing.Point(155, 260)
 $EnableEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
 $DisableTelemetry = New-Object system.Windows.Forms.Button
 $DisableTelemetry.text = "Disable Telemetry/Tasks"
 $DisableTelemetry.width = 152
 $DisableTelemetry.height = 35
-$DisableTelemetry.location = New-Object System.Drawing.Point(9, 345)
+$DisableTelemetry.location = New-Object System.Drawing.Point(365, 260)
 $DisableTelemetry.Font = 'Microsoft Sans Serif,10'
 
 $RemoveRegkeys = New-Object system.Windows.Forms.Button
 $RemoveRegkeys.text = "Remove Bloatware Regkeys"
 $RemoveRegkeys.width = 188
 $RemoveRegkeys.height = 35
-$RemoveRegkeys.location = New-Object System.Drawing.Point(169, 345)
+$RemoveRegkeys.location = New-Object System.Drawing.Point(540, 260)
 $RemoveRegkeys.Font = 'Microsoft Sans Serif,10'
 
 $UnpinStartMenuTiles = New-Object system.Windows.Forms.Button
 $UnpinStartMenuTiles.text = "Unpin Tiles From Start Menu"
 $UnpinStartMenuTiles.width = 190
 $UnpinStartMenuTiles.height = 35
-$UnpinStartMenuTiles.location = New-Object System.Drawing.Point(169, 303)
+$UnpinStartMenuTiles.location = New-Object System.Drawing.Point(540, 217)
 $UnpinStartMenuTiles.Font = 'Microsoft Sans Serif,10'
 
 $RemoveOnedrive = New-Object system.Windows.Forms.Button
 $RemoveOnedrive.text = "Uninstall OneDrive"
 $RemoveOnedrive.width = 152
 $RemoveOnedrive.height = 35
-$RemoveOnedrive.location = New-Object System.Drawing.Point(9, 303)
+$RemoveOnedrive.location = New-Object System.Drawing.Point(365, 217)
 $RemoveOnedrive.Font = 'Microsoft Sans Serif,10'
 
-$FixWhitelist = New-Object system.Windows.Forms.Button
-$FixWhitelist.text = "Fix Whitelisted Apps"
-$FixWhitelist.width = 130
-$FixWhitelist.height = 37
-$FixWhitelist.location = New-Object System.Drawing.Point(254, 74)
-$FixWhitelist.Font = 'Microsoft Sans Serif,10'
+#$FixWhitelist = New-Object system.Windows.Forms.Button
+#$FixWhitelist.text = "Fix Whitelisted Apps"
+#$FixWhitelist.width = 130
+#$FixWhitelist.height = 37
+#$FixWhitelist.location = New-Object System.Drawing.Point(254, 74)
+#$FixWhitelist.Font = 'Microsoft Sans Serif,10'
 
 $InstallNet35 = New-Object system.Windows.Forms.Button
 $InstallNet35.text = "Install .NET v3.5"
 $InstallNet35.width = 152
 $InstallNet35.height = 39
-$InstallNet35.location = New-Object System.Drawing.Point(9, 387)
+$InstallNet35.location = New-Object System.Drawing.Point(169, 335)
 $InstallNet35.Font = 'Microsoft Sans Serif,10'
 
 $EnableDarkMode = New-Object system.Windows.Forms.Button
 $EnableDarkMode.text = "Enable Dark Mode"
 $EnableDarkMode.width = 152
 $EnableDarkMode.height = 39
-$EnableDarkMode.location = New-Object System.Drawing.Point(9, 435)
+$EnableDarkMode.location = New-Object System.Drawing.Point(9, 335)
 $EnableDarkMode.Font = 'Microsoft Sans Serif,10'
 
 $DisableDarkMode = New-Object system.Windows.Forms.Button
 $DisableDarkMode.text = "Disable Dark Mode"
 $DisableDarkMode.width = 152
 $DisableDarkMode.height = 39
-$DisableDarkMode.location = New-Object System.Drawing.Point(169, 435)
+$DisableDarkMode.location = New-Object System.Drawing.Point(9, 385)
 $DisableDarkMode.Font = 'Microsoft Sans Serif,10'
 
 
@@ -719,23 +712,7 @@ $RemoveAllBloatware.Add_Click( {
                 Remove-Item $Objects64 -Recurse 
             }
 }
-  
-        #This includes fixes by xsisbest
-        Function FixWhitelistedApps {
-            $ErrorActionPreference = 'silentlycontinue'
-      
-            If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.MSPaint, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.MicrosoftStickyNotes, Microsoft.WindowsSoundRecorder, Microsoft.Windows.Photos)) {
-      
-                #Credit to abulgatz for the 4 lines of code
-                Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.MSPaint | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.MicrosoftStickyNotes | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.WindowsSoundRecorder | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-                Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
-            }
-        }
+
   
         Function CheckDMWService {
 
@@ -881,19 +858,6 @@ $RevertChange.Add_Click( {
         If (!(Test-Path $Objects64)) {
             New-Item $Objects64
         }
-    })
-$FixWhitelist.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
-        If (!(Get-AppxPackage -AllUsers | Select Microsoft.Paint3D, Microsoft.WindowsCalculator, Microsoft.WindowsStore, Microsoft.Windows.Photos, Microsoft.WindowsCamera)) {
-    
-            #Credit to abulgatz for these 4 lines of code
-            Get-AppxPackage -allusers Microsoft.Paint3D | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.WindowsCalculator | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.WindowsStore | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"}
-            Get-AppxPackage -allusers Microsoft.Windows.Photos | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
-        } 
-        
-        Write-Host "Whitelisted apps were either fixed or re-added."
     })
 $DisableCortana.Add_Click( { 
         $ErrorActionPreference = 'silentlycontinue'
