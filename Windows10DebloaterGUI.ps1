@@ -1,8 +1,30 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
+
+$ErrorActionPreference = 'silentlycontinue'
+
+$Button = [Windows.MessageBoxButton]::YesNoCancel
+$ErrorIco = [Windows.MessageBoxImage]::Error
+$Ask = 'Do you want to run this as an Administrator?
+
+        Select "Yes" to Run as an Administrator
+
+        Select "No" to not run this as an Administrator
+        
+        Select "Cancel" to stop the script.'
+
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
-    Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
-    Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-    Exit
+    $Prompt = [Windows.MessageBox]::Show($Ask, "Run as an Administrator or not?", $Button, $ErrorIco) 
+    Switch ($Prompt) {
+        #This will debloat Windows 10
+        Yes {
+            Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
+            Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+            Exit
+        }
+        No {
+            Break
+        }
+    }
 }
 
 #Unnecessary Windows 10 AppX apps that will be removed by the blacklist.
@@ -95,12 +117,13 @@ $global:WhiteListedApps = @(
 )
 
 #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
-$NonRemovables  = Get-AppxPackage -AllUsers | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.Name}
-$NonRemovables += Get-AppxPackage | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.Name}
-$NonRemovables += Get-AppxProvisionedPackage -Online | Where-Object {$_.NonRemovable -eq $true} | foreach{$_.DisplayName}
+$NonRemovables = Get-AppxPackage -AllUsers | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.Name }
+$NonRemovables += Get-AppxPackage | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.Name }
+$NonRemovables += Get-AppxProvisionedPackage -Online | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.DisplayName }
 $NonRemovables = $NonRemovables | Sort-Object -unique
 
-if ($NonRemovables -eq $null ) { # the .NonRemovable property doesn't exist until version 18xx. Use a hard-coded list instead.
+if ($NonRemovables -eq $null ) {
+    # the .NonRemovable property doesn't exist until version 18xx. Use a hard-coded list instead.
     #WARNING: only use exact names here - no short names or wildcards
     $NonRemovables = @(
         "1527c705-839a-4832-9118-54d4Bd6a0c89"
@@ -157,7 +180,7 @@ Function dotInclude() {
     if ( $PSScriptRoot -eq $null -and $psISE) {
         $scriptPath = (Split-Path -Path $psISE.CurrentFile.FullPath)
     }
-    if ( test-path $scriptPath\$includeFile ){
+    if ( test-path $scriptPath\$includeFile ) {
         # import and immediately execute the requested file
         . $scriptPath\$includeFile
     }
@@ -337,146 +360,146 @@ Start-Transcript -OutputDirectory "$DebloatFolder"
 
 #region gui events {
 $CustomizeBlacklists.Add_Click( {
-    $CustomizeForm                            = New-Object system.Windows.Forms.Form
-    $CustomizeForm.ClientSize                 = '600,400'
-    $CustomizeForm.text                       = "Customize Whitelist and Blacklist"
-    $CustomizeForm.TopMost                    = $false
-    $CustomizeForm.AutoScroll = $true
+        $CustomizeForm = New-Object system.Windows.Forms.Form
+        $CustomizeForm.ClientSize = '600,400'
+        $CustomizeForm.text = "Customize Whitelist and Blacklist"
+        $CustomizeForm.TopMost = $false
+        $CustomizeForm.AutoScroll = $true
 
-    $SaveList = New-Object system.Windows.Forms.Button
-    $SaveList.text = "Save custom Whitelist and Blacklist to custom-lists.ps1"
-    $SaveList.AutoSize = $true
-    $SaveList.location = New-Object System.Drawing.Point(200, 5)
-    $CustomizeForm.controls.Add($SaveList)
+        $SaveList = New-Object system.Windows.Forms.Button
+        $SaveList.text = "Save custom Whitelist and Blacklist to custom-lists.ps1"
+        $SaveList.AutoSize = $true
+        $SaveList.location = New-Object System.Drawing.Point(200, 5)
+        $CustomizeForm.controls.Add($SaveList)
 
-    $SaveList.Add_Click( {
-       $ErrorActionPreference = 'silentlycontinue'
+        $SaveList.Add_Click( {
+                $ErrorActionPreference = 'silentlycontinue'
 
-       '$global:WhiteListedApps = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Encoding utf8
-       @($CustomizeForm.controls) | ForEach {
-            if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and !$_.Checked) {
-                "    ""$( $_.Text )""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
-            }
+                '$global:WhiteListedApps = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Encoding utf8
+                @($CustomizeForm.controls) | ForEach {
+                    if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and !$_.Checked) {
+                        "    ""$( $_.Text )""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+                    }
+                }
+                ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+
+                '$global:Bloatware = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+                @($CustomizeForm.controls) | ForEach {
+                    if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and $_.Checked) {
+                        "    ""$($_.Text)""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+                    }
+                }
+                ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+
+                #Over-ride the white/blacklist with the newly saved custom list
+                dotInclude custom-lists.ps1
+
+                #convert to regular expression to allow for the super-useful -match operator
+                $global:BloatwareRegex = $global:Bloatware -join '|'
+                $global:WhiteListedAppsRegex = $global:WhiteListedApps -join '|'
+            })
+
+        Function AddAppToCustomizeForm() {
+            Param(
+                [Parameter(Mandatory)]
+                [int] $position,
+                [Parameter(Mandatory)]
+                [string] $appName,
+                [Parameter(Mandatory)]
+                [bool] $enabled,
+                [Parameter(Mandatory)]
+                [bool] $checked,
+
+                [string] $notes
+            )
+
+            $label = New-Object system.Windows.Forms.Label
+            $label.Location = New-Object System.Drawing.Point(2, (30 + $position * 16))
+            $label.Text = $notes
+            $label.width = 300
+            $label.height = 16
+            $Label.TextAlign = [System.Drawing.ContentAlignment]::TopRight
+            $CustomizeForm.controls.Add($label)
+
+            $Checkbox = New-Object system.Windows.Forms.CheckBox
+            $Checkbox.text = $appName
+            $Checkbox.location = New-Object System.Drawing.Point(320, (30 + $position * 16))
+            $Checkbox.Autosize = 1;
+            $Checkbox.Checked = $checked
+            $Checkbox.Enabled = $enabled
+            $CustomizeForm.controls.Add($CheckBox)
         }
-        ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
 
-        '$global:Bloatware = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
-        @($CustomizeForm.controls) | ForEach {
-            if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and $_.Checked) {
-                 "    ""$($_.Text)""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
-            }
+
+        $Installed = @( (Get-AppxPackage).Name )
+        $Online = @( (Get-AppxProvisionedPackage -Online).DisplayName )
+        $AllUsers = @( (Get-AppxPackage -AllUsers).Name )
+        [int]$checkboxCounter = 0
+
+        foreach ($item in $NonRemovables) {
+            $string = ""
+            if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { $string += " ConflictBlacklist " }
+            if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { $string += " ConflictWhitelist" }
+            if ( $null -notmatch $Installed -and $Installed -cmatch $item) { $string += "Installed" }
+            if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { $string += " AllUsers" }
+            if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
+            $string += "  NONREMOVABLE"
+            AddAppToCustomizeForm $checkboxCounter $item $false $false $string
+            ++$checkboxCounter
         }
-        ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
+        foreach ( $item in $global:WhiteListedApps ) {
+            $string = ""
+            if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { $string += " Conflict NonRemovables " }
+            if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { $string += " ConflictBlacklist " }
+            if ( $null -notmatch $Installed -and $Installed -cmatch $item) { $string += "Installed" }
+            if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { $string += " AllUsers" }
+            if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
+            AddAppToCustomizeForm $checkboxCounter $item $true $false $string
+            ++$checkboxCounter
+        }
+        foreach ( $item in $global:Bloatware ) {
+            $string = ""
+            if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { $string += " Conflict NonRemovables " }
+            if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { $string += " Conflict Whitelist " }
+            if ( $null -notmatch $Installed -and $Installed -cmatch $item) { $string += "Installed" }
+            if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { $string += " AllUsers" }
+            if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
+            AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+            ++$checkboxCounter
+        }
+        foreach ( $item in $AllUsers ) {
+            $string = "NEW   AllUsers"
+            if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
+            if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
+            if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { continue }
+            if ( $null -notmatch $Installed -and $Installed -cmatch $item) { $string += " Installed" }
+            if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
+            AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+            ++$checkboxCounter
+        }
+        foreach ( $item in $Installed ) {
+            $string = "NEW   Installed"
+            if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
+            if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
+            if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { continue }
+            if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { continue }
+            if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
+            AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+            ++$checkboxCounter
+        }
+        foreach ( $item in $Online ) {
+            $string = "NEW   Online "
+            if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
+            if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
+            if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { continue }
+            if ( $null -notmatch $Installed -and $Installed -cmatch $item) { continue }
+            if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { continue }
+            AddAppToCustomizeForm $checkboxCounter $item $true $true $string
+            ++$checkboxCounter
+        }
+        [void]$CustomizeForm.ShowDialog()
 
-        #Over-ride the white/blacklist with the newly saved custom list
-        dotInclude custom-lists.ps1
-
-        #convert to regular expression to allow for the super-useful -match operator
-        $global:BloatwareRegex = $global:Bloatware -join '|'
-        $global:WhiteListedAppsRegex = $global:WhiteListedApps -join '|'
     })
-
-    Function AddAppToCustomizeForm() {
-        Param(
-            [Parameter(Mandatory)]
-            [int] $position,
-            [Parameter(Mandatory)]
-            [string] $appName,
-            [Parameter(Mandatory)]
-            [bool] $enabled,
-            [Parameter(Mandatory)]
-            [bool] $checked,
-
-            [string] $notes
-        )
-
-        $label=New-Object system.Windows.Forms.Label
-        $label.Location = New-Object System.Drawing.Point(2,(30+$position*16))
-        $label.Text = $notes
-        $label.width = 300
-        $label.height= 16
-        $Label.TextAlign = [System.Drawing.ContentAlignment]::TopRight
-        $CustomizeForm.controls.Add($label)
-
-        $Checkbox = New-Object system.Windows.Forms.CheckBox
-        $Checkbox.text = $appName
-        $Checkbox.location = New-Object System.Drawing.Point(320,(30+$position*16))
-        $Checkbox.Autosize = 1;
-        $Checkbox.Checked = $checked
-        $Checkbox.Enabled = $enabled
-        $CustomizeForm.controls.Add($CheckBox)
-    }
-
-
-    $Installed = @( (Get-AppxPackage).Name )
-    $Online = @( (Get-AppxProvisionedPackage -Online).DisplayName )
-    $AllUsers = @( (Get-AppxPackage -AllUsers).Name )
-    [int]$checkboxCounter = 0
-
-    foreach ($item in $NonRemovables) {
-        $string = ""
-        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {$string += " ConflictBlacklist "}
-        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {$string += " ConflictWhitelist" }
-        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
-        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
-        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
-        $string += "  NONREMOVABLE"
-        AddAppToCustomizeForm $checkboxCounter $item $false $false $string
-        ++$checkboxCounter
-    }
-    foreach ( $item in $global:WhiteListedApps ) {
-        $string = ""
-        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {$string += " Conflict NonRemovables "}
-        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {$string += " ConflictBlacklist "}
-        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
-        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
-        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
-        AddAppToCustomizeForm $checkboxCounter $item $true $false $string
-        ++$checkboxCounter
-    }
-    foreach ( $item in $global:Bloatware ) {
-        $string = ""
-        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {$string += " Conflict NonRemovables "}
-        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {$string += " Conflict Whitelist "}
-        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += "Installed"}
-        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {$string += " AllUsers"}
-        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
-        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
-        ++$checkboxCounter
-    }
-    foreach ( $item in $AllUsers ) {
-        $string = "NEW   AllUsers"
-        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
-        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
-        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
-        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ $string += " Installed"}
-        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
-        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
-        ++$checkboxCounter
-    }
-    foreach ( $item in $Installed ) {
-        $string = "NEW   Installed"
-        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
-        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
-        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
-        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) {continue}
-        if ( $null -notmatch $Online -and $Online -cmatch $item) {$string += " Online"}
-        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
-        ++$checkboxCounter
-    }
-    foreach ( $item in $Online ) {
-        $string = "NEW   Online "
-        if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) {continue}
-        if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) {continue}
-        if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) {continue}
-        if ( $null -notmatch $Installed -and $Installed -cmatch $item){ continue}
-        if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { continue}
-        AddAppToCustomizeForm $checkboxCounter $item $true $true $string
-        ++$checkboxCounter
-    }
-    [void]$CustomizeForm.ShowDialog()
-
-})
 
 
 $RemoveBlacklist.Add_Click( { 
@@ -525,11 +548,11 @@ $RemoveAllBloatware.Add_Click( {
 
             Param([switch]$Debloat)
   
-            If (Get-Service dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+            If (Get-Service dmwappushservice | Where-Object { $_.StartType -eq "Disabled" }) {
                 Set-Service dmwappushservice -StartupType Automatic
             }
 
-            If (Get-Service dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+            If (Get-Service dmwappushservice | Where-Object { $_.Status -eq "Stopped" }) {
                 Start-Service dmwappushservice
             } 
         }
@@ -539,7 +562,7 @@ $RemoveAllBloatware.Add_Click( {
             Get-AppxPackage | Where { !($_.Name -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.Name) } | Remove-AppxPackage
             Get-AppxProvisionedPackage -Online | Where { !($_.DisplayName -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.DisplayName) } | Remove-AppxProvisionedPackage -Online
             Get-AppxPackage -AllUsers | Where { !($_.Name -cmatch $global:WhiteListedAppsRegex) -and !($NonRemovables -cmatch $_.Name) } | Remove-AppxPackage
-}
+        }
   
         #Creates a PSDrive to be able to access the 'HKCR' tree
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
@@ -695,13 +718,13 @@ $RemoveAllBloatware.Add_Click( {
             (New-Object -Com Shell.Application).
             NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
             Items() |
-            %{ $_.Verbs() } |
-            ?{$_.Name -match 'Un.*pin from Start'} |
-            %{$_.DoIt()}
-    }
+            % { $_.Verbs() } |
+            ? { $_.Name -match 'Un.*pin from Start' } |
+            % { $_.DoIt() }
+        }
 
         Function Remove3dObjects {
-        #Removes 3D Objects from the 'My Computer' submenu in explorer
+            #Removes 3D Objects from the 'My Computer' submenu in explorer
             Write-Output "Removing 3D Objects from explorer 'My Computer' submenu"
             $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
             $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
@@ -711,25 +734,25 @@ $RemoveAllBloatware.Add_Click( {
             If (Test-Path $Objects64) {
                 Remove-Item $Objects64 -Recurse 
             }
-}
+        }
 
   
         Function CheckDMWService {
 
             Param([switch]$Debloat)
   
-            If (Get-Service dmwappushservice | Where-Object {$_.StartType -eq "Disabled"}) {
+            If (Get-Service dmwappushservice | Where-Object { $_.StartType -eq "Disabled" }) {
                 Set-Service dmwappushservice -StartupType Automatic
             }
 
-            If (Get-Service dmwappushservice | Where-Object {$_.Status -eq "Stopped"}) {
+            If (Get-Service dmwappushservice | Where-Object { $_.Status -eq "Stopped" }) {
                 Start-Service dmwappushservice
             } 
         }
         
         Function CheckInstallService {
   
-            If (Get-Service InstallService | Where-Object {$_.Status -eq "Stopped"}) {  
+            If (Get-Service InstallService | Where-Object { $_.Status -eq "Stopped" }) {  
                 Start-Service InstallService
                 Set-Service InstallService -StartupType Automatic 
             }
@@ -758,7 +781,7 @@ $RevertChange.Add_Click( {
         #This function will revert the changes you made when running the Start-Debloat function.
         
         #This line reinstalls all of the bloatware that was removed
-        Get-AppxPackage -AllUsers | ForEach {Add-AppxPackage -Verbose -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"} 
+        Get-AppxPackage -AllUsers | ForEach { Add-AppxPackage -Verbose -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml" } 
     
         #Tells Windows to enable your advertising information.    
         Write-Host "Re-enabling key to show advertisement information"
@@ -1158,13 +1181,13 @@ $RemoveRegkeys.Add_Click( {
 $UnpinStartMenuTiles.Add_Click( {
         #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
         #Unpins all tiles from the Start Menu
-            Write-Host "Unpinning all tiles from the start menu"
-            (New-Object -Com Shell.Application).
-            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
-            Items() |
-            %{ $_.Verbs() } |
-            ?{$_.Name -match 'Un.*pin from Start'} |
-            %{$_.DoIt()}
+        Write-Host "Unpinning all tiles from the start menu"
+        (New-Object -Com Shell.Application).
+        NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
+        Items() |
+        % { $_.Verbs() } |
+        ? { $_.Name -match 'Un.*pin from Start' } |
+        % { $_.DoIt() }
     })
 
 $RemoveOnedrive.Add_Click( { 
@@ -1252,22 +1275,22 @@ $InstallNet35.Add_Click( {
         Write-Host ".NET 3.5 has been successfully installed!"
     } )
 
-$EnableDarkMode.Add_Click(  {
-    Write-Host "Enabling Dark Mode"
-    $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-    Set-ItemProperty $Theme AppsUseLightTheme -Value 0
-    Start-Sleep 1
-    Write-Host "Enabled"
-}
+$EnableDarkMode.Add_Click( {
+        Write-Host "Enabling Dark Mode"
+        $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        Set-ItemProperty $Theme AppsUseLightTheme -Value 0
+        Start-Sleep 1
+        Write-Host "Enabled"
+    }
 )
 
-$DisableDarkMode.Add_Click(  {
-    Write-Host "Disabling Dark Mode"
-    $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-    Set-ItemProperty $Theme AppsUseLightTheme -Value 1
-    Start-Sleep 1
-    Write-Host "Disabled"
-}
+$DisableDarkMode.Add_Click( {
+        Write-Host "Disabling Dark Mode"
+        $Theme = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        Set-ItemProperty $Theme AppsUseLightTheme -Value 1
+        Start-Sleep 1
+        Write-Host "Disabled"
+    }
 )
 
 [void]$Form.ShowDialog()
