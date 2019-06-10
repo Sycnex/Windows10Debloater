@@ -868,44 +868,45 @@ Switch ($Prompt1) {
             }
         }
     }
+    No {
+        Write-Host "Reverting changes..."
+        Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
+        New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+        Revert-Changes
+        #Prompt asking to revert edge changes as well
+        $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
+        Switch ($Prompt6) {
+            Yes {
+                Enable-EdgePDF
+                Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
+            }
+            No {
+                Write-Host "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
+            }
+        }
+        #Prompt asking if you'd like to reboot your machine
+        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt7) {
+            Yes {
+                Write-Host "Unloading the HKCR drive..."
+                Remove-PSDrive HKCR 
+                Start-Sleep 1
+                Write-Host "Initiating reboot."
+                Stop-Transcript
+                Start-Sleep 2
+                Restart-Computer
+            }
+            No {
+                Write-Host "Unloading the HKCR drive..."
+                Remove-PSDrive HKCR 
+                Start-Sleep 1
+                Write-Host "Script has finished. Exiting."
+                Stop-Transcript
+                Start-Sleep 2
+                Exit
+            }
+        }
+    }
 }
 
-No {
-    Write-Host "Reverting changes..."
-    Write-Host "Creating PSDrive 'HKCR' (HKEY_CLASSES_ROOT). This will be used for the duration of the script as it is necessary for the modification of specific registry keys."
-    New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-    Revert-Changes
-    #Prompt asking to revert edge changes as well
-    $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
-    Switch ($Prompt6) {
-        Yes {
-            Enable-EdgePDF
-            Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
-        }
-        No {
-            Write-Host "You have chosen to keep the setting that disallows Edge to be the default PDF viewer."
-        }
-    }
-    #Prompt asking if you'd like to reboot your machine
-    $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-    Switch ($Prompt7) {
-        Yes {
-            Write-Host "Unloading the HKCR drive..."
-            Remove-PSDrive HKCR 
-            Start-Sleep 1
-            Write-Host "Initiating reboot."
-            Stop-Transcript
-            Start-Sleep 2
-            Restart-Computer
-        }
-        No {
-            Write-Host "Unloading the HKCR drive..."
-            Remove-PSDrive HKCR 
-            Start-Sleep 1
-            Write-Host "Script has finished. Exiting."
-            Stop-Transcript
-            Start-Sleep 2
-            Exit
-        }
-    }
-}
+
