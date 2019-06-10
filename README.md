@@ -29,7 +29,7 @@ Remember this script NEEDS to be run as admin in order to function properly.
 # How To Run the Windows10SysPrepDebloater.ps1 file
 
 For the WindowsSysPrepDebloater.ps1 file, there are a couple of paramters that you can run so that you can specify which functions are used. The parameters are:
--SysPrep, -Debloat, and -StopEdgePDF. 
+-SysPrep, -Debloat. 
 
 To run this with parameters, do the following:
 
@@ -38,14 +38,14 @@ To run this with parameters, do the following:
 3) On the prompt, change to the directory where you extracted the files:
   e.g. - cd c:\temp
 4) Next, to run either script, enter in the following:
-  e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy and -StopEdgePDF
+  e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy
   
 
 # Sysprep, Interactive, and GUI Application
 
 There are now 3 versions of my Windows10Debloater - There is an interactive version, a GUI app version, and a pure silent version.
 
-Windows10SysPrepDebloater.ps1 - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy and -StopEdgePDF. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+Windows10SysPrepDebloater.ps1 - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
 Windows10Debloater.ps1 - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
 
@@ -62,8 +62,6 @@ The second switch parameter is -Debloat, which does as it suggests. It runs the 
 Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
 
 Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
-
-Finally, there is an optional switch parameter which is Stop-EdgePDF. This just stops Edge from taking over as the default PDF viewer. I made this optional since some do not find this necessary for them or their organization.
 
 # This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
 
