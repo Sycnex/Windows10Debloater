@@ -660,6 +660,8 @@ Function UninstallOneDrive {
         Write-Host "Restarting Explorer that was shut down before."
         Start-Process explorer.exe -NoNewWindow
         Write-Host "OneDrive has been successfully uninstalled!"
+        
+        Remove-item env:OneDrive
     }
 }
 
