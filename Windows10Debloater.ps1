@@ -612,6 +612,8 @@ Function UninstallOneDrive {
         If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
             Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
         }
+        Write-Output "Removing leftover user environment variable"
+        [environment]::SetEnvironmentVariable("OneDrive", $null, "User")
         Write-Output "Removing OneDrive from windows explorer"
         If (!(Test-Path $ExplorerReg1)) {
             New-Item $ExplorerReg1

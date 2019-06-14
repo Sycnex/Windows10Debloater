@@ -1254,6 +1254,8 @@ $RemoveOnedrive.Add_Click( {
         If (Test-Path "$env:SYSTEMDRIVE\OneDriveTemp") {
             Remove-Item "$env:SYSTEMDRIVE\OneDriveTemp" -Force -Recurse
         }
+        Write-Host "Removing leftover user environment variable"
+        [environment]::SetEnvironmentVariable("OneDrive", $null, "User")
         Write-Host "Removing OneDrive from windows explorer"
         If (!(Test-Path $ExplorerReg1)) {
             New-Item $ExplorerReg1
