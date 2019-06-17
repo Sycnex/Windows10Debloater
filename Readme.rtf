@@ -1,0 +1,143 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset2 Symbol;}}
+{\*\generator Riched20 10.0.18362}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\b\f0\fs32\lang9 Windows 10 Debloater\par
+\b0\fs22 Script/Utility/Application to debloat Windows 10\par
+\par
+\b\fs32 How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files\par
+\b0\fs22 There are different methods of running the PowerShell script. The methods are as follows:\fs32\par
+\fs22\par
+First Method:\par
+
+\pard 
+{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\fi-360\li720\sa200\sl276\slmult1 Download the .zip file on the main page of the github and extract the .zip file to your desired location\par
+{\pntext\f0 2.\tab}Once extracted, open PowerShell (or PowerShell ISE) as an Administrator\par
+{\pntext\f0 3.\tab}Enable PowerShell execution Set-ExecutionPolicy Unrestricted -Force\par
+{\pntext\f0 4.\tab}On the prompt, change to the directory where you extracted the files: e.g. - cd c:\\temp\par
+{\pntext\f0 5.\tab}Next, to run either script, enter in the following: e.g. - .\\Windows10DebloaterGUI.ps1\par
+
+\pard\sa200\sl276\slmult1 Second Method:\par
+
+\pard 
+{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\fi-360\li720\sa200\sl276\slmult1 Download the .zip file on the main page of the github and extract the .zip file to your desired location\par
+{\pntext\f0 2.\tab}Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"\par
+{\pntext\f0 3.\tab}This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.\par
+
+\pard\sa200\sl276\slmult1\par
+Remember this script NEEDS to be run as admin in order to function properly.\par
+\par
+\b\fs32 How To Run the Windows10SysPrepDebloater.ps1 file\b0\fs22\par
+For the WindowsSysPrepDebloater.ps1 file, there are a couple of paramters that you can run so that you can specify which functions are used. The parameters are: -SysPrep, -Debloat.\par
+\par
+To run this with parameters, do the following:\par
+
+\pard 
+{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}
+\fi-360\li720\sa200\sl276\slmult1 Download the .zip file on the main page of the github and extract the .zip file to your desired location\par
+{\pntext\f0 2.\tab}Once extracted, open PowerShell (or PowerShell ISE) as an Administrator\par
+{\pntext\f0 3.\tab}On the prompt, change to the directory where you extracted the files: e.g. - cd c:\\temp\par
+{\pntext\f0 4.\tab}Next, to run either script, enter in the following: e.g. - .\\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy\par
+
+\pard\sa200\sl276\slmult1\b\fs32 Sysprep, Interactive, and GUI Application\par
+\b0\fs22 There are now 3 versions of my Windows10Debloater - There is an interactive version, a GUI app version, and a pure silent version.\par
+\par
+Windows10SysPrepDebloater.ps1 - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.\par
+\par
+Windows10Debloater.ps1 - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.\par
+\par
+Windows10DebloaterGUI.ps1 - There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen.\par
+\par
+\b\fs32 Switch Parameters\b0\fs22\par
+There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.\par
+\par
+The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.\par
+\par
+The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.\par
+\par
+Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.\par
+\par
+Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.\par
+\par
+\b\fs32 This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.\par
+\b0\fs22 These registry keys are:\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1 EclipseManager\par
+{\pntext\f1\'B7\tab}ActiproSoftwareLLC\par
+{\pntext\f1\'B7\tab}Microsoft.PPIProjection\par
+{\pntext\f1\'B7\tab}Microsoft.XboxGameCallableUI\par
+
+\pard\sa200\sl276\slmult1 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.\par
+\par
+The Debloat switch choice runs the following functions:\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1 Debloat, Remove-Keys, Protect-Privacy, Stop-EdgePDF (If chosen)\par
+{\pntext\f1\'B7\tab}The Revert switch choice runs the following functions:\par
+{\pntext\f1\'B7\tab}Revert-Changes, Enable-EdgePDF\par
+{\pntext\f1\'B7\tab}The Revert option reinstalls the bloatware and changes your registry keys back to default.\par
+
+\pard\sa200\sl276\slmult1\par
+\b\fs32 The scheduled tasks that are disabled are:\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1\b0\fs22 XblGameSaveTaskLogon\par
+{\pntext\f1\'B7\tab}XblGameSaveTask\par
+{\pntext\f1\'B7\tab}Consolidator\par
+{\pntext\f1\'B7\tab}UsbCeip\par
+{\pntext\f1\'B7\tab}DmClient\par
+
+\pard\sa200\sl276\slmult1 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.\par
+\b\fs32\par
+Bloatware that is removed:\b0\fs22\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1 Appconnector\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1 Bing Finance, Bing News, Bing Sports, Bing Weather, Bing Food And Drink, Bing Travel, Bing Health And Fitness\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1 Fresh Paint\par
+{\pntext\f1\'B7\tab}Microsoft Office Hub, Microsoft Solitaire Collection, Microsoft Sticky Notes, OneNote, Office Sway\par
+{\pntext\f1\'B7\tab}3DBuilder, Alarms, Camera, Maps, Phone, SoundRecorder, People, Get started, Skype for Desktop, Windows communications apps, Windows Feedback Hub, Windows Reading List, Windows Feedback\par
+{\pntext\f1\'B7\tab}Zune Music, Zune Video\par
+{\pntext\f1\'B7\tab}Minecraft\par
+{\pntext\f1\'B7\tab}PowerBI \par
+{\pntext\f1\'B7\tab}Network Speed Test \par
+{\pntext\f1\'B7\tab}Phone, Messaging\par
+{\pntext\f1\'B7\tab}OneConnect\par
+{\pntext\f1\'B7\tab}Twitter\par
+{\pntext\f1\'B7\tab}Pandora\par
+{\pntext\f1\'B7\tab}Flipboard\par
+{\pntext\f1\'B7\tab}Shazam\par
+{\pntext\f1\'B7\tab}CandyCrush, CandyCrushSoda \par
+{\pntext\f1\'B7\tab}King apps\par
+{\pntext\f1\'B7\tab}iHeartRadio\par
+{\pntext\f1\'B7\tab}Netflix\par
+{\pntext\f1\'B7\tab}DrawboardPDF\par
+{\pntext\f1\'B7\tab}PicsArt-PhotoStudio\par
+{\pntext\f1\'B7\tab}FarmVille 2 Country Escape\par
+{\pntext\f1\'B7\tab}TuneInRadio\par
+{\pntext\f1\'B7\tab}Asphalt8\par
+{\pntext\f1\'B7\tab}NYT Crossword\par
+{\pntext\f1\'B7\tab}CyberLink MediaSuite Essentials\par
+{\pntext\f1\'B7\tab}Facebook\par
+{\pntext\f1\'B7\tab}Royal Revolt 2\par
+{\pntext\f1\'B7\tab}Caesars Slots Free Casino\par
+{\pntext\f1\'B7\tab}March of Empires\par
+{\pntext\f1\'B7\tab}Phototastic Collage\par
+{\pntext\f1\'B7\tab}Autodesk SketchBook \par
+{\pntext\f1\'B7\tab}Duolingo\par
+{\pntext\f1\'B7\tab}EclipseManager\par
+{\pntext\f1\'B7\tab}ActiproSoftware\par
+{\pntext\f1\'B7\tab}BioEnrollment\par
+{\pntext\f1\'B7\tab}Xbox Game CallableUI, Xbox Identity Provider, Xbox App\par
+{\pntext\f1\'B7\tab}ContactSupport\par
+
+\pard\sa200\sl276\slmult1\b\fs32\par
+Quick download link\par
+\b0\fs22 For people who like to be quick about things:\b\fs32\par
+
+\pard{\pntext\f1\'B7\tab}{\*\pn\pnlvlblt\pnf1\pnindent0{\pntxtb\'B7}}\fi-360\li720\sa200\sl276\slmult1\b0\fs22 iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/debloat'))\par
+
+\pard\sa200\sl276\slmult1\par
+\b\fs32 Credits\b0\fs22\par
+Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!\par
+}
+ 
