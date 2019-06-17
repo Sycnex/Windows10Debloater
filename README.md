@@ -171,6 +171,6 @@ ContactSupport.
 
 iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/debloat'))
 
-# Credit
+# Credits
 
 Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
