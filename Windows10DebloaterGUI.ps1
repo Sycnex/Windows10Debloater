@@ -1,6 +1,6 @@
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
 
-$ErrorActionPreference = 'silentlycontinue'
+$ErrorActionPreference = 'SilentlyContinue'
 
 $Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
