@@ -1,9 +1,17 @@
+<#
+$EnableEdgePDFTakeover.Text = "Enable Edge PDF Takeover"
+$EnableEdgePDFTakeover.Width = 185
+$EnableEdgePDFTakeover.Height = 35
+$EnableEdgePDFTakeover.Location = New-Object System.Drawing.Point(155, 260)
+
+#>
+
 #This will self elevate the script so with a UAC prompt since this script needs to be run as an Administrator in order to function properly.
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-$Button = [Windows.MessageBoxButton]::YesNoCancel
-$ErrorIco = [Windows.MessageBoxImage]::Error
+$Button = [System.Windows.MessageBoxButton]::YesNoCancel
+$ErrorIco = [System.Windows.MessageBoxImage]::Error
 $Ask = 'Do you want to run this as an Administrator?
 
         Select "Yes" to Run as an Administrator
@@ -13,12 +21,12 @@ $Ask = 'Do you want to run this as an Administrator?
         Select "Cancel" to stop the script.'
 
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
-    $Prompt = [Windows.MessageBox]::Show($Ask, "Run as an Administrator or not?", $Button, $ErrorIco) 
+    $Prompt = [System.Windows.MessageBox]::Show($Ask, "Run as an Administrator or not?", $Button, $ErrorIco) 
     Switch ($Prompt) {
         #This will debloat Windows 10
         Yes {
             Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
-            Start-Process powershell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
+            Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
             Exit
         }
         No {
@@ -117,10 +125,10 @@ $global:WhiteListedApps = @(
 )
 
 #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
-$NonRemovables = Get-AppxPackage -AllUsers | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.Name }
-$NonRemovables += Get-AppxPackage | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.Name }
-$NonRemovables += Get-AppxProvisionedPackage -Online | Where-Object { $_.NonRemovable -eq $true } | foreach { $_.DisplayName }
-$NonRemovables = $NonRemovables | Sort-Object -unique
+$NonRemovables = Get-AppxPackage -AllUsers | Where-Object { $_.NonRemovable -eq $true } | ForEach { $_.Name }
+$NonRemovables += Get-AppxPackage | Where-Object { $_.NonRemovable -eq $true } | ForEach { $_.Name }
+$NonRemovables += Get-AppxProvisionedPackage -Online | Where-Object { $_.NonRemovable -eq $true } | ForEach { $_.DisplayName }
+$NonRemovables = $NonRemovables | Sort-Object -Unique
 
 if ($NonRemovables -eq $null ) {
     # the .NonRemovable property doesn't exist until version 18xx. Use a hard-coded list instead.
@@ -199,146 +207,146 @@ Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 #region begin GUI 
-$Form = New-Object system.Windows.Forms.Form
+$Form = New-Object System.Windows.Forms.Form
 $Form.ClientSize = '800,500'
-$Form.text = "Windows10Debloater"
+$Form.Text = "Windows10Debloater"
 $Form.TopMost = $false
 
-$Debloat = New-Object system.Windows.Forms.Label
-$Debloat.text = "Debloat Options"
+$Debloat = New-Object System.Windows.Forms.Label
+$Debloat.Text = "Debloat Options"
 $Debloat.AutoSize = $true
-$Debloat.width = 25
-$Debloat.height = 10
-$Debloat.location = New-Object System.Drawing.Point(9, 8)
+$Debloat.Width = 25
+$Debloat.Height = 10
+$Debloat.Location = New-Object System.Drawing.Point(9, 8)
 $Debloat.Font = 'Microsoft Sans Serif,12,style=Bold,Underline'
 
 
-$CustomizeBlacklists = New-Object system.Windows.Forms.Button
-$CustomizeBlacklists.text = "Customize Blacklist"
-$CustomizeBlacklists.width = 140
-$CustomizeBlacklists.height = 40
-$CustomizeBlacklists.location = New-Object System.Drawing.Point(9, 32)
+$CustomizeBlacklists = New-Object System.Windows.Forms.Button
+$CustomizeBlacklists.Text = "Customize Blacklist"
+$CustomizeBlacklists.Width = 140
+$CustomizeBlacklists.Height = 40
+$CustomizeBlacklists.Location = New-Object System.Drawing.Point(9, 32)
 $CustomizeBlacklists.Font = 'Microsoft Sans Serif,10'
 
-$RemoveAllBloatware = New-Object system.Windows.Forms.Button
-$RemoveAllBloatware.text = "Remove All Bloatware"
-$RemoveAllBloatware.width = 142
-$RemoveAllBloatware.height = 40
-$RemoveAllBloatware.location = New-Object System.Drawing.Point(8, 79)
+$RemoveAllBloatware = New-Object System.Windows.Forms.Button
+$RemoveAllBloatware.Text = "Remove All Bloatware"
+$RemoveAllBloatware.Width = 142
+$RemoveAllBloatware.Height = 40
+$RemoveAllBloatware.Location = New-Object System.Drawing.Point(8, 79)
 $RemoveAllBloatware.Font = 'Microsoft Sans Serif,10'
 
-$RemoveBlacklist = New-Object system.Windows.Forms.Button
-$RemoveBlacklist.text = "Remove Bloatware With Customized Blacklist"
-$RemoveBlacklist.width = 205
-$RemoveBlacklist.height = 37
-$RemoveBlacklist.location = New-Object System.Drawing.Point(9, 124)
+$RemoveBlacklist = New-Object System.Windows.Forms.Button
+$RemoveBlacklist.Text = "Remove Bloatware With Customized Blacklist"
+$RemoveBlacklist.Width = 205
+$RemoveBlacklist.Height = 37
+$RemoveBlacklist.Location = New-Object System.Drawing.Point(9, 124)
 $RemoveBlacklist.Font = 'Microsoft Sans Serif,10'
 
-$Label1 = New-Object system.Windows.Forms.Label
-$Label1.text = "Revert Registry Changes"
+$Label1 = New-Object System.Windows.Forms.Label
+$Label1.Text = "Revert Registry Changes"
 $Label1.AutoSize = $true
-$Label1.width = 25
-$Label1.height = 10
-$Label1.location = New-Object System.Drawing.Point(254, 7)
+$Label1.Width = 25
+$Label1.Height = 10
+$Label1.Location = New-Object System.Drawing.Point(254, 7)
 $Label1.Font = 'Microsoft Sans Serif,12,style=Bold,Underline'
 
-$RevertChange = New-Object system.Windows.Forms.Button
-$RevertChange.text = "Revert Registry Changes"
-$RevertChange.width = 113
-$RevertChange.height = 36
-$RevertChange.location = New-Object System.Drawing.Point(254, 32)
+$RevertChange = New-Object System.Windows.Forms.Button
+$RevertChange.Text = "Revert Registry Changes"
+$RevertChange.Width = 113
+$RevertChange.Height = 36
+$RevertChange.Location = New-Object System.Drawing.Point(254, 32)
 $RevertChange.Font = 'Microsoft Sans Serif,10'
 
-$Label2 = New-Object system.Windows.Forms.Label
-$Label2.text = "Optional Changes/Fixes"
+$Label2 = New-Object System.Windows.Forms.Label
+$Label2.Text = "Optional Changes/Fixes"
 $Label2.AutoSize = $true
-$Label2.width = 25
-$Label2.height = 10
-$Label2.location = New-Object System.Drawing.Point(9, 193)
+$Label2.Width = 25
+$Label2.Height = 10
+$Label2.Location = New-Object System.Drawing.Point(9, 193)
 $Label2.Font = 'Microsoft Sans Serif,12,style=Bold,Underline'
 
-$DisableCortana = New-Object system.Windows.Forms.Button
-$DisableCortana.text = "Disable Cortana"
-$DisableCortana.width = 111
-$DisableCortana.height = 36
-$DisableCortana.location = New-Object System.Drawing.Point(9, 217)
+$DisableCortana = New-Object System.Windows.Forms.Button
+$DisableCortana.Text = "Disable Cortana"
+$DisableCortana.Width = 111
+$DisableCortana.Height = 36
+$DisableCortana.Location = New-Object System.Drawing.Point(9, 217)
 $DisableCortana.Font = 'Microsoft Sans Serif,10'
 
-$EnableCortana = New-Object system.Windows.Forms.Button
-$EnableCortana.text = "Enable Cortana"
-$EnableCortana.width = 112
-$EnableCortana.height = 36
-$EnableCortana.location = New-Object System.Drawing.Point(9, 260)
+$EnableCortana = New-Object System.Windows.Forms.Button
+$EnableCortana.Text = "Enable Cortana"
+$EnableCortana.Width = 112
+$EnableCortana.Height = 36
+$EnableCortana.Location = New-Object System.Drawing.Point(9, 260)
 $EnableCortana.Font = 'Microsoft Sans Serif,10'
 
-$StopEdgePDFTakeover = New-Object system.Windows.Forms.Button
-$StopEdgePDFTakeover.text = "Stop Edge PDF Takeover"
-$StopEdgePDFTakeover.width = 175
-$StopEdgePDFTakeover.height = 35
-$StopEdgePDFTakeover.location = New-Object System.Drawing.Point(155, 217)
+$StopEdgePDFTakeover = New-Object System.Windows.Forms.Button
+$StopEdgePDFTakeover.Text = "Stop Edge PDF Takeover"
+$StopEdgePDFTakeover.Width = 175
+$StopEdgePDFTakeover.Height = 35
+$StopEdgePDFTakeover.Location = New-Object System.Drawing.Point(155, 217)
 $StopEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
-$EnableEdgePDFTakeover = New-Object system.Windows.Forms.Button
-$EnableEdgePDFTakeover.text = "Enable Edge PDF Takeover"
-$EnableEdgePDFTakeover.width = 185
-$EnableEdgePDFTakeover.height = 35
-$EnableEdgePDFTakeover.location = New-Object System.Drawing.Point(155, 260)
+$EnableEdgePDFTakeover = New-Object System.Windows.Forms.Button
+$EnableEdgePDFTakeover.Text = "Enable Edge PDF Takeover"
+$EnableEdgePDFTakeover.Width = 185
+$EnableEdgePDFTakeover.Height = 35
+$EnableEdgePDFTakeover.Location = New-Object System.Drawing.Point(155, 260)
 $EnableEdgePDFTakeover.Font = 'Microsoft Sans Serif,10'
 
-$DisableTelemetry = New-Object system.Windows.Forms.Button
-$DisableTelemetry.text = "Disable Telemetry/Tasks"
-$DisableTelemetry.width = 152
-$DisableTelemetry.height = 35
-$DisableTelemetry.location = New-Object System.Drawing.Point(365, 260)
+$DisableTelemetry = New-Object System.Windows.Forms.Button
+$DisableTelemetry.Text = "Disable Telemetry/Tasks"
+$DisableTelemetry.Width = 152
+$DisableTelemetry.Height = 35
+$DisableTelemetry.Location = New-Object System.Drawing.Point(365, 260)
 $DisableTelemetry.Font = 'Microsoft Sans Serif,10'
 
-$RemoveRegkeys = New-Object system.Windows.Forms.Button
-$RemoveRegkeys.text = "Remove Bloatware Regkeys"
-$RemoveRegkeys.width = 188
-$RemoveRegkeys.height = 35
-$RemoveRegkeys.location = New-Object System.Drawing.Point(540, 260)
+$RemoveRegkeys = New-Object System.Windows.Forms.Button
+$RemoveRegkeys.Text = "Remove Bloatware Regkeys"
+$RemoveRegkeys.Width = 188
+$RemoveRegkeys.Height = 35
+$RemoveRegkeys.Location = New-Object System.Drawing.Point(540, 260)
 $RemoveRegkeys.Font = 'Microsoft Sans Serif,10'
 
-$UnpinStartMenuTiles = New-Object system.Windows.Forms.Button
-$UnpinStartMenuTiles.text = "Unpin Tiles From Start Menu"
-$UnpinStartMenuTiles.width = 190
-$UnpinStartMenuTiles.height = 35
-$UnpinStartMenuTiles.location = New-Object System.Drawing.Point(540, 217)
+$UnpinStartMenuTiles = New-Object System.Windows.Forms.Button
+$UnpinStartMenuTiles.Text = "Unpin Tiles From Start Menu"
+$UnpinStartMenuTiles.Width = 190
+$UnpinStartMenuTiles.Height = 35
+$UnpinStartMenuTiles.Location = New-Object System.Drawing.Point(540, 217)
 $UnpinStartMenuTiles.Font = 'Microsoft Sans Serif,10'
 
-$RemoveOnedrive = New-Object system.Windows.Forms.Button
-$RemoveOnedrive.text = "Uninstall OneDrive"
-$RemoveOnedrive.width = 152
-$RemoveOnedrive.height = 35
-$RemoveOnedrive.location = New-Object System.Drawing.Point(365, 217)
+$RemoveOnedrive = New-Object System.Windows.Forms.Button
+$RemoveOnedrive.Text = "Uninstall OneDrive"
+$RemoveOnedrive.Width = 152
+$RemoveOnedrive.Height = 35
+$RemoveOnedrive.Location = New-Object System.Drawing.Point(365, 217)
 $RemoveOnedrive.Font = 'Microsoft Sans Serif,10'
 
-#$FixWhitelist = New-Object system.Windows.Forms.Button
-#$FixWhitelist.text = "Fix Whitelisted Apps"
-#$FixWhitelist.width = 130
-#$FixWhitelist.height = 37
-#$FixWhitelist.location = New-Object System.Drawing.Point(254, 74)
+#$FixWhitelist = New-Object System.Windows.Forms.Button
+#$FixWhitelist.Text = "Fix Whitelisted Apps"
+#$FixWhitelist.Width = 130
+#$FixWhitelist.Height = 37
+#$FixWhitelist.Location = New-Object System.Drawing.Point(254, 74)
 #$FixWhitelist.Font = 'Microsoft Sans Serif,10'
 
-$InstallNet35 = New-Object system.Windows.Forms.Button
-$InstallNet35.text = "Install .NET v3.5"
-$InstallNet35.width = 152
-$InstallNet35.height = 39
-$InstallNet35.location = New-Object System.Drawing.Point(169, 335)
+$InstallNet35 = New-Object System.Windows.Forms.Button
+$InstallNet35.Text = "Install .NET v3.5"
+$InstallNet35.Width = 152
+$InstallNet35.Height = 39
+$InstallNet35.Location = New-Object System.Drawing.Point(169, 335)
 $InstallNet35.Font = 'Microsoft Sans Serif,10'
 
-$EnableDarkMode = New-Object system.Windows.Forms.Button
-$EnableDarkMode.text = "Enable Dark Mode"
-$EnableDarkMode.width = 152
-$EnableDarkMode.height = 39
-$EnableDarkMode.location = New-Object System.Drawing.Point(9, 335)
+$EnableDarkMode = New-Object System.Windows.Forms.Button
+$EnableDarkMode.Text = "Enable Dark Mode"
+$EnableDarkMode.Width = 152
+$EnableDarkMode.Height = 39
+$EnableDarkMode.Location = New-Object System.Drawing.Point(9, 335)
 $EnableDarkMode.Font = 'Microsoft Sans Serif,10'
 
-$DisableDarkMode = New-Object system.Windows.Forms.Button
-$DisableDarkMode.text = "Disable Dark Mode"
-$DisableDarkMode.width = 152
-$DisableDarkMode.height = 39
-$DisableDarkMode.location = New-Object System.Drawing.Point(9, 385)
+$DisableDarkMode = New-Object System.Windows.Forms.Button
+$DisableDarkMode.Text = "Disable Dark Mode"
+$DisableDarkMode.Width = 152
+$DisableDarkMode.Height = 39
+$DisableDarkMode.Location = New-Object System.Drawing.Point(9, 385)
 $DisableDarkMode.Font = 'Microsoft Sans Serif,10'
 
 
@@ -347,33 +355,33 @@ $Form.controls.AddRange(@($Debloat, $CustomizeBlacklists, $RemoveAllBloatware, $
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
-    Write-Host "$DebloatFolder exists. Skipping."
+    Write-Host "${DebloatFolder} exists. Skipping."
 }
 Else {
-    Write-Host "The folder "$DebloatFolder" doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
+    Write-Host "The folder ${DebloatFolder} doesn't exist. This folder will be used for storing logs created after the script runs. Creating now."
     Start-Sleep 1
-    New-Item -Path "$DebloatFolder" -ItemType Directory
-    Write-Host "The folder $DebloatFolder was successfully created."
+    New-Item -Path "${DebloatFolder}" -ItemType Directory
+    Write-Host "The folder ${DebloatFolder} was successfully created."
 }
 
-Start-Transcript -OutputDirectory "$DebloatFolder"
+Start-Transcript -OutputDirectory "${DebloatFolder}"
 
 #region gui events {
 $CustomizeBlacklists.Add_Click( {
-        $CustomizeForm = New-Object system.Windows.Forms.Form
+        $CustomizeForm = New-Object System.Windows.Forms.Form
         $CustomizeForm.ClientSize = '600,400'
-        $CustomizeForm.text = "Customize Whitelist and Blacklist"
+        $CustomizeForm.Text = "Customize Whitelist and Blacklist"
         $CustomizeForm.TopMost = $false
         $CustomizeForm.AutoScroll = $true
 
-        $SaveList = New-Object system.Windows.Forms.Button
-        $SaveList.text = "Save custom Whitelist and Blacklist to custom-lists.ps1"
+        $SaveList = New-Object System.Windows.Forms.Button
+        $SaveList.Text = "Save custom Whitelist and Blacklist to custom-lists.ps1"
         $SaveList.AutoSize = $true
-        $SaveList.location = New-Object System.Drawing.Point(200, 5)
+        $SaveList.Location = New-Object System.Drawing.Point(200, 5)
         $CustomizeForm.controls.Add($SaveList)
 
         $SaveList.Add_Click( {
-                $ErrorActionPreference = 'silentlycontinue'
+                $ErrorActionPreference = 'SilentlyContinue'
 
                 '$global:WhiteListedApps = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Encoding utf8
                 @($CustomizeForm.controls) | ForEach {
@@ -413,17 +421,17 @@ $CustomizeBlacklists.Add_Click( {
                 [string] $notes
             )
 
-            $label = New-Object system.Windows.Forms.Label
+            $label = New-Object System.Windows.Forms.Label
             $label.Location = New-Object System.Drawing.Point(2, (30 + $position * 16))
             $label.Text = $notes
-            $label.width = 300
-            $label.height = 16
+            $label.Width = 300
+            $label.Height = 16
             $Label.TextAlign = [System.Drawing.ContentAlignment]::TopRight
             $CustomizeForm.controls.Add($label)
 
-            $Checkbox = New-Object system.Windows.Forms.CheckBox
-            $Checkbox.text = $appName
-            $Checkbox.location = New-Object System.Drawing.Point(320, (30 + $position * 16))
+            $Checkbox = New-Object System.Windows.Forms.CheckBox
+            $Checkbox.Text = $appName
+            $Checkbox.Location = New-Object System.Drawing.Point(320, (30 + $position * 16))
             $Checkbox.Autosize = 1;
             $Checkbox.Checked = $checked
             $Checkbox.Enabled = $enabled
@@ -436,7 +444,7 @@ $CustomizeBlacklists.Add_Click( {
         $AllUsers = @( (Get-AppxPackage -AllUsers).Name )
         [int]$checkboxCounter = 0
 
-        foreach ($item in $NonRemovables) {
+        ForEach ($item in $NonRemovables) {
             $string = ""
             if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { $string += " ConflictBlacklist " }
             if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { $string += " ConflictWhitelist" }
@@ -447,7 +455,7 @@ $CustomizeBlacklists.Add_Click( {
             AddAppToCustomizeForm $checkboxCounter $item $false $false $string
             ++$checkboxCounter
         }
-        foreach ( $item in $global:WhiteListedApps ) {
+        ForEach ( $item in $global:WhiteListedApps ) {
             $string = ""
             if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { $string += " Conflict NonRemovables " }
             if ( $null -notmatch $global:BloatwareRegex -and $item -cmatch $global:BloatwareRegex ) { $string += " ConflictBlacklist " }
@@ -457,7 +465,7 @@ $CustomizeBlacklists.Add_Click( {
             AddAppToCustomizeForm $checkboxCounter $item $true $false $string
             ++$checkboxCounter
         }
-        foreach ( $item in $global:Bloatware ) {
+        ForEach ( $item in $global:Bloatware ) {
             $string = ""
             if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { $string += " Conflict NonRemovables " }
             if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { $string += " Conflict Whitelist " }
@@ -467,7 +475,7 @@ $CustomizeBlacklists.Add_Click( {
             AddAppToCustomizeForm $checkboxCounter $item $true $true $string
             ++$checkboxCounter
         }
-        foreach ( $item in $AllUsers ) {
+        ForEach ( $item in $AllUsers ) {
             $string = "NEW   AllUsers"
             if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
             if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
@@ -477,7 +485,7 @@ $CustomizeBlacklists.Add_Click( {
             AddAppToCustomizeForm $checkboxCounter $item $true $true $string
             ++$checkboxCounter
         }
-        foreach ( $item in $Installed ) {
+        ForEach ( $item in $Installed ) {
             $string = "NEW   Installed"
             if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
             if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
@@ -487,7 +495,7 @@ $CustomizeBlacklists.Add_Click( {
             AddAppToCustomizeForm $checkboxCounter $item $true $true $string
             ++$checkboxCounter
         }
-        foreach ( $item in $Online ) {
+        ForEach ( $item in $Online ) {
             $string = "NEW   Online "
             if ( $null -notmatch $NonRemovables -and $NonRemovables -cmatch $item ) { continue }
             if ( $null -notmatch $global:WhiteListedAppsRegex -and $item -cmatch $global:WhiteListedAppsRegex ) { continue }
@@ -503,7 +511,7 @@ $CustomizeBlacklists.Add_Click( {
 
 
 $RemoveBlacklist.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         Function DebloatBlacklist {
             Write-Host "Requesting removal of $global:BloatwareRegex"
             Write-Host "--- This may take a while - please be patient ---"
@@ -518,7 +526,7 @@ $RemoveBlacklist.Add_Click( {
         Write-Host "Bloatware removed!"
     })
 $RemoveAllBloatware.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         #This function finds any AppX/AppXProvisioned package and uninstalls it, except for Freshpaint, Windows Calculator, Windows Store, and Windows Photos.
         #Also, to note - This does NOT remove essential system services/software/etc such as .NET framework installations, Cortana, Edge, etc.
 
@@ -777,7 +785,7 @@ $RemoveAllBloatware.Add_Click( {
   
     } )
 $RevertChange.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         #This function will revert the changes you made when running the Start-Debloat function.
         
         #This line reinstalls all of the bloatware that was removed
@@ -872,7 +880,7 @@ $RevertChange.Add_Click( {
         Write-Host "Done reverting changes!"
 
         #
-        Write-Output "Restoring 3D Objects from explorer 'My Computer' submenu"
+        Write-Output "Restoring 3D Objects from Explorer 'My Computer' submenu"
         $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
         $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
         If (!(Test-Path $Objects32)) {
@@ -883,7 +891,7 @@ $RevertChange.Add_Click( {
         }
     })
 $DisableCortana.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         Write-Host "Disabling Cortana"
         $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
         $Cortana2 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization"
@@ -904,7 +912,7 @@ $DisableCortana.Add_Click( {
         Write-Host "Cortana has been disabled."
     })
 $StopEdgePDFTakeover.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         #Stops edge from taking over as the default .PDF viewer    
         Write-Host "Stopping Edge from taking over as the default .PDF viewer"
         $NoPDF = "HKCR:\.pdf"
@@ -937,7 +945,7 @@ $StopEdgePDFTakeover.Add_Click( {
         Write-Host "Edge should no longer take over as the default .PDF."
     })
 $EnableCortana.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         Write-Host "Re-enabling Cortana"
         $Cortana1 = "HKCU:\SOFTWARE\Microsoft\Personalization\Settings"
         $Cortana2 = "HKCU:\SOFTWARE\Microsoft\InputPersonalization"
@@ -959,7 +967,7 @@ $EnableCortana.Add_Click( {
     })
 $EnableEdgePDFTakeover.Add_Click( { 
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         Write-Host "Setting Edge back to default"
         $NoPDF = "HKCR:\.pdf"
         $NoProgids = "HKCR:\.pdf\OpenWithProgids"
@@ -992,7 +1000,7 @@ $EnableEdgePDFTakeover.Add_Click( {
         Write-Host "Edge will now be able to be used for .PDF."
     })
 $DisableTelemetry.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         #Disables Windows Feedback Experience
         Write-Host "Disabling Windows Feedback Experience program"
         $Advertising = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
@@ -1036,12 +1044,12 @@ $DisableTelemetry.Add_Click( {
         If (!(Test-Path $registryOEM)) {
             New-Item $registryOEM
         }
-        Set-ItemProperty $registryOEM  ContentDeliveryAllowed -Value 0 
-        Set-ItemProperty $registryOEM  OemPreInstalledAppsEnabled -Value 0 
-        Set-ItemProperty $registryOEM  PreInstalledAppsEnabled -Value 0 
-        Set-ItemProperty $registryOEM  PreInstalledAppsEverEnabled -Value 0 
-        Set-ItemProperty $registryOEM  SilentInstalledAppsEnabled -Value 0 
-        Set-ItemProperty $registryOEM  SystemPaneSuggestionsEnabled -Value 0          
+        Set-ItemProperty $registryOEM ContentDeliveryAllowed -Value 0 
+        Set-ItemProperty $registryOEM OemPreInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM PreInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM PreInstalledAppsEverEnabled -Value 0 
+        Set-ItemProperty $registryOEM SilentInstalledAppsEnabled -Value 0 
+        Set-ItemProperty $registryOEM SystemPaneSuggestionsEnabled -Value 0          
     
         #Preping mixed Reality Portal for removal    
         Write-Host "Setting Mixed Reality Portal value to 0 so that you can uninstall it in Settings"
@@ -1110,12 +1118,12 @@ $DisableTelemetry.Add_Click( {
         
         #Disables scheduled tasks that are considered unnecessary 
         Write-Host "Disabling scheduled tasks"
-        #Get-ScheduledTask  XblGameSaveTaskLogon | Disable-ScheduledTask
-        Get-ScheduledTask  XblGameSaveTask | Disable-ScheduledTask
-        Get-ScheduledTask  Consolidator | Disable-ScheduledTask
-        Get-ScheduledTask  UsbCeip | Disable-ScheduledTask
-        Get-ScheduledTask  DmClient | Disable-ScheduledTask
-        Get-ScheduledTask  DmClientOnScenarioDownload | Disable-ScheduledTask
+        #Get-ScheduledTask XblGameSaveTaskLogon | Disable-ScheduledTask
+        Get-ScheduledTask XblGameSaveTask | Disable-ScheduledTask
+        Get-ScheduledTask Consolidator | Disable-ScheduledTask
+        Get-ScheduledTask UsbCeip | Disable-ScheduledTask
+        Get-ScheduledTask DmClient | Disable-ScheduledTask
+        Get-ScheduledTask DmClientOnScenarioDownload | Disable-ScheduledTask
 
         #Write-Host "Uninstalling Telemetry Windows Updates"
         #Uninstalls Some Windows Updates considered to be Telemetry. !WIP!
@@ -1136,7 +1144,7 @@ $DisableTelemetry.Add_Click( {
         Write-Host "Telemetry has been disabled!"
     })
 $RemoveRegkeys.Add_Click( { 
-        $ErrorActionPreference = 'silentlycontinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         $Keys = @(
             
             New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
