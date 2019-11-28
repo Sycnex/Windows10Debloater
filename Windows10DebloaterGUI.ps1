@@ -122,6 +122,7 @@ $global:WhiteListedApps = @(
     "WindSynthBerry"                            # Issue 68
     "MIDIBerry"                                 # Issue 68
     "Slack"                                     # Issue 83
+    "*Nvidia*"                                  # Issue 198
 )
 
 #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
