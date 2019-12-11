@@ -1,7 +1,7 @@
 # Windows10Debloater
-Script/Utility/Application to debloat Windows 10
+Script/Application to debloat Windows 10.
 
-# How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
+## How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
 
 There are different methods of running the PowerShell script. The methods are as follows:
 
@@ -26,7 +26,7 @@ Second Method:
 Remember this script NEEDS to be run as admin in order to function properly.
 
 
-# How To Run the Windows10SysPrepDebloater.ps1 file
+## How To Run the Windows10SysPrepDebloater.ps1 file
 
 For the WindowsSysPrepDebloater.ps1 file, there are a couple of paramters that you can run so that you can specify which functions are used. The parameters are:
 -SysPrep, -Debloat. 
@@ -41,7 +41,7 @@ To run this with parameters, do the following:
   e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy
   
 
-# Sysprep, Interactive, and GUI Application
+## Sysprep, Interactive, and GUI Application
 
 There are now 3 versions of my Windows10Debloater - There is an interactive version, a GUI app version, and a pure silent version.
 
@@ -51,7 +51,7 @@ Windows10Debloater.ps1 - This interactive version is what it implies - a Windows
 
 Windows10DebloaterGUI.ps1 There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
 
-# Switch Parameters
+## Switch Parameters
 
 There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
 
@@ -63,7 +63,7 @@ Remove-Keys removes registry keys leftover that are associated with the bloatwar
 
 Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
 
-# This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
+## This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
 
 These registry keys are:
 
@@ -88,7 +88,7 @@ Enable-EdgePDF
 
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
 
-# The scheduled tasks that are disabled are:
+## The scheduled tasks that are disabled are:
 
 XblGameSaveTaskLogon,
 XblGameSaveTask,
@@ -98,7 +98,7 @@ DmClient
 
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
 
-# Bloatware that is removed:
+## Bloatware that is removed:
 
 3DBuilder,
 Appconnector,
@@ -166,10 +166,10 @@ Xbox Game CallableUI,
 Xbox Identity Provider, and
 ContactSupport.
 
-# Quick download link
+## Quick download link
 
 `iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/debloat'))`
 
-# Credits
+## Credits
 
 Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
