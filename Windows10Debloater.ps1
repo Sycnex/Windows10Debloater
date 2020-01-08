@@ -305,7 +305,7 @@ Function Protect-Privacy {
     $CloudStore = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\CloudStore'
     If (Test-Path $CloudStore) {
         Stop-Process Explorer.exe -Force
-        Remove-Item $CloudStore
+        Remove-Item $CloudStore -Recurse -Force
         Start-Process Explorer.exe -Wait
     }
 }
