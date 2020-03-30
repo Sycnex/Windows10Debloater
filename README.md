@@ -1,4 +1,5 @@
 # Windows10Debloater
+
 Script/Utility/Application to debloat Windows 10
 
 # How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
@@ -7,21 +8,21 @@ There are different methods of running the PowerShell script. The methods are as
 
 First Method:
 
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) Enable PowerShell execution
-<code>Set-ExecutionPolicy Unrestricted -Force</code>
-4) On the prompt, change to the directory where you extracted the files:
-  e.g. - cd c:\temp
-5) Next, to run either script, enter in the following:
-  e.g. - .\Windows10DebloaterGUI.ps1
-  
+1. Download the .zip file on the main page of the github and extract the .zip file to your desired location
+1. Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
+1. Enable PowerShell execution
+   <code>Set-ExecutionPolicy Unrestricted -Force</code>
+1. On the prompt, change to the directory where you extracted the files:
+   e.g. - cd c:\temp
+1. Next, to run either script, enter in the following:
+   e.g. - .\Windows10DebloaterGUI.ps1
+
 
 Second Method:
 
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
-3) This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
+1. Download the .zip file on the main page of the github and extract the .zip file to your desired location
+1. Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
+1. This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
 
 Remember this script NEEDS to be run as admin in order to function properly.
 
@@ -33,13 +34,13 @@ For the WindowsSysPrepDebloater.ps1 file, there are a couple of parameters that 
 
 To run this with parameters, do the following:
 
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) On the prompt, change to the directory where you extracted the files:
-  e.g. - cd c:\temp
-4) Next, to run either script, enter in the following:
-  e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy
-  
+1. Download the .zip file on the main page of the github and extract the .zip file to your desired location
+1. Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
+1. On the prompt, change to the directory where you extracted the files:
+   e.g. - cd c:\temp
+1. Next, to run either script, enter in the following:
+   e.g. - .\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy
+
 
 # Sysprep, Interactive, and GUI Application
 
@@ -67,104 +68,104 @@ Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry 
 
 These registry keys are:
 
-EclipseManager,
-ActiproSoftwareLLC,
-Microsoft.PPIProjection,
-Microsoft.XboxGameCallableUI
+* ActiproSoftwareLLC
+* EclipseManager
+* Microsoft.PPIProjection
+* Microsoft.XboxGameCallableUI
 
 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.
 
 The Debloat switch choice runs the following functions:
 
-Debloat,
-Remove-Keys,
-Protect-Privacy,
-Stop-EdgePDF (If chosen)
+1. Debloat,
+1. Remove-Keys,
+1. Protect-Privacy,
+1. Stop-EdgePDF (If chosen)
 
 The Revert switch choice runs the following functions:
 
-Revert-Changes,
-Enable-EdgePDF
+1. Revert-Changes,
+1. Enable-EdgePDF
 
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
 
 # The scheduled tasks that are disabled are:
 
-XblGameSaveTaskLogon,
-XblGameSaveTask,
-Consolidator,
-UsbCeip,
-DmClient
+* Consolidator
+* DmClient
+* UsbCeip
+* XblGameSaveTask
+* XblGameSaveTaskLogon
 
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
 
 # Bloatware that is removed:
 
-3DBuilder,
-Appconnector,
-Bing Finance,
-Bing News,
-Bing Sports,
-Bing Weather,
-Fresh Paint,
-Get started,
-Microsoft Office Hub,
-Microsoft Solitaire Collection,
-Microsoft Sticky Notes,
-OneNote,
-OneConnect,
-People,
-Skype for Desktop,
-Alarms,
-Camera,
-Maps,
-Phone,
-SoundRecorder,
-XboxApp,
-Zune Music,
-Zune Video,
-Windows communications apps,
-Minecraft,
-PowerBI,
-Network Speed Test,
-Phone,
-Messaging,
-Office Sway,
-Windows Feedback Hub,
-Bing Food And Drink,
-Bing Travel,
-Bing Health And Fitness,
-Windows Reading List,
-Twitter,
-Pandora,
-Flipboard,
-Shazam,
-CandyCrush,
-CandyCrushSoda,
-King apps,
-iHeartRadio,
-Netflix,
-DrawboardPDF,
-PicsArt-PhotoStudio,
-FarmVille 2 Country Escape,
-TuneInRadio,
-Asphalt8,
-NYT Crossword,
-CyberLink MediaSuite Essentials,
-Facebook,
-Royal Revolt 2,
-Caesars Slots Free Casino,
-March of Empires,
-Phototastic Collage,
-Autodesk SketchBook,
-Duolingo,
-EclipseManager,
-ActiproSoftware,
-BioEnrollment,
-Windows Feedback,
-Xbox Game CallableUI,
-Xbox Identity Provider, and
-ContactSupport.
+* 3DBuilder
+* ActiproSoftware
+* Alarms
+* Appconnector
+* Asphalt8
+* Autodesk SketchBook
+* Bing Finance
+* Bing Food And Drink
+* Bing Health And Fitness
+* Bing News
+* Bing Sports
+* Bing Travel
+* Bing Weather
+* BioEnrollment
+* Caesars Slots Free Casino
+* Camera
+* CandyCrush
+* CandyCrushSoda
+* ContactSupport.
+* CyberLink MediaSuite Essentials
+* DrawboardPDF
+* Duolingo
+* EclipseManager
+* Facebook
+* FarmVille 2 Country Escape
+* Flipboard
+* Fresh Paint
+* Get started
+* iHeartRadio
+* King apps
+* Maps
+* March of Empires
+* Messaging
+* Microsoft Office Hub
+* Microsoft Solitaire Collection
+* Microsoft Sticky Notes
+* Minecraft
+* NYT Crossword
+* Netflix
+* Network Speed Test
+* Office Sway
+* OneConnect
+* OneNote
+* Pandora
+* People
+* Phone
+* Phone
+* Phototastic Collage
+* PicsArt-PhotoStudio
+* PowerBI
+* Royal Revolt 2
+* Shazam
+* Skype for Desktop
+* SoundRecorder
+* TuneInRadio
+* Twitter
+* Windows Feedback Hub
+* Windows Feedback
+* Windows Reading List
+* Windows communications apps
+* Xbox Game CallableUI
+* Xbox Identity Provider
+* XboxApp
+* Zune Music
+* Zune Video
 
 # Quick download link
 
