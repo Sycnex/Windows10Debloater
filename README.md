@@ -28,7 +28,7 @@ Remember this script NEEDS to be run as admin in order to function properly.
 
 # How To Run the Windows10SysPrepDebloater.ps1 file
 
-For the WindowsSysPrepDebloater.ps1 file, there are a couple of paramters that you can run so that you can specify which functions are used. The parameters are:
+For the WindowsSysPrepDebloater.ps1 file, there are a couple of parameters that you can run so that you can specify which functions are used. The parameters are:
 -SysPrep, -Debloat. 
 
 To run this with parameters, do the following:
