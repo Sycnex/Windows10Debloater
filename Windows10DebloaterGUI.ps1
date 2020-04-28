@@ -37,6 +37,7 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
 
 #Unnecessary Windows 10 AppX apps that will be removed by the blacklist.
 $global:Bloatware = @(
+    "Microsoft.PPIProjection"
     "Microsoft.BingNews"
     "Microsoft.GetHelp"
     "Microsoft.Getstarted"
