@@ -1,175 +1,153 @@
+
 # Windows10Debloater
-
-Script/Utility/Application to debloat Windows 10
-
-# How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
-
-There are different methods of running the PowerShell script. The methods are as follows:
-
-First Method:
-
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) Enable PowerShell execution
-<code>Set-ExecutionPolicy Unrestricted -Force</code>
-4) On the prompt, change to the directory where you extracted the files:
-  e.g. - `cd c:\temp`
-5) Next, to run either script, enter in the following:
-  e.g. - `.\Windows10DebloaterGUI.ps1`
+Script/Utility/Application to debloat, optimize and tweak Windows 10
 
 
-Second Method:
+# Methods to Run Windows10Debloater
 
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
-3) This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
+There are different methods of running the Windows10Debloater:
+* with GUI (**recommended**)
+* Interactive (Commandline)
+* SysPrep (Silence)
 
-Remember this script NEEDS to be run as admin in order to function properly.
-
-
-# How To Run the Windows10SysPrepDebloater.ps1 file
-
-For the WindowsSysPrepDebloater.ps1 file, there are a couple of parameters that you can run so that you can specify which functions are used. The parameters are:
-`-SysPrep, -Debloat`. 
-
-To run this with parameters, do the following:
-
-1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
-2) Once extracted, open PowerShell (or PowerShell ISE) as an Administrator
-3) On the prompt, change to the directory where you extracted the files:
-  e.g. - `cd c:\temp`
-4) Next, to run either script, enter in the following:
-  e.g. - `.\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy`
+The GUI-Method offers you a simple GUI where you just select your tasks of choice.
+The Interactive-Method guides you thru all the options - in the console.
+The SysPrep-Method, is a complete silence way.
 
 
-# Sysprep, Interactive, and GUI Application
+# How to Run Windows10Debloater
 
-There are now 3 versions of my Windows10Debloater - There is an interactive version, a GUI app version, and a pure silent version.
+1. Download the .zip file from the main page and extract it to your desired location.
+2. Once extracted, start you favorite method by using one of the following batch-files:
 
-Windows10SysPrepDebloater.ps1 - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+* Start_GUI.bat (**recommended**)
+* Start_NOGUI.bat (Interactive-Method)
+* Start_SysPrep.bat (Silence)
 
-Windows10Debloater.ps1 - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
-
-Windows10DebloaterGUI.ps1 There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
 
 # Switch Parameters
 
-There are 3 switch parameters in the Windows10SysPrepDebloater.ps1 script.
+There are 3 switch parameters in the `Windows10SysPrepDebloater.ps1` script.
 
-The first one is -SysPrep, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
+The first one is `-SysPrep`, which runs the command within a function: `get-appxpackage | remove-appxpackage`. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
 
-The second switch parameter is -Debloat, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
+The second switch parameter is `-Debloat`, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
 
 Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
 
 Third, Protect-Privacy adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
 
-# This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.
+**This script will remove the bloatware from Windows 10 when using `Remove-AppXPackage`/`Remove-AppXProvisionedPackage`, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.**
 
-These registry keys are:
+## These registry keys are:
 
-EclipseManager,
-ActiproSoftwareLLC,
-Microsoft.PPIProjection,
-Microsoft.XboxGameCallableUI
+* ActiproSoftwareLLC,
+* EclipseManager,
+* Microsoft.PPIProjection,
+* Microsoft.XboxGameCallableUI
 
 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.
 
-The Debloat switch choice runs the following functions:
+**The Debloat switch choice runs the following functions:**
 
-Debloat,
-Remove-Keys,
-Protect-Privacy,
-Stop-EdgePDF (If chosen)
+* Debloat
+* Protect-Privacy
+* Remove-Keys
+* Stop-EdgePDF (If chosen)
 
-The Revert switch choice runs the following functions:
+**The Revert switch choice runs the following functions:**
 
-Revert-Changes,
-Enable-EdgePDF
+* Enable-EdgePDF
+* Revert-Changes
 
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
 
 # The scheduled tasks that are disabled are:
 
-XblGameSaveTaskLogon,
-XblGameSaveTask,
-Consolidator,
-UsbCeip,
-DmClient
+* Consolidator
+* DmClient
+* UsbCeip
+* XblGameSaveTask
+* XblGameSaveTaskLogon
 
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
 
 # Bloatware that is removed:
 
-3DBuilder,
-ActiproSoftware,
-Alarms,
-Appconnector,
-Asphalt8,
-Autodesk SketchBook,
-Bing Finance,
-Bing Food And Drink,
-Bing Health And Fitness,
-Bing News,
-Bing Sports,
-Bing Travel,
-Bing Weather,
-BioEnrollment,
-Camera,
-CandyCrush,
-CandyCrushSoda,
-Caesars Slots Free Casino,
-ContactSupport,
-CyberLink MediaSuite Essentials,
-DrawboardPDF,
-Duolingo,
-EclipseManager,
-Facebook,
-FarmVille 2 Country Escape,
-Flipboard,
-Fresh Paint,
-Get started,
-iHeartRadio,
-King apps,
-Maps,
-March of Empires,
-Messaging,
-Microsoft Office Hub,
-Microsoft Solitaire Collection,
-Microsoft Sticky Notes,
-Minecraft,
-Netflix,
-Network Speed Test,
-NYT Crossword,
-Office Sway,
-OneNote,
-OneConnect,
-Pandora,
-People,
-Phone,
-Phototastic Collage,
-PicsArt-PhotoStudio,
-PowerBI,
-Royal Revolt 2,
-Shazam,
-Skype for Desktop,
-SoundRecorder,
-TuneInRadio,
-Twitter,
-Windows communications apps,
-Windows Feedback,
-Windows Feedback Hub,
-Windows Reading List,
-XboxApp,
-Xbox Game CallableUI,
-Xbox Identity Provider,
-Zune Music,
-Zune Video.
+* 3DBuilder
+* ActiproSoftware
+* Alarms
+* Appconnector
+* Asphalt8
+* Autodesk SketchBook
+* Bing Finance
+* Bing Food And Drink
+* Bing Health And Fitness
+* Bing News
+* Bing Sports
+* Bing Travel
+* Bing Weather
+* BioEnrollment
+* Caesars Slots Free Casino
+* Camera
+* CandyCrush
+* CandyCrushSoda
+* ContactSupport
+* CyberLink MediaSuite Essentials
+* DrawboardPDF
+* Duolingo
+* EclipseManager
+* Facebook
+* FarmVille 2 Country Escape
+* Flipboard
+* Fresh Paint
+* Get started
+* iHeartRadio
+* King apps
+* Maps
+* March of Empires
+* Messaging
+* Microsoft Office Hub
+* Microsoft Solitaire Collection
+* Microsoft Sticky Notes
+* Minecraft
+* NYT Crossword
+* Netflix
+* Network Speed Test
+* Office Sway
+* OneConnect
+* OneNote
+* Pandora
+* People
+* Phone
+* Phototastic Collage
+* PicsArt-PhotoStudio
+* PowerBI
+* Royal Revolt 2
+* Shazam
+* Skype for Desktop
+* SoundRecorder
+* TuneInRadio
+* Twitter
+* Windows Feedback
+* Windows Feedback Hub
+* Windows Reading List
+* Windows communications apps
+* Xbox Game CallableUI
+* Xbox Identity Provider
+* XboxApp
+* Zune Music
+* Zune Video
 
-# Quick download link
+# Quick Download Link
 
 `iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/debloat'))`
 
+# Refactoring requiered
+The code needs a whole refactoring. Many functions are doubled thru all the different execude-methods. That makes it even harder to add new functionallity.
+There should also be only one start script, preffered in PowerShell instead of Batch. Start different modes by using different parameters.
+Additionally the individual scripts should end on `.ps1`.
+
 # Credits
 
-Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
+Thank you to a60wattfish, abulgatz, Damian, Norrodar, Vikingat-RAGE, xsisbest and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!

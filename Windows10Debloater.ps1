@@ -704,6 +704,11 @@ Function Restore3dObjects {
     }
 }
 
+#Function DisableLastUsedFilesAndFolders {
+#	Write-Host = "Disable Explorer to show last used files and folders."
+#	Invoke-Item (start powershell ((Split-Path $MyInvocation.InvocationName) + "\Individual Scripts\Disable Last Used Files and Folders View.ps1"))
+#}
+
 #Interactive prompt Debloat/Revert options
 $Button = [Windows.MessageBoxButton]::YesNoCancel
 $ErrorIco = [Windows.MessageBoxImage]::Error
@@ -723,6 +728,11 @@ $Reboot = "For some of the changes to properly take effect it is recommended to 
 $OneDriveDelete = "Do you want to uninstall One Drive?"
 $Unpin = "Do you want to unpin all items from the Start menu?"
 $InstallNET = "Do you want to install .NET 3.5?"
+$LastUsedFilesFolders = "Do you want to hide last used files and folders in Explorer?"
+$LastUsedFilesFolders2 = "Do you want to show last used files and folders in Explorer?"
+$ClearLastUsedFilesFolders = "Do you want to clear last used files and folders?"
+$AeroShake = "Do you want to disable AeroShake?"
+$AeroShake2 = "Do you want to re-enable AeroShake?"
 $Prompt1 = [Windows.MessageBox]::Show($Ask, "Debloat or Revert", $Button, $ErrorIco) 
 Switch ($Prompt1) {
     #This will debloat Windows 10
@@ -848,9 +858,21 @@ Switch ($Prompt1) {
                 Write-Host "Skipping .NET install."
             }
         }
+#		#Prompt asking if you want to deactivate Last Used Files and Folders
+#        $Prompt7 = [Windows.MessageBox]::Show($LastUsedFilesFolders, "Deactivate Last Used Files and Folders", $Button, $Warn)
+#        Switch ($Prompt7) {
+#            Yes {
+#                DisableLastUsedFilesAndFolders
+#                Write-Host "Last Used Files and Folders will no longer been shown!"
+#            }
+#            No {
+#                Write-Host "Skipping Hiding Last used Files and Folders."
+#            }
+#        }
+		
         #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-        Switch ($Prompt7) {
+        $Prompt0 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt0) {
             Yes {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
@@ -888,8 +910,8 @@ Switch ($Prompt1) {
             }
         }
         #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-        Switch ($Prompt7) {
+        $Prompt0 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt0) {
             Yes {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
