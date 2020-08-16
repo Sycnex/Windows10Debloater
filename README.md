@@ -1,3 +1,6 @@
+# Warning
+I do *not* take responsibility for what may happen to your system. This is at your own risk.
+
 # Windows10Debloater
 
 Script/Utility/Application to debloat Windows 10
