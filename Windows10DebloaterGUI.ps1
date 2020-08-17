@@ -336,7 +336,7 @@ $InstallNet35 = New-Object System.Windows.Forms.Button
 $InstallNet35.Text = "Install .NET v3.5"
 $InstallNet35.Width = 152
 $InstallNet35.Height = 39
-$InstallNet35.Location = New-Object System.Drawing.Point(169, 335)
+$InstallNet35.Location = New-Object System.Drawing.Point(329, 335)
 $InstallNet35.Font = 'Microsoft Sans Serif,10'
 
 $EnableDarkMode = New-Object System.Windows.Forms.Button
@@ -353,9 +353,23 @@ $DisableDarkMode.Height = 39
 $DisableDarkMode.Location = New-Object System.Drawing.Point(9, 385)
 $DisableDarkMode.Font = 'Microsoft Sans Serif,10'
 
+$DisableXboxGameDVR = New-Object System.Windows.Forms.Button
+$DisableXboxGameDVR.Text = "Disable Xbox GameDVR"
+$DisableXboxGameDVR.Width = 152
+$DisableXboxGameDVR.Height = 39
+$DisableXboxGameDVR.Location = New-Object System.Drawing.Point(169, 335)
+$DisableXboxGameDVR.Font = 'Microsoft Sans Serif,10'
+
+$EnableXboxGameDVR = New-Object System.Windows.Forms.Button
+$EnableXboxGameDVR.Text = "Enable Xbox GameDVR"
+$EnableXboxGameDVR.Width = 152
+$EnableXboxGameDVR.Height = 39
+$EnableXboxGameDVR.Location = New-Object System.Drawing.Point(169, 385)
+$EnableXboxGameDVR.Font = 'Microsoft Sans Serif,10'
 
 
-$Form.controls.AddRange(@($Debloat, $CustomizeBlacklists, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35, $EnableDarkMode, $DisableDarkMode))
+
+$Form.controls.AddRange(@($Debloat, $CustomizeBlacklists, $RemoveAllBloatware, $RemoveBlacklist, $Label1, $RevertChange, $Label2, $DisableCortana, $EnableCortana, $StopEdgePDFTakeover, $EnableEdgePDFTakeover, $DisableTelemetry, $RemoveRegkeys, $UnpinStartMenuTiles, $RemoveOnedrive, $FixWhitelist, $RemoveBloatNoBlacklist, $InstallNet35, $EnableDarkMode, $DisableDarkMode, $DisableXboxGameDVR, $EnableXboxGameDVR))
 
 $DebloatFolder = "C:\Temp\Windows10Debloater"
 If (Test-Path $DebloatFolder) {
@@ -1304,6 +1318,40 @@ $DisableDarkMode.Add_Click( {
         Set-ItemProperty $Theme AppsUseLightTheme -Value 1
         Start-Sleep 1
         Write-Host "Disabled"
+    }
+)
+
+$DisableXboxGameDVR.Add_Click( {
+        Write-Host "Disabling Xbox GameDVR"
+        $GameDVR1 = "HKCU:\System\GameConfigStore"
+        $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+        If (!(Test-Path $GameDVR1)) {
+            New-Item $GameDVR1
+        }
+        Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 0
+        If (!(Test-Path $GameDVR2)) {
+            New-Item $GameDVR2
+        }
+        Set-ItemProperty $GameDVR2 AllowGameDVR -Value 0
+        Start-Sleep 1
+        Write-Host "Disabled"
+    }
+)
+
+$EnableXboxGameDVR.Add_Click( {
+        Write-Host "Enabling Xbox GameDVR"
+        $GameDVR1 = "HKCU:\System\GameConfigStore"
+        $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+        If (!(Test-Path $GameDVR1)) {
+            New-Item $GameDVR1
+        }
+        Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 1
+        If (!(Test-Path $GameDVR2)) {
+            New-Item $GameDVR2
+        }
+        Set-ItemProperty $GameDVR2 AllowGameDVR -Value 1
+        Start-Sleep 1
+        Write-Host "Enabled"
     }
 )
 

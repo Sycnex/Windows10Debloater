@@ -351,7 +351,35 @@ Function EnableCortana {
     }
     Set-ItemProperty $Cortana3 HarvestContacts -Value 1 
 }
-        
+
+Function DisableXboxGameDVR {
+    Write-Host "Disabling Xbox GameDVR"
+    $GameDVR1 = "HKCU:\System\GameConfigStore"
+    $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+	If (!(Test-Path $GameDVR1)) {
+		New-Item $GameDVR1
+	}
+	Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 0
+	If (!(Test-Path $GameDVR2)) {
+		New-Item $GameDVR2
+	}
+	Set-ItemProperty $GameDVR2 AllowGameDVR -Value 0
+}
+
+Function EnableXboxGameDVR {
+    Write-Host "Disabling Xbox GameDVR"
+    $GameDVR1 = "HKCU:\System\GameConfigStore"
+    $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+	If (!(Test-Path $GameDVR1)) {
+		New-Item $GameDVR1
+	}
+	Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 1
+	If (!(Test-Path $GameDVR2)) {
+		New-Item $GameDVR2
+	}
+	Set-ItemProperty $GameDVR2 AllowGameDVR -Value 1
+}
+
 Function Stop-EdgePDF {
     
     #Stops edge from taking over as the default .PDF viewer    
@@ -719,6 +747,7 @@ $Ask = 'The following will allow you to either Debloat Windows 10 or to revert c
 $EverythingorSpecific = "Would you like to remove everything that was preinstalled on your Windows Machine? Select Yes to remove everything, or select No to remove apps via a blacklist."
 $EdgePdf = "Do you want to stop edge from taking over as the default PDF viewer?"
 $EdgePdf2 = "Do you want to revert changes that disabled Edge as the default PDF viewer?"
+$XboxGameDVR = "Do you want to disable Xbox GameDVR?"
 $Reboot = "For some of the changes to properly take effect it is recommended to reboot your machine. Would you like to restart?"
 $OneDriveDelete = "Do you want to uninstall One Drive?"
 $Unpin = "Do you want to unpin all items from the Start menu?"
@@ -794,6 +823,9 @@ Switch ($Prompt1) {
                 DisableDiagTrack
                 Write-Host "Diagnostics Tracking Service disabled"
                 Start-Sleep 1
+                DisableXboxGameDVR
+                Write-Host "Disabled Xbox GameDVR"
+                Start-Sleep 1
                 Write-Host "Disabling WAP push service"
                 Start-Sleep 1
                 DisableWAPPush
@@ -813,9 +845,20 @@ Switch ($Prompt1) {
                 Write-Host "You chose not to stop Edge from taking over as the default PDF viewer."
             }
         }
-        #Prompt asking to delete OneDrive
-        $Prompt4 = [Windows.MessageBox]::Show($OneDriveDelete, "Delete OneDrive", $Button, $ErrorIco) 
+        #Disabling EdgePDF prompt
+        $Prompt4 = [Windows.MessageBox]::Show($XboxGameDVR, "Xbox GameDVR", $Button, $Warn)
         Switch ($Prompt4) {
+            Yes {
+                DisableXboxGameDVR
+                Write-Host "Xbox GameDVR is no longer enabled"
+            }
+            No {
+                Write-Host "You chose not to disable Xbox GameDVR."
+            }
+        }
+        #Prompt asking to delete OneDrive
+        $Prompt5 = [Windows.MessageBox]::Show($OneDriveDelete, "Delete OneDrive", $Button, $ErrorIco)
+        Switch ($Prompt5) {
             Yes {
                 UninstallOneDrive
                 Write-Host "OneDrive is now removed from the computer."
@@ -825,8 +868,8 @@ Switch ($Prompt1) {
             }
         }
         #Prompt asking if you'd like to unpin all start items
-        $Prompt5 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco) 
-        Switch ($Prompt5) {
+        $Prompt6 = [Windows.MessageBox]::Show($Unpin, "Unpin", $Button, $ErrorIco)
+        Switch ($Prompt6) {
             Yes {
                 UnpinStart
                 Write-Host "Start Apps unpined."
@@ -837,8 +880,8 @@ Switch ($Prompt1) {
             }
         }
         #Prompt asking if you want to install .NET
-        $Prompt6 = [Windows.MessageBox]::Show($InstallNET, "Install .Net", $Button, $Warn)
-        Switch ($Prompt6) {
+        $Prompt7 = [Windows.MessageBox]::Show($InstallNET, "Install .Net", $Button, $Warn)
+        Switch ($Prompt7) {
             Yes {
                 Write-Host "Initializing the installation of .NET 3.5..."
                 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
@@ -849,8 +892,8 @@ Switch ($Prompt1) {
             }
         }
         #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-        Switch ($Prompt7) {
+        $Prompt8 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt8) {
             Yes {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 
@@ -877,8 +920,8 @@ Switch ($Prompt1) {
         New-PSDrive  HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
         Revert-Changes
         #Prompt asking to revert edge changes as well
-        $Prompt6 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
-        Switch ($Prompt6) {
+        $Prompt7 = [Windows.MessageBox]::Show($EdgePdf2, "Revert Edge", $Button, $ErrorIco)
+        Switch ($Prompt7) {
             Yes {
                 Enable-EdgePDF
                 Write-Host "Edge will no longer be disabled from being used as the default Edge PDF viewer."
@@ -888,8 +931,8 @@ Switch ($Prompt1) {
             }
         }
         #Prompt asking if you'd like to reboot your machine
-        $Prompt7 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
-        Switch ($Prompt7) {
+        $Prompt8 = [Windows.MessageBox]::Show($Reboot, "Reboot", $Button, $Warn)
+        Switch ($Prompt8) {
             Yes {
                 Write-Host "Unloading the HKCR drive..."
                 Remove-PSDrive HKCR 

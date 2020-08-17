@@ -9,7 +9,20 @@
     If (Test-Path $Advertising) {
         Set-ItemProperty $Advertising  Enabled -Value 1
     }
-            
+
+    #Enables Xbox GameDVR
+    Write-Output "Re-enabling Xbox GameDVR"
+    $GameDVR1 = "HKCU:\System\GameConfigStore"
+    $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+	If (!(Test-Path $GameDVR1)) {
+		New-Item $GameDVR1
+	}
+	Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 1
+	If (!(Test-Path $GameDVR2)) {
+		New-Item $GameDVR2
+	}
+	Set-ItemProperty $GameDVR2 AllowGameDVR -Value 1
+
     #Enables Cortana to be used as part of your Windows Search Function
     Write-Output "Re-enabling Cortana to be used in your Windows Search"
     $Search = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
@@ -90,3 +103,4 @@
     #Enabling the Diagnostics Tracking Service
 	Set-Service "DiagTrack" -StartupType Automatic
 	Start-Service "DiagTrack"
+
