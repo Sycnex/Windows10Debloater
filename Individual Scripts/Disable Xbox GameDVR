@@ -1,0 +1,11 @@
+Write-Host "Disabling Xbox GameDVR"
+    $GameDVR1 = "HKCU:\System\GameConfigStore"
+    $GameDVR2 = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\GameDVR"
+	If (!(Test-Path $GameDVR1)) {
+		New-Item $GameDVR1
+	}
+	Set-ItemProperty $GameDVR1 GameDVR_Enabled -Value 0
+	If (!(Test-Path $GameDVR2)) {
+		New-Item $GameDVR2
+	}
+	Set-ItemProperty $GameDVR2 AllowGameDVR -Value 0
