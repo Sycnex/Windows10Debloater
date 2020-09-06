@@ -46,6 +46,7 @@ Else {
 Start-Transcript -OutputDirectory "${DebloatFolder}"
 
 Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName PresentationCore, PresentationFramework
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $Form = New-Object system.Windows.Forms.Form
@@ -196,8 +197,28 @@ foreach ($Bloat in $Bloatware) {
     
 }
 
+$Button = [Windows.MessageBoxButton]::YesNoCancel
+$ErrorIco = [Windows.MessageBoxImage]::Error
+$Warn = [Windows.MessageBoxImage]::Warning
+
+$Ask = 'Do you want to create a System Restore Point?
+        Select "Yes" to create a System Restore Point
+        Select "No" to not create a System Restore Point
+        
+        Select "Cancel" to stop the script.'
+
+
 $SelectedBloatware = $ListBox1.SelectedItems
 $Button1.Add_Click( {
+
+$Prompt1 = [Windows.MessageBox]::Show($Ask, "Create a System Restore Point?", $Button, $ErrorIco) 
+Switch ($Prompt1) {
+    Yes {
+$TextBox1.AppendText("Creating System Restore point. Please wait...
+
+")
+Checkpoint-Computer -Description "Install MyApp" -Verbose
+
         
 
         ForEach ($Selected in $SelectedBloatware) {
@@ -232,6 +253,14 @@ $Button1.Add_Click( {
             }
         }
     
+    }
+
+    No {
+        
+        Break
+    
+    }
+    }
     } )
 
 
