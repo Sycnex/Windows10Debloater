@@ -217,7 +217,7 @@ Switch ($Prompt1) {
 $TextBox1.AppendText("Creating System Restore point. Please wait...
 
 ")
-Checkpoint-Computer -Description "Install MyApp" -Verbose
+Checkpoint-Computer -Description "Before using W10DebloaterGUI.ps1" -Verbose
 
         
 
@@ -260,8 +260,8 @@ Checkpoint-Computer -Description "Install MyApp" -Verbose
         Break
     
     }
-    }
-    } )
+  }
+} )
 
 
 $Button2.Add_Click( { 
