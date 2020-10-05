@@ -217,7 +217,7 @@ $Form.FormBorderStyle            = 'FixedSingle'
 $Form.MinimizeBox                = $false
 $Form.MaximizeBox                = $false
 $Form.ShowIcon                   = $false
-$Form.text                       = "Windows10Debloader"
+$Form.text                       = "Windows10Debloater"
 $Form.TopMost                    = $false
 $Form.BackColor                  = [System.Drawing.ColorTranslator]::FromHtml("#252525")
 
