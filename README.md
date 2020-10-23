@@ -4,7 +4,7 @@
 Script/Utility/Application to debloat Windows 10
 
 ##  Disclaimer
-I do ***not*** take responsibility for what may happen to your system. This is at your own risk.
+I do ***NOT*** take responsibility for what may happen to your system. This is at your own risk.
 
 
 ## How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
