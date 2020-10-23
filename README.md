@@ -17,7 +17,7 @@ Script/Utility/Application to debloat Windows 10, to remove Windows pre-installe
 There are different methods of running the PowerShell script. The methods are as follows:
 
 
-### First Method:
+### First Method
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Once extracted, open [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-5.1) (or [PowerShell ISE](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/ise/introducing-the-windows-powershell-ise?view=powershell-7)) as an Administrator
@@ -29,7 +29,7 @@ There are different methods of running the PowerShell script. The methods are as
   e.g. - `.\Windows10DebloaterGUI.ps1`
 
 
-### Second Method:
+### Second Method
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
 2) Right click the PowerShell file that you'd like to run and click on "Run With PowerShell"
@@ -79,7 +79,7 @@ Remove-Keys removes registry keys leftover that are associated with the bloatwar
 ***This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.***
 
 
-## These registry keys are:
+## These registry keys are
 
 EclipseManager,
 ActiproSoftwareLLC,
@@ -89,7 +89,7 @@ Microsoft.XboxGameCallableUI
 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.
 
 
-## The Debloat switch choice runs the following functions:
+## The Debloat switch choice runs the following functions
 
 Debloat,
 Remove-Keys,
@@ -97,7 +97,7 @@ Protect-Privacy,
 Stop-EdgePDF (If chosen)
 
 
-## The Revert switch choice runs the following functions:
+## The Revert switch choice runs the following functions
 
 Revert-Changes,
 Enable-EdgePDF
@@ -105,7 +105,7 @@ Enable-EdgePDF
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
 
 
-## The scheduled tasks that are disabled are:
+## The scheduled tasks that are disabled are
 
 XblGameSaveTaskLogon,
 XblGameSaveTask,
@@ -116,7 +116,7 @@ DmClient
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
 
 
-## Bloatware that is removed:
+## Bloatware that is removed
 
 [3DBuilder](https://www.microsoft.com/en-us/p/3d-builder/9wzdncrfj3t6),
 [ActiproSoftware](https://www.microsoft.com/en-us/p/actipro-universal-windows-controls/9wzdncrdlvzp),
