@@ -4,11 +4,12 @@
 [![made-with-powershell](https://img.shields.io/badge/PowerShell-1f425f?logo=Powershell)](https://microsoft.com/PowerShell)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Script/Utility/Application to debloat Windows 10
+Script/Utility/Application to debloat Windows 10, to remove Windows pre-installed unnecessary applications, stop some telemetry functions, stop Cortana from being used as your Search Index, to disable unnecessary scheduled tasks, and more...
+
 
 ##  Disclaimer
 
-**WARNING:** I do **NOT** take responsibility for what may happen to your system. This is at your own risk.
+**WARNING:** I do **NOT** take responsibility for what may happen to your system! Run scripts at your own risk!
 
 
 ## How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
@@ -40,7 +41,7 @@ Remember this script **NEEDS** to be run as admin in order to function properly.
 ## How To Run the Windows10SysPrepDebloater.ps1 file
 
 For the WindowsSysPrepDebloater.ps1 file, there are a couple of parameters that you can run so that you can specify which functions are used. The parameters are:
-`-SysPrep, -Debloat`.
+`-SysPrep`, `-Debloat` and `-Privacy`.
 
 To run this with parameters, do the following:
 
@@ -126,12 +127,12 @@ These scheduled tasks that are disabled have absolutely no impact on the functio
 [MSN Money](https://www.microsoft.com/en-us/p/msn-money/9wzdncrfhv4v?activetab=pivot:overviewtab),
 [Food And Drink](https://www.microsoft.com/en-us/p/food-and-drink/9nblggh0jhqg),
 [Health And Fitness](https://www.microsoft.com/en-us/p/health-fitness-free/9wzdncrcwcdp),
-Bing News,
-Bing Sports,
-Bing Travel,
-Bing Weather,
+[Microsoft News](https://www.microsoft.com/en-us/p/microsoft-news/9wzdncrfhvfw#activetab=pivot:overviewtab),
+[MSN Sports](https://www.microsoft.com/en-us/p/msn-sports/9wzdncrfhvh4?activetab=pivot:overviewtab),
+[MSN Travel](https://www.microsoft.com/en-us/p/msn-travel/9wzdncrfj3ft?activetab=pivot:overviewtab),
+[MSN Weather](https://www.microsoft.com/en-us/p/msn-weather/9wzdncrfj3q2?activetab=pivot:overviewtab),
 BioEnrollment,
-Camera,
+[Windows Camera](https://www.microsoft.com/en-us/p/windows-camera/9wzdncrfjbbg#activetab=pivot:overviewtab),
 CandyCrush,
 CandyCrushSoda,
 Caesars Slots Free Casino,
@@ -188,4 +189,4 @@ Zune Video.
 
 ## Credits
 
-Thank you to a60wattfish, abulgatz, xsisbest, Damian, Vikingat-RAGE, and Reddit user /u/GavinEke for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
+Thank you to [a60wattfish](https://github.com/a60wattfish), [abulgatz](abulgatz), [xsisbest](https://github.com/xsisbest), [Damian](https://github.com/Damian), [Vikingat-RAGE](https://github.com/Vikingat-RAGE), and Reddit user [/u/GavinEke](https://github.com/GavinEke) for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
