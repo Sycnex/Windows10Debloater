@@ -5,7 +5,7 @@
 
 Script/Utility/Application to debloat Windows 10, to remove Windows pre-installed unnecessary applications, stop some telemetry functions, stop Cortana from being used as your Search Index, to disable unnecessary scheduled tasks, and more...
 
-##  Disclaimer
+## Disclaimer
 
 **WARNING:** I do **NOT** take responsibility for what may happen to your system! Run scripts at your own risk!
 
