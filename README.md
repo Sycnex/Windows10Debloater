@@ -1,4 +1,3 @@
-
 # Windows10Debloater
 
 [![made-with-powershell](https://img.shields.io/badge/PowerShell-1f425f?logo=Powershell)](https://microsoft.com/PowerShell)
@@ -6,16 +5,13 @@
 
 Script/Utility/Application to debloat Windows 10, to remove Windows pre-installed unnecessary applications, stop some telemetry functions, stop Cortana from being used as your Search Index, to disable unnecessary scheduled tasks, and more...
 
-
 ##  Disclaimer
 
 **WARNING:** I do **NOT** take responsibility for what may happen to your system! Run scripts at your own risk!
 
-
 ## How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
 
 There are different methods of running the PowerShell script. The methods are as follows:
-
 
 ### First Method
 
@@ -28,7 +24,6 @@ There are different methods of running the PowerShell script. The methods are as
 5) Next, to run either script, enter in the following:
   e.g. - `.\Windows10DebloaterGUI.ps1`
 
-
 ### Second Method
 
 1) Download the .zip file on the main page of the github and extract the .zip file to your desired location
@@ -36,7 +31,6 @@ There are different methods of running the PowerShell script. The methods are as
 3) This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
 
 Remember this script **NEEDS** to be run as admin in order to function properly.
-
 
 ## How To Run the Windows10SysPrepDebloater.ps1 file
 
@@ -52,7 +46,6 @@ To run this with parameters, do the following:
 4) Next, to run either script, enter in the following:
   e.g. - `.\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy`
 
-
 ## Sysprep, Interactive, and GUI Application
 
 There are now 3 versions of **Windows10Debloater** - There is an interactive version, a GUI app version, and a pure silent version.
@@ -62,7 +55,6 @@ There are now 3 versions of **Windows10Debloater** - There is an interactive ver
 - **`Windows10Debloater.ps1`** - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
 
 - **`Windows10DebloaterGUI.ps1`** There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
-
 
 ## Switch Parameters
 
@@ -78,7 +70,6 @@ Remove-Keys removes registry keys leftover that are associated with the bloatwar
 
 ***This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.***
 
-
 ## These registry keys are
 
 EclipseManager,
@@ -88,7 +79,6 @@ Microsoft.XboxGameCallableUI
 
 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.
 
-
 ## The Debloat switch choice runs the following functions
 
 Debloat,
@@ -96,14 +86,12 @@ Remove-Keys,
 Protect-Privacy,
 Stop-EdgePDF (If chosen)
 
-
 ## The Revert switch choice runs the following functions
 
 Revert-Changes,
 Enable-EdgePDF
 
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
-
 
 ## The scheduled tasks that are disabled are
 
@@ -114,7 +102,6 @@ UsbCeip,
 DmClient
 
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
-
 
 ## Bloatware that is removed
 
