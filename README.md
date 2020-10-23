@@ -57,11 +57,11 @@ To run this with parameters, do the following:
 
 There are now 3 versions of **Windows10Debloater** - There is an interactive version, a GUI app version, and a pure silent version.
 
-**`Windows10SysPrepDebloater.ps1`** - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
+- **`Windows10SysPrepDebloater.ps1`** - The silent version now utilizes the switch parameters: -Sysprep, -Debloat -Privacy. The silent version can be useful for deploying MDT Images/sysprepping or any other way you deploy Windows 10. This will work to remove the bloatware during the deployment process.
 
-**`Windows10Debloater.ps1`** - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
+- **`Windows10Debloater.ps1`** - This interactive version is what it implies - a Windows10Debloater script with interactive prompts. This one should not be used for deployments that require a silent script with optional parameters. This script gives you choices with prompts as it runs so that you can make the choices of what the script does.
 
-**`Windows10DebloaterGUI.ps1`** There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
+- **`Windows10DebloaterGUI.ps1`** There is now a GUI Application named Windows10DebloaterGUI.ps1 with buttons to perform all of the functions that the scripts do. This is better for the average user who does not want to work with code, or if you'd prefer to just see an application screen. 
 
 
 ## Switch Parameters
