@@ -7,7 +7,8 @@
 Script/Utility/Application to debloat Windows 10
 
 ##  Disclaimer
-I do **NOT** take responsibility for what may happen to your system. This is at your own risk.
+
+**WARNING:** I do **NOT** take responsibility for what may happen to your system. This is at your own risk.
 
 
 ## How To Run the Windows10Debloater.ps1 and the Windows10DebloaterGUI.ps1 files
@@ -66,18 +67,18 @@ There are now 3 versions of **Windows10Debloater** - There is an interactive ver
 
 There are 3 switch parameters in the `Windows10SysPrepDebloater.ps1` script.
 
-The first one is **`-SysPrep`**, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
+- **`-SysPrep`**, which runs the command within a function: get-appxpackage | remove-appxpackage. This is useful since some administrators need that command to run first in order for machines to be able to properly provision the apps for removal.
 
-The second switch parameter is **`-Debloat`**, which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
+- **`-Debloat`**, switch parameter which does as it suggests. It runs the following functions: Start-Debloat, Remove-Keys, and Protect-Privacy.
 
 Remove-Keys removes registry keys leftover that are associated with the bloatware apps listed above, but not removed during the Start-Debloat function.
 
-Third, **`Protect-Privacy`** adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
+- **`Protect-Privacy`** adds and/or changes registry keys to stop some telemetry functions, stops Cortana from being used as your Search Index, disables "unneccessary" scheduled tasks, and more.
 
 ***This script will remove the bloatware from Windows 10 when using Remove-AppXPackage/Remove-AppXProvisionedPackage, and then delete specific registry keys that are were not removed beforehand. For best results, this script should be ran before a user profile is configured, otherwise you will likely see that apps that should have been removed will remain, and if they are removed you will find broken tiles on the start menu.***
 
 
-### These registry keys are:
+## These registry keys are:
 
 EclipseManager,
 ActiproSoftwareLLC,
@@ -87,19 +88,21 @@ Microsoft.XboxGameCallableUI
 You can choose to either 'Debloat' or 'Revert'. Depending on your choice, either one will run specific code to either debloat your Windows 10 machine.
 
 
-### The Debloat switch choice runs the following functions:
+## The Debloat switch choice runs the following functions:
 
 Debloat,
 Remove-Keys,
 Protect-Privacy,
 Stop-EdgePDF (If chosen)
 
-### The Revert switch choice runs the following functions:
+
+## The Revert switch choice runs the following functions:
 
 Revert-Changes,
 Enable-EdgePDF
 
 The Revert option reinstalls the bloatware and changes your registry keys back to default. 
+
 
 ## The scheduled tasks that are disabled are:
 
@@ -111,6 +114,7 @@ DmClient
 
 These scheduled tasks that are disabled have absolutely no impact on the function of the OS.
 
+
 ## Bloatware that is removed:
 
 [3DBuilder](https://www.microsoft.com/en-us/p/3d-builder/9wzdncrfj3t6),
@@ -118,10 +122,10 @@ These scheduled tasks that are disabled have absolutely no impact on the functio
 [Alarms](https://www.microsoft.com/en-us/p/windows-alarms-clock/9wzdncrfj3pr?activetab=pivot:overviewtab),
 [Appconnector](https://www.microsoft.com/en-us/p/connector/9wzdncrdjmlj?activetab=pivot:overviewtab),
 [Asphalt8](https://www.microsoft.com/en-us/p/asphalt-8-racing-game-drive-drift-at-real-speed/9wzdncrfj26j?activetab=pivot:overviewtab),
-Autodesk SketchBook,
-Bing Finance,
-Bing Food And Drink,
-Bing Health And Fitness,
+[Autodesk SketchBook](https://www.microsoft.com/en-us/p/autodesk-sketchbook/9nblggh4vzw5),
+[MSN Money](https://www.microsoft.com/en-us/p/msn-money/9wzdncrfhv4v?activetab=pivot:overviewtab),
+[Food And Drink](https://www.microsoft.com/en-us/p/food-and-drink/9nblggh0jhqg),
+[Health And Fitness](https://www.microsoft.com/en-us/p/health-fitness-free/9wzdncrcwcdp),
 Bing News,
 Bing Sports,
 Bing Travel,
