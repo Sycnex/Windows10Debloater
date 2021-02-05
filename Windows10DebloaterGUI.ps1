@@ -723,43 +723,64 @@ $RemoveAllBloatware.Add_Click( {
         }
 
         Function UnpinStart {
-            #Credit to Vikingat-Rage
-            #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
-            #Unpins all tiles from the Start Menu
-            Write-Host "Unpinning all tiles from the start menu"
-            (New-Object -Com Shell.Application).
-            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
-            Items() |
-            % { $_.Verbs() } |
-            ? { $_.Name -match 'Un.*pin from Start' } |
-            % { $_.DoIt() }
-        }
+            # https://superuser.com/a/1442733
+            # Requires -RunAsAdministrator
 
-        Function Remove3dObjects {
-            #Removes 3D Objects from the 'My Computer' submenu in explorer
-            Write-Output "Removing 3D Objects from explorer 'My Computer' submenu"
-            $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
-            $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
-            If (Test-Path $Objects32) {
-                Remove-Item $Objects32 -Recurse 
-            }
-            If (Test-Path $Objects64) {
-                Remove-Item $Objects64 -Recurse 
-            }
-        }
+$START_MENU_LAYOUT = @"
+<LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
+    <LayoutOptions StartTileGroupCellWidth="6" />
+    <DefaultLayoutOverride>
+        <StartLayoutCollection>
+            <defaultlayout:StartLayout GroupCellWidth="6" />
+        </StartLayoutCollection>
+    </DefaultLayoutOverride>
+</LayoutModificationTemplate>
+"@
 
-  
-        Function CheckDMWService {
+            $layoutFile="C:\Windows\StartMenuLayout.xml"
 
-            Param([switch]$Debloat)
-  
-            If (Get-Service dmwappushservice | Where-Object { $_.StartType -eq "Disabled" }) {
-                Set-Service dmwappushservice -StartupType Automatic
+            #Delete layout file if it already exists
+            If(Test-Path $layoutFile)
+            {
+                Remove-Item $layoutFile
             }
 
-            If (Get-Service dmwappushservice | Where-Object { $_.Status -eq "Stopped" }) {
-                Start-Service dmwappushservice
-            } 
+            #Creates the blank layout file
+            $START_MENU_LAYOUT | Out-File $layoutFile -Encoding ASCII
+
+            $regAliases = @("HKLM", "HKCU")
+
+            #Assign the start layout and force it to apply with "LockedStartLayout" at both the machine and user level
+            foreach ($regAlias in $regAliases){
+                $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+                $keyPath = $basePath + "\Explorer" 
+                IF(!(Test-Path -Path $keyPath)) { 
+                    New-Item -Path $basePath -Name "Explorer"
+                }
+                Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 1
+                Set-ItemProperty -Path $keyPath -Name "StartLayoutFile" -Value $layoutFile
+            }
+
+            #Restart Explorer, open the start menu (necessary to load the new layout), and give it a few seconds to process
+            Stop-Process -name explorer
+            Start-Sleep -s 5
+            $wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^{ESCAPE}')
+            Start-Sleep -s 5
+
+            #Enable the ability to pin items again by disabling "LockedStartLayout"
+            foreach ($regAlias in $regAliases){
+                $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+                $keyPath = $basePath + "\Explorer" 
+                Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 0
+            }
+
+            #Restart Explorer and delete the layout file
+            Stop-Process -name explorer
+
+            # Uncomment the next line to make clean start menu default for all new users
+            #Import-StartLayout -LayoutPath $layoutFile -MountPath $env:SystemDrive\
+
+            Remove-Item $layoutFile
         }
         
         Function CheckInstallService {
