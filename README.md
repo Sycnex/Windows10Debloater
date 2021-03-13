@@ -176,3 +176,7 @@ Zune Video.
 ## Credits
 
 Thank you to [a60wattfish](https://github.com/a60wattfish), [abulgatz](abulgatz), [xsisbest](https://github.com/xsisbest), [Damian](https://github.com/Damian), [Vikingat-RAGE](https://github.com/Vikingat-RAGE), and Reddit user [/u/GavinEke](https://github.com/GavinEke) for some of the suggestions and fixes that I have placed into my scripts. You all have done a fantastic job!
+
+
+## Donate a cup of coffee
+<a href="https://www.buymeacoffee.com/HZNh7w1Bm" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
