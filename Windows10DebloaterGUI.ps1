@@ -269,7 +269,7 @@ $Debloat.ForeColor               = [System.Drawing.ColorTranslator]::FromHtml("#
 
 $CustomizeBlacklist             = New-Object system.Windows.Forms.Button
 $CustomizeBlacklist.FlatStyle   = 'Flat'
-$CustomizeBlacklist.text        = "CUSTOMISE BLACKLIST"
+$CustomizeBlacklist.text        = "CUSTOMISE BLOCKLIST"
 $CustomizeBlacklist.width       = 460
 $CustomizeBlacklist.height      = 30
 $CustomizeBlacklist.Anchor      = 'top,right,left'
@@ -289,7 +289,7 @@ $RemoveAllBloatware.ForeColor    = [System.Drawing.ColorTranslator]::FromHtml("#
 
 $RemoveBlacklistedBloatware                 = New-Object system.Windows.Forms.Button
 $RemoveBlacklistedBloatware.FlatStyle       = 'Flat'
-$RemoveBlacklistedBloatware.text            = "REMOVE BLOATWARE WITH CUSTOM BLACKLIST"
+$RemoveBlacklistedBloatware.text            = "REMOVE BLOATWARE WITH CUSTOM BLOCKLIST"
 $RemoveBlacklistedBloatware.width           = 460
 $RemoveBlacklistedBloatware.height          = 30
 $RemoveBlacklistedBloatware.Anchor          = 'top,right,left'
@@ -497,7 +497,7 @@ $CustomizeBlacklist.Add_Click( {
         $CustomizeForm.MinimizeBox      = $false
         $CustomizeForm.MaximizeBox      = $false
         $CustomizeForm.ShowIcon         = $false
-        $CustomizeForm.Text             = "Customize Whitelist and Blacklist"
+        $CustomizeForm.Text             = "Customize Allowlist and Blocklist"
         $CustomizeForm.TopMost          = $false
         $CustomizeForm.AutoScroll       = $false
         $CustomizeForm.BackColor        = [System.Drawing.ColorTranslator]::FromHtml("#252525")
@@ -513,7 +513,7 @@ $CustomizeBlacklist.Add_Click( {
 
         $SaveList                       = New-Object System.Windows.Forms.Button
         $SaveList.FlatStyle             = 'Flat'
-        $SaveList.Text                  = "Save custom Whitelist and Blacklist to custom-lists.ps1"
+        $SaveList.Text                  = "Save custom Allowlist and Blocklist to custom-lists.ps1"
         $SaveList.width                 = 480
         $SaveList.height                = 30
         $SaveList.Location              = New-Object System.Drawing.Point(10, 530)
@@ -670,7 +670,7 @@ $RemoveBlacklistedBloatware.Add_Click( {
             Write-Host "...and the final cleanup..."
             Get-AppxPackage -AllUsers | Where-Object Name -cmatch $global:BloatwareRegex | Remove-AppxPackage
         }
-        Write-Host "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`nRemoving blacklisted Bloatware.`n"
+        Write-Host "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`nRemoving blocklisted Bloatware.`n"
         DebloatBlacklist
         Write-Host "Bloatware removed!"
     })
@@ -942,7 +942,7 @@ $START_MENU_LAYOUT = @"
         DebloatAll
         Write-Host "Removing leftover bloatware registry keys."
         Remove-Keys
-        Write-Host "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+        Write-Host "Checking to see if any Allowlisted Apps were removed, and if so re-adding them."
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
