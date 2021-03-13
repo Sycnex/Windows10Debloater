@@ -171,7 +171,7 @@ Zune Video.
 
 # Quick download link
 
-`iex ((New-Object System.Net.WebClient).DownloadString('https://git.io/debloat'))`
+`iwr -useb https://git.io/debloat|iex`
 
 # Credits
 
