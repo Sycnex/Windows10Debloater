@@ -35,6 +35,7 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     }
 }
 
+
 #Unnecessary Windows 10 AppX apps that will be removed by the blacklist.
 $global:Bloatware = @(
     "Microsoft.PPIProjection"
@@ -487,6 +488,10 @@ Else {
 }
 
 Start-Transcript -OutputDirectory "${DebloatFolder}"
+
+Write-Output "Creating System Restore Point if one does not already exist. If one does, then you will receive a warning. Please wait..."
+Checkpoint-Computer -Description "Before using W10DebloaterGUI.ps1" 
+
 
 #region gui events {
 $CustomizeBlacklist.Add_Click( {
