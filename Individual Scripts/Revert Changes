@@ -90,3 +90,29 @@
     #Enabling the Diagnostics Tracking Service
 	Set-Service "DiagTrack" -StartupType Automatic
 	Start-Service "DiagTrack"
+	
+#	# Re-Enable the showing of last used files and folders (luff)
+#    Write-Output "Re-enabling keys to show last used files and folders"
+#	$luffKeys = @(
+#		"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HomeFolderDesktop\NameSpace\DelegateFolders\{3134ef9c-6b18-4996-ad04-ed5912e00eb5}"
+#		"HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HomeFolderDesktop\NameSpace\DelegateFolders\{3936E9E4-D92C-4EEE-A85A-BC16D5EA0819}"
+#	)
+#	ForEach ($luffKey in $luffKeys) {
+#		If (! (Test-Path $lastUsedFiles)) {
+#			Write-Output "Adding $luffKey to registry"
+#			New-Item $luffKey
+#		}
+#    }
+#    Write-Output "Re-enabling explorer to show last used files and folders"
+#	$explorerLastUsed = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"
+#	Set-ItemProperty $explorerLastUsed HubMode -Value 0
+#	
+#	# Re-Enable AeroShake
+#	Write-Output "Re-enabling AeroShake"
+#	$aeroShake = "HKCU:\Software\Policies\Microsoft\Windows\Explorer"
+#	Set-ItemProperty $aeroShake NoWindowMinimizingShortcuts -Value 0
+#	
+#	# Re-Locate Explorer LaunchTo
+#	Write-Output "Re-Locate the Explorers Launch To (Entry Point)"
+#	$LaunchTo = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+#	Set-ItemProperty $LaunchTo LaunchTo -Value 2
