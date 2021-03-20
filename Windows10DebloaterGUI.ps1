@@ -496,7 +496,7 @@ Checkpoint-Computer -Description "Before using W10DebloaterGUI.ps1"
 #region gui events {
 $CustomizeBlacklist.Add_Click( {
         $CustomizeForm                  = New-Object System.Windows.Forms.Form
-        $CustomizeForm.ClientSize       = New-Object System.Drawing.Point(500,570)
+        $CustomizeForm.ClientSize       = New-Object System.Drawing.Point(580,570)
         $CustomizeForm.StartPosition    = 'CenterScreen'
         $CustomizeForm.FormBorderStyle  = 'FixedSingle'
         $CustomizeForm.MinimizeBox      = $false
@@ -509,7 +509,7 @@ $CustomizeBlacklist.Add_Click( {
 
         $ListPanel                     = New-Object system.Windows.Forms.Panel
         $ListPanel.height              = 510
-        $ListPanel.width               = 480
+        $ListPanel.width               = 572
         $ListPanel.Anchor              = 'top,right,left'
         $ListPanel.location            = New-Object System.Drawing.Point(10,10)
         $ListPanel.AutoScroll          = $true
@@ -519,7 +519,7 @@ $CustomizeBlacklist.Add_Click( {
         $SaveList                       = New-Object System.Windows.Forms.Button
         $SaveList.FlatStyle             = 'Flat'
         $SaveList.Text                  = "Save custom Allowlist and Blocklist to custom-lists.ps1"
-        $SaveList.width                 = 480
+        $SaveList.width                 = 560
         $SaveList.height                = 30
         $SaveList.Location              = New-Object System.Drawing.Point(10, 530)
         $SaveList.Font                  = New-Object System.Drawing.Font('Consolas',9)
@@ -571,11 +571,11 @@ $CustomizeBlacklist.Add_Click( {
             )
 
             $label = New-Object System.Windows.Forms.Label
-            $label.Location = New-Object System.Drawing.Point(0, (2 + $position * 25))
+            $label.Location = New-Object System.Drawing.Point(-10, (2 + $position * 25))
             $label.Text = $notes
             $label.Font = New-Object System.Drawing.Font('Consolas',8)
-            $label.Width = 150
-            $label.Height = 16
+            $label.Width = 260
+            $label.Height = 27
             $Label.TextAlign = [System.Drawing.ContentAlignment]::TopRight
             $label.ForeColor = [System.Drawing.ColorTranslator]::FromHtml("#888888")
             $ListPanel.controls.AddRange(@($label))
@@ -585,7 +585,7 @@ $CustomizeBlacklist.Add_Click( {
             $CheckBox.Font = New-Object System.Drawing.Font('Consolas',8)
             $CheckBox.FlatStyle = 'Flat'
             $CheckBox.ForeColor = [System.Drawing.ColorTranslator]::FromHtml("#eeeeee")
-            $Checkbox.Location = New-Object System.Drawing.Point(160, (0 + $position * 25))
+            $Checkbox.Location = New-Object System.Drawing.Point(268, (0 + $position * 25))
             $Checkbox.Autosize = 1;
             $Checkbox.Checked = $checked
             $Checkbox.Enabled = $enabled
@@ -606,7 +606,7 @@ $CustomizeBlacklist.Add_Click( {
             if ( $null -notmatch $Installed -and $Installed -cmatch $item) { $string += "Installed" }
             if ( $null -notmatch $AllUsers -and $AllUsers -cmatch $item) { $string += " AllUsers" }
             if ( $null -notmatch $Online -and $Online -cmatch $item) { $string += " Online" }
-            $string += "  NON-REMOVABLE"
+            $string += "  Non-Removable"
             AddAppToCustomizeForm $checkboxCounter $item $true $false $false $string
             ++$checkboxCounter
         }
