@@ -35,6 +35,7 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     }
 }
 
+
 #Unnecessary Windows 10 AppX apps that will be removed by the blacklist.
 $global:Bloatware = @(
     "Microsoft.PPIProjection"
@@ -194,7 +195,7 @@ Function dotInclude() {
     }
     if ( test-path $scriptPath\$includeFile ) {
         # import and immediately execute the requested file
-        . $scriptPath\$includeFile
+        .$scriptPath\$includeFile
     }
 }
 
@@ -217,7 +218,7 @@ $Form.FormBorderStyle            = 'FixedSingle'
 $Form.MinimizeBox                = $false
 $Form.MaximizeBox                = $false
 $Form.ShowIcon                   = $false
-$Form.text                       = "Windows10Debloader"
+$Form.text                       = "Windows10Debloater"
 $Form.TopMost                    = $false
 $Form.BackColor                  = [System.Drawing.ColorTranslator]::FromHtml("#252525")
 
@@ -269,7 +270,7 @@ $Debloat.ForeColor               = [System.Drawing.ColorTranslator]::FromHtml("#
 
 $CustomizeBlacklist             = New-Object system.Windows.Forms.Button
 $CustomizeBlacklist.FlatStyle   = 'Flat'
-$CustomizeBlacklist.text        = "CUSTOMISE BLACKLIST"
+$CustomizeBlacklist.text        = "CUSTOMISE BLOCKLIST"
 $CustomizeBlacklist.width       = 460
 $CustomizeBlacklist.height      = 30
 $CustomizeBlacklist.Anchor      = 'top,right,left'
@@ -289,7 +290,7 @@ $RemoveAllBloatware.ForeColor    = [System.Drawing.ColorTranslator]::FromHtml("#
 
 $RemoveBlacklistedBloatware                 = New-Object system.Windows.Forms.Button
 $RemoveBlacklistedBloatware.FlatStyle       = 'Flat'
-$RemoveBlacklistedBloatware.text            = "REMOVE BLOATWARE WITH CUSTOM BLACKLIST"
+$RemoveBlacklistedBloatware.text            = "REMOVE BLOATWARE WITH CUSTOM BLOCKLIST"
 $RemoveBlacklistedBloatware.width           = 460
 $RemoveBlacklistedBloatware.height          = 30
 $RemoveBlacklistedBloatware.Anchor          = 'top,right,left'
@@ -488,6 +489,10 @@ Else {
 
 Start-Transcript -OutputDirectory "${DebloatFolder}"
 
+Write-Output "Creating System Restore Point if one does not already exist. If one does, then you will receive a warning. Please wait..."
+Checkpoint-Computer -Description "Before using W10DebloaterGUI.ps1" 
+
+
 #region gui events {
 $CustomizeBlacklist.Add_Click( {
         $CustomizeForm                  = New-Object System.Windows.Forms.Form
@@ -497,7 +502,7 @@ $CustomizeBlacklist.Add_Click( {
         $CustomizeForm.MinimizeBox      = $false
         $CustomizeForm.MaximizeBox      = $false
         $CustomizeForm.ShowIcon         = $false
-        $CustomizeForm.Text             = "Customize Whitelist and Blacklist"
+        $CustomizeForm.Text             = "Customize Allowlist and Blocklist"
         $CustomizeForm.TopMost          = $false
         $CustomizeForm.AutoScroll       = $false
         $CustomizeForm.BackColor        = [System.Drawing.ColorTranslator]::FromHtml("#252525")
@@ -513,7 +518,7 @@ $CustomizeBlacklist.Add_Click( {
 
         $SaveList                       = New-Object System.Windows.Forms.Button
         $SaveList.FlatStyle             = 'Flat'
-        $SaveList.Text                  = "Save custom Whitelist and Blacklist to custom-lists.ps1"
+        $SaveList.Text                  = "Save custom Allowlist and Blocklist to custom-lists.ps1"
         $SaveList.width                 = 480
         $SaveList.height                = 30
         $SaveList.Location              = New-Object System.Drawing.Point(10, 530)
@@ -523,10 +528,10 @@ $CustomizeBlacklist.Add_Click( {
         $CustomizeForm.controls.AddRange(@($SaveList,$ListPanel))
 
         $SaveList.Add_Click( {
-                $ErrorActionPreference = 'SilentlyContinue'
+               # $ErrorActionPreference = 'SilentlyContinue'
 
                 '$global:WhiteListedApps = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Encoding utf8
-                @($ListPanel.controls) | ForEach {
+                @($CustomizeForm.controls) | ForEach {
                     if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and !$_.Checked) {
                         "    ""$( $_.Text )""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
                     }
@@ -534,7 +539,7 @@ $CustomizeBlacklist.Add_Click( {
                 ')' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
 
                 '$global:Bloatware = @(' | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
-                @($ListPanel.controls) | ForEach {
+                @($CustomizeForm.controls) | ForEach {
                     if ($_ -is [System.Windows.Forms.CheckBox] -and $_.Enabled -and $_.Checked) {
                         "    ""$($_.Text)""" | Out-File -FilePath $PSScriptRoot\custom-lists.ps1 -Append -Encoding utf8
                     }
@@ -670,7 +675,7 @@ $RemoveBlacklistedBloatware.Add_Click( {
             Write-Host "...and the final cleanup..."
             Get-AppxPackage -AllUsers | Where-Object Name -cmatch $global:BloatwareRegex | Remove-AppxPackage
         }
-        Write-Host "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`nRemoving blacklisted Bloatware.`n"
+        Write-Host "`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`nRemoving blocklisted Bloatware.`n"
         DebloatBlacklist
         Write-Host "Bloatware removed!"
     })
@@ -841,6 +846,11 @@ $RemoveAllBloatware.Add_Click( {
                 Set-ItemProperty $Suggestions SystemPaneSuggestionsEnabled -Value 0
             }
             
+            Write-Host "Disabling Bing Search when using Search via the Start Menu"
+            $BingSearch = 'HKCU:\SOFTWARE\Policies\Microsoft\Windows\Explorer'
+            If (Test-Path $BingSearch) {
+                Set-ItemProperty $BingSearch DisableSearchBoxSuggestions -Value 1
+            }
             
             Write-Host "Removing CloudStore from registry if it exists"
             $CloudStore = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\CloudStore'
@@ -849,6 +859,7 @@ $RemoveAllBloatware.Add_Click( {
                 Remove-Item $CloudStore -Recurse -Force
                 Start-Process Explorer.exe -Wait
             }
+
   
             #Loads the registry keys/values below into the NTUSER.DAT file which prevents the apps from redownloading. Credit to a60wattfish
             reg load HKU\Default_User C:\Users\Default\NTUSER.DAT
@@ -868,43 +879,64 @@ $RemoveAllBloatware.Add_Click( {
         }
 
         Function UnpinStart {
-            #Credit to Vikingat-Rage
-            #https://superuser.com/questions/1068382/how-to-remove-all-the-tiles-in-the-windows-10-start-menu
-            #Unpins all tiles from the Start Menu
-            Write-Host "Unpinning all tiles from the start menu"
-            (New-Object -Com Shell.Application).
-            NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').
-            Items() |
-            % { $_.Verbs() } |
-            ? { $_.Name -match 'Un.*pin from Start' } |
-            % { $_.DoIt() }
-        }
+            # https://superuser.com/a/1442733
+            # Requires -RunAsAdministrator
 
-        Function Remove3dObjects {
-            #Removes 3D Objects from the 'My Computer' submenu in explorer
-            Write-Output "Removing 3D Objects from explorer 'My Computer' submenu"
-            $Objects32 = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
-            $Objects64 = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
-            If (Test-Path $Objects32) {
-                Remove-Item $Objects32 -Recurse 
-            }
-            If (Test-Path $Objects64) {
-                Remove-Item $Objects64 -Recurse 
-            }
-        }
+$START_MENU_LAYOUT = @"
+<LayoutModificationTemplate xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" Version="1" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification">
+    <LayoutOptions StartTileGroupCellWidth="6" />
+    <DefaultLayoutOverride>
+        <StartLayoutCollection>
+            <defaultlayout:StartLayout GroupCellWidth="6" />
+        </StartLayoutCollection>
+    </DefaultLayoutOverride>
+</LayoutModificationTemplate>
+"@
 
-  
-        Function CheckDMWService {
+            $layoutFile="C:\Windows\StartMenuLayout.xml"
 
-            Param([switch]$Debloat)
-  
-            If (Get-Service dmwappushservice | Where-Object { $_.StartType -eq "Disabled" }) {
-                Set-Service dmwappushservice -StartupType Automatic
+            #Delete layout file if it already exists
+            If(Test-Path $layoutFile)
+            {
+                Remove-Item $layoutFile
             }
 
-            If (Get-Service dmwappushservice | Where-Object { $_.Status -eq "Stopped" }) {
-                Start-Service dmwappushservice
-            } 
+            #Creates the blank layout file
+            $START_MENU_LAYOUT | Out-File $layoutFile -Encoding ASCII
+
+            $regAliases = @("HKLM", "HKCU")
+
+            #Assign the start layout and force it to apply with "LockedStartLayout" at both the machine and user level
+            foreach ($regAlias in $regAliases){
+                $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+                $keyPath = $basePath + "\Explorer" 
+                IF(!(Test-Path -Path $keyPath)) { 
+                    New-Item -Path $basePath -Name "Explorer"
+                }
+                Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 1
+                Set-ItemProperty -Path $keyPath -Name "StartLayoutFile" -Value $layoutFile
+            }
+
+            #Restart Explorer, open the start menu (necessary to load the new layout), and give it a few seconds to process
+            Stop-Process -name explorer
+            Start-Sleep -s 5
+            $wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^{ESCAPE}')
+            Start-Sleep -s 5
+
+            #Enable the ability to pin items again by disabling "LockedStartLayout"
+            foreach ($regAlias in $regAliases){
+                $basePath = $regAlias + ":\SOFTWARE\Policies\Microsoft\Windows"
+                $keyPath = $basePath + "\Explorer" 
+                Set-ItemProperty -Path $keyPath -Name "LockedStartLayout" -Value 0
+            }
+
+            #Restart Explorer and delete the layout file
+            Stop-Process -name explorer
+
+            # Uncomment the next line to make clean start menu default for all new users
+            #Import-StartLayout -LayoutPath $layoutFile -MountPath $env:SystemDrive\
+
+            Remove-Item $layoutFile
         }
         
         Function CheckInstallService {
@@ -921,7 +953,7 @@ $RemoveAllBloatware.Add_Click( {
         DebloatAll
         Write-Host "Removing leftover bloatware registry keys."
         Remove-Keys
-        Write-Host "Checking to see if any Whitelisted Apps were removed, and if so re-adding them."
+        Write-Host "Checking to see if any Allowlisted Apps were removed, and if so re-adding them."
         FixWhitelistedApps
         Write-Host "Stopping telemetry, disabling unneccessary scheduled tasks, and preventing bloatware from returning."
         Protect-Privacy
