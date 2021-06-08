@@ -51,7 +51,7 @@ $services = @(
     "SCardSvr"                                      #Disables Windows smart card
     "lfsvc"                                         #Disable Windows geolocation service  it can be use to track you
     "EntAppSvc"                                     #Disables enterprise application management.
-    "BthAvctpSvc"                                   #Disables AVCTP service (if you use  Bluetooth Audio Device or Wireless Headphones. then don't disable this)
+    #"BthAvctpSvc"                                   #Disables AVCTP service (if you use  Bluetooth Audio Device or Wireless Headphones. then don't disable this)
     #"FrameServer"                                   #Disables Windows Camera Frame Server(this allows multiple clients to access video frames from camera devices.)
     "Browser"                                       #Disables computer browser
     "BthAvctpSvc"                                   #AVCTP service (This is Audio Video Control Transport Protocol service.)
