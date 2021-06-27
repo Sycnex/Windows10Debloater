@@ -50,7 +50,7 @@ To run this with parameters, do the following:
 3) On the prompt, change to the directory where you extracted the files:
   e.g. - `cd c:\temp`
 4) Next, to run either script, enter in the following:
-  e.g. - `.\Windows10SysPrepDebloater.ps1 -Sysprep, -Debloat -Privacy`
+  e.g. - `.\Windows10SysPrepDebloater.ps1 -Sysprep -Debloat -Privacy`
 
 ## Sysprep, Interactive, and GUI Application
 
