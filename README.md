@@ -36,7 +36,13 @@ There are different methods of running the PowerShell script. The methods are as
 2) Right-click the PowerShell file that you'd like to run and click on "Run With PowerShell"
 3) This will allow the script to run without having to do the above steps but Powershell will ask if you're sure you want to run this script.
 
+
+
 Remember this script **NEEDS** to be run as admin in order to function properly.
+
+### Third Method  
+`iwr -useb https://git.io/debloat|iex` 
+
 
 ## How To Run the Windows10SysPrepDebloater.ps1 file
 
