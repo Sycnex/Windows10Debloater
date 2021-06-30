@@ -99,21 +99,21 @@ foreach ($service in $services) {
 }
 
 #stop service this stop the services
-Get-Service diagnosticshub.standardcollector.service | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service DiagTrack | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service dmwappushservice | Where {$_.status –eq 'Stopped'} |  Stop-Service
+Get-Service diagnosticshub.standardcollector.service | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service DiagTrack | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service dmwappushservice | Where {$_.status –eq 'running'} |  Stop-Service
 Get-Service lfsvc | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service MapsBroker | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service NetTcpPortSharing | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service RemoteAccess | Where {$_.status –eq 'Stopped'} |  Stop-Service  
-Get-Service RemoteRegistry | Where {$_.status –eq 'Stopped'} |  Stop-Service 
-Get-Service TrkWk | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service WbioSrvc | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service WlanSvc | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service WMPNetworkSvc | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service wscsvc | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service WSearch | Where {$_.status –eq 'Stopped'} |  Stop-Service
-Get-Service XblAuthManager | Where {$_.status –eq 'Stopped'} |  Stop-Service
+Get-Service MapsBroker | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service NetTcpPortSharing | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service RemoteAccess | Where {$_.status –eq 'running'} |  Stop-Service  
+Get-Service RemoteRegistry | Where {$_.status –eq 'running'} |  Stop-Service 
+Get-Service TrkWk | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service WbioSrvc | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service WlanSvc | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service WMPNetworkSvc | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service wscsvc | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service WSearch | Where {$_.status –eq 'running'} |  Stop-Service
+Get-Service XblAuthManager | Where {$_.status –eq 'running'} |  Stop-Service
 Get-Service XblGameSave | Where {$_.status –eq 'running'} |  Stop-Service 
 Get-Service XboxNetApiSvc | Where {$_.status –eq 'running'} |  Stop-Service 
 Get-Service XboxGipSvc | Where {$_.status –eq 'running'} |  Stop-Service 
