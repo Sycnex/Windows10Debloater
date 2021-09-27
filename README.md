@@ -23,6 +23,7 @@ There are different methods of running the PowerShell script. The methods are as
 
 1) Download the .zip file on the main page of the GitHub and extract the .zip file to your desired location
 2) Once extracted, open [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/overview?view=powershell-5.1) (or [PowerShell ISE](https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/ise/introducing-the-windows-powershell-ise?view=powershell-7)) as an Administrator
+   > :information_source: _If you are experiencing issues in PowerShell ISE, try regular PowerShell_
 3) Enable PowerShell execution
 <code>Set-ExecutionPolicy Unrestricted -Force</code>
 4) On the prompt, change to the directory where you extracted the files:
