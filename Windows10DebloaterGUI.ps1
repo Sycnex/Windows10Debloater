@@ -195,7 +195,7 @@ Function dotInclude() {
     }
     if ( test-path $scriptPath\$includeFile ) {
         # import and immediately execute the requested file
-        .$scriptPath\$includeFile
+        . $scriptPath\$includeFile
     }
 }
 
