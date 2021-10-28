@@ -127,6 +127,10 @@ $global:WhiteListedApps = @(
     "Slack"                                     # Issue 83
     "*Nvidia*"                                  # Issue 198
     "Microsoft.MixedReality.Portal"             # Issue 195
+    "Microsoft.Paint"                           # new in Windows 11
+    "Microsoft.WindowsNotepad"                  # new in Windows 11
+    "Microsoft.WindowsTerminal"                 # new in Windows 11
+    "Microsoft.UI.Xaml.2.4"                     # new in Windows 11 - an earlier version was non-removable and this probably should be too
 )
 
 #NonRemovable Apps that where getting attempted and the system would reject the uninstall, speeds up debloat and prevents 'initalizing' overlay when removing apps
