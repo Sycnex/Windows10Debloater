@@ -10,8 +10,12 @@ $EnableEdgePDFTakeover.Location = New-Object System.Drawing.Point(155, 260)
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-$Button = [System.Windows.MessageBoxButton]::YesNoCancel
-$ErrorIco = [System.Windows.MessageBoxImage]::Error
+## The following four lines only need to be declared once in your script.
+$yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes","Description."
+$no = New-Object System.Management.Automation.Host.ChoiceDescription "&No","Description."
+$cancel = New-Object System.Management.Automation.Host.ChoiceDescription "&Cancel","Description."
+$options = [System.Management.Automation.Host.ChoiceDescription[]]($no, $yes, $cancel)
+
 $Ask = 'Do you want to run this as an Administrator?
 
         Select "Yes" to Run as an Administrator
@@ -20,16 +24,17 @@ $Ask = 'Do you want to run this as an Administrator?
         
         Select "Cancel" to stop the script.'
 
+
 If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
-    $Prompt = [System.Windows.MessageBox]::Show($Ask, "Run as an Administrator or not?", $Button, $ErrorIco) 
+    $Prompt = $host.ui.PromptForChoice($Ask, "Run as an Administrator or not?", $options, 1)
     Switch ($Prompt) {
         #This will debloat Windows 10
-        Yes {
+        1 { #Yes
             Write-Host "You didn't run this script as an Administrator. This script will self elevate to run as an Administrator and continue."
             Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
             Exit
         }
-        No {
+        default {
             Break
         }
     }
