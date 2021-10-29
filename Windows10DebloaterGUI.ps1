@@ -125,7 +125,6 @@ $global:WhiteListedApps = @(
     "WindSynthBerry"                            # Issue 68
     "MIDIBerry"                                 # Issue 68
     "Slack"                                     # Issue 83
-    "*Nvidia*"                                  # Issue 198
     "Microsoft.MixedReality.Portal"             # Issue 195
 )
 
