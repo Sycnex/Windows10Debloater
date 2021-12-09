@@ -888,7 +888,7 @@ Switch ($Prompt1) {
         Switch ($Prompt5) {
             Yes {
                 UnpinStart
-                Write-Host "Start Apps unpined."
+                Write-Host "Start Apps unpinned."
             }
             No {
                 Write-Host "Apps will remain pinned to the start menu."
