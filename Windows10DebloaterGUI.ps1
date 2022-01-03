@@ -270,7 +270,7 @@ $Debloat.ForeColor               = [System.Drawing.ColorTranslator]::FromHtml("#
 
 $CustomizeBlacklist             = New-Object system.Windows.Forms.Button
 $CustomizeBlacklist.FlatStyle   = 'Flat'
-$CustomizeBlacklist.text        = "CUSTOMISE BLOCKLIST"
+$CustomizeBlacklist.text        = "CUSTOMIZE BLOCKLIST"
 $CustomizeBlacklist.width       = 460
 $CustomizeBlacklist.height      = 30
 $CustomizeBlacklist.Anchor      = 'top,right,left'
@@ -496,7 +496,7 @@ Checkpoint-Computer -Description "Before using W10DebloaterGUI.ps1"
 #region gui events {
 $CustomizeBlacklist.Add_Click( {
         $CustomizeForm                  = New-Object System.Windows.Forms.Form
-        $CustomizeForm.ClientSize       = New-Object System.Drawing.Point(580,570)
+        $CustomizeForm.ClientSize       = New-Object System.Drawing.Point(594,570)
         $CustomizeForm.StartPosition    = 'CenterScreen'
         $CustomizeForm.FormBorderStyle  = 'FixedSingle'
         $CustomizeForm.MinimizeBox      = $false
@@ -507,14 +507,24 @@ $CustomizeBlacklist.Add_Click( {
         $CustomizeForm.AutoScroll       = $false
         $CustomizeForm.BackColor        = [System.Drawing.ColorTranslator]::FromHtml("#252525")
 
-        $ListPanel                     = New-Object system.Windows.Forms.Panel
-        $ListPanel.height              = 510
-        $ListPanel.width               = 572
-        $ListPanel.Anchor              = 'top,right,left'
-        $ListPanel.location            = New-Object System.Drawing.Point(10,10)
-        $ListPanel.AutoScroll          = $true
-        $ListPanel.BackColor           = [System.Drawing.ColorTranslator]::FromHtml("#252525")
+        $InfoLabel                      = New-Object System.Windows.Forms.Label
+        $InfoLabel.text                 = "Checking an item will add it to the Blocklist."
+        $InfoLabel.BackColor            = [System.Drawing.ColorTranslator]::FromHtml("#333333")
+        $InfoLabel.TextAlign            = 'MiddleCenter'
+        $InfoLabel.width                = 594
+        $InfoLabel.height               = 26
+        $InfoLabel.Anchor               = 'top,right,left'
+        $InfoLabel.location             = New-Object System.Drawing.Point(0,0)
+        $InfoLabel.Font                 = New-Object System.Drawing.Font('Consolas',9,[System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold))
+        $InfoLabel.ForeColor            = [System.Drawing.ColorTranslator]::FromHtml("#eeeeee")
 
+        $ListPanel                      = New-Object System.Windows.Forms.Panel
+        $ListPanel.height               = 494
+        $ListPanel.width                = 586
+        $ListPanel.Anchor               = 'top,right,left'
+        $ListPanel.location             = New-Object System.Drawing.Point(10,26)
+        $ListPanel.AutoScroll           = $true
+        $ListPanel.BackColor            = [System.Drawing.ColorTranslator]::FromHtml("#252525")
 
         $SaveList                       = New-Object System.Windows.Forms.Button
         $SaveList.FlatStyle             = 'Flat'
@@ -525,7 +535,7 @@ $CustomizeBlacklist.Add_Click( {
         $SaveList.Font                  = New-Object System.Drawing.Font('Consolas',9)
         $SaveList.ForeColor             = [System.Drawing.ColorTranslator]::FromHtml("#eeeeee")
 
-        $CustomizeForm.controls.AddRange(@($SaveList,$ListPanel))
+        $CustomizeForm.controls.AddRange(@($SaveList,$InfoLabel,$ListPanel))
 
         $SaveList.Add_Click( {
                # $ErrorActionPreference = 'SilentlyContinue'
