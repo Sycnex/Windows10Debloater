@@ -574,9 +574,8 @@ Function UninstallOneDrive {
         $OneDriveKey = 'HKLM:Software\Policies\Microsoft\Windows\OneDrive'
         If (!(Test-Path $OneDriveKey)) {
             Mkdir $OneDriveKey
-            Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
         }
-        Set-ItemProperty $OneDriveKey -Name OneDrive -Value DisableFileSyncNGSC
+        Set-ItemProperty $OneDriveKey -Name DisableFileSyncNGSC -Value 1
     }
 
     Write-Host "Uninstalling OneDrive. Please wait..."
